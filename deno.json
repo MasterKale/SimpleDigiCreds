@@ -1,0 +1,11 @@
+{
+  "tasks": {
+    "dev": "deno run --watch main.ts"
+  },
+  "fmt": {
+    "lineWidth": 100
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1"
+  }
+}
