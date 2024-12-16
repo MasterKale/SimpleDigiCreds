@@ -25,7 +25,8 @@ await build({
   package: {
     name: denoJSON.name,
     version: denoJSON.version,
-    description: "Coming Soon",
+    description:
+      "Part of a collection of TypeScript-first libraries for simpler Digital Credential presentation and verification. Pairs with @simpledigicreds/browser",
     license: "MIT",
     author: "Matthew Miller <matthew@millerti.me>",
     repository: {
