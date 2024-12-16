@@ -4,5 +4,5 @@
 
 ## Overview
 
-This project makes it easier to leverage verifiable digital credentials for meaningful identity
-proofing via the Digital Credentials API.
+This project makes it easier to leverage Digital Credentials for meaningful identity proofing via
+the [Digital Credentials API](https://wicg.github.io/digital-credentials/).
