@@ -1,0 +1,11 @@
+node_modules/
+dist/
+npm/
+.DS_Store
+docs/
+.env
+scratchenv*
+# Test coverage
+cov_profile/
+html_cov/
+cov.lcov
