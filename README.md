@@ -26,11 +26,11 @@ See the packages' READMEs for more specific installation information.
 
 The SimpleDigiCreds project is not currently open to external contributions.
 
-Please [submit an Issue](https://github.com/MasterKale/SimpleWebAuthn/issues/new/choose) and fill
+Please [submit an Issue](https://github.com/MasterKale/SimpleDigiCreds/issues/new/choose) and fill
 out the provided template with as much information as possible if you have found a bug in need of
 fixing.
 
-You can also [submit an Issue](https://github.com/MasterKale/SimpleWebAuthn/issues/new/choose) to
+You can also [submit an Issue](https://github.com/MasterKale/SimpleDigiCreds/issues/new/choose) to
 request new features, or to suggest changes to existing features.
 
 ## Development
