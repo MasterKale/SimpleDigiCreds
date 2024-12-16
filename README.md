@@ -11,8 +11,8 @@ This project makes it easier to leverage Digital Credentials for meaningful iden
 the [Digital Credentials API](https://wicg.github.io/digital-credentials/). The following packages
 are maintained here to achieve this:
 
-- [@simpledigicreds/server](https://github.com/MasterKale/SimpleDigiCreds/tree/master/packages/server)
 - [@simpledigicreds/browser](https://github.com/MasterKale/SimpleDigiCreds/tree/master/packages/browser)
+- [@simpledigicreds/server](https://github.com/MasterKale/SimpleDigiCreds/tree/master/packages/server)
 
 ## Installation
 
