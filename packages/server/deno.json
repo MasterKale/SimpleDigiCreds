@@ -4,7 +4,14 @@
   "exports": "./src/index.ts",
   "imports": {},
   "tasks": {
-    "build": "deno run -A build_npm.ts",
+    "test": "deno test -A src/",
+    "test:watch": "deno test -A --watch src/",
+    "build": {
+      "command": "deno run -A build_npm.ts",
+      "dependencies": [
+        "test"
+      ]
+    },
     "publish": {
       "command": "deno task publish:jsr && deno task publish:npm",
       "dependencies": [
