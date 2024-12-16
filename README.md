@@ -16,7 +16,7 @@ are maintained here to achieve this:
 
 ## Installation
 
-simpledigicreds can be installed from **[NPM](https://www.npmjs.com/search?q=%40simpledigicreds)**
+SimpleDigiCreds can be installed from **[NPM](https://www.npmjs.com/search?q=%40simpledigicreds)**
 and **[JSR](https://jsr.io/@simpledigicreds)** in **Node LTS 22.x and higher**, **Deno v2.1 and
 higher** projects, and other compatible runtimes (Cloudflare Workers, Bun, etc...)
 
