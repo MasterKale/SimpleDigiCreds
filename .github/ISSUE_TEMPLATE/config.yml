@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discuss a general Digital Credentials question or issue
+    url: https://github.com/MasterKale/SimpleDigiCreds/discussions/new/choose
+    about: Have a question about Digital Credentials? Is a certain browser and/or wallet combo acting strange? Start a Discussion instead.
