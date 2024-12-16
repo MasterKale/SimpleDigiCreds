@@ -1,0 +1,21 @@
+{
+  "name": "@simpledigicreds/browser",
+  "version": "0.0.0",
+  "exports": "./src/index.ts",
+  "imports": {},
+  "tasks": {},
+  "fmt": {
+    "lineWidth": 100
+  },
+  "publish": {
+    "include": [
+      "README.md",
+      "LICENSE.md",
+      "./src/**/*.ts"
+    ],
+    "exclude": [
+      "./src/**/*.test.ts",
+      "./npm"
+    ]
+  }
+}
