@@ -1,6 +1,7 @@
 {
   "tasks": {
-    "dev": "deno run --watch main.ts"
+    "publish:browser": "(cd packages/browser; deno task publish)",
+    "publish:server": "(cd packages/server; deno task publish)"
   },
   "fmt": {
     "lineWidth": 100
