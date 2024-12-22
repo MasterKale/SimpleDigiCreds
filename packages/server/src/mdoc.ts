@@ -168,3 +168,35 @@ const DataElementUNDistinguishingSign: DataElement = {
   encodingFormat: ['tstr'],
 };
 
+/**
+ * Optional Data Elements
+ *
+ * - [ ] administrative_number
+ * - [ ] sex
+ * - [ ] height
+ * - [ ] weight
+ * - [ ] eye_colour
+ * - [ ] hair_colour
+ * - [ ] birth_place
+ * - [ ] resident_address
+ * - [ ] portrait_capture_date
+ * - [ ] age_in_years
+ * - [ ] age_birth_year
+ * - [ ] age_over_NN
+ * - [ ] issuing_jurisdiction
+ * - [ ] nationality
+ * - [ ] resident_city
+ * - [ ] resident_state
+ * - [ ] resident_postal_code
+ * - [ ] resident_country
+ * - [ ] family_name_national_character
+ * - [ ] given_name_national_character
+ * - [ ] signature_usual_mark
+ */
+
+// const DataElement: DataElement = {
+//   identifier: '',
+//   meaning: '',
+//   definition: '',
+//   presence: 'M',
+// };
