@@ -2,7 +2,9 @@
   "name": "@simpledigicreds/server",
   "version": "0.0.0",
   "exports": "./src/index.ts",
-  "imports": {},
+  "imports": {
+    "@std/encoding": "jsr:@std/encoding@^1.0.6"
+  },
   "tasks": {
     "test": "deno test -A src/",
     "test:watch": "deno test -A --watch src/",
