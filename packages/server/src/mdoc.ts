@@ -196,9 +196,9 @@ const DataElementUNDistinguishingSign: DataElement = {
  * - [ ] birth_place
  * - [ ] resident_address
  * - [ ] portrait_capture_date
- * - [ ] age_in_years
- * - [ ] age_birth_year
- * - [ ] age_over_NN
+ * - [x] age_in_years
+ * - [x] age_birth_year
+ * - [x] age_over_NN
  * - [ ] issuing_jurisdiction
  * - [ ] nationality
  * - [ ] resident_city
@@ -210,9 +210,38 @@ const DataElementUNDistinguishingSign: DataElement = {
  * - [ ] signature_usual_mark
  */
 
-// const DataElement: DataElement = {
-//   identifier: '',
-//   meaning: '',
-//   definition: '',
-//   presence: 'M',
-// };
+const DataElementAgeInYears: DataElement = {
+  identifier: 'age_in_years',
+  meaning: 'Age attestation: How old are you (in years)?',
+  definition: 'The age of the mDL holder',
+  presence: 'O',
+  encodingFormat: ['uint'],
+};
+
+const DataElementAgeBirthYear: DataElement = {
+  identifier: 'age_birth_year',
+  meaning: 'Age attestation: In what year were you born?',
+  definition: 'The year when the mDL holder was born',
+  presence: 'O',
+  encodingFormat: ['uint'],
+};
+
+/**
+ * Notes:
+ * - NN is a value from 00 to 99
+ * - "Provide the nearest age attestation equal to or larger than NN with value True, or smaller than NN with value False"
+ * - If multiple ages are specified, return value indicates the NN CLOSEST to their actual age
+ *   - Ex: "age_over_18" -> "age_over_21" is true, "age_over_35" is false -> response ONLY contains "age_over_21: true"
+ *   - Ex: "age_over_18" -> "age_over_21" is true, "age_over_35" is true -> response ONLY contains "age_over_21: true"
+ *   - Ex: "age_over_18" -> "age_over_21" is false, "age_over_35" is false -> response ONLY contains "age_over_21: false"
+ * - Reader "shall not" request more than two age_over_NN values, and mDL/IA "should not" return more than two
+ * - Request can include two age_over_NN statements to support determining whether age falls within a range
+ * - When mDL does not have an age_over_NN value, mLD Reader can make back-up request with "age_in_years" and "birth_date"
+ */
+const DataElementAgeOverNN: DataElement = {
+  identifier: 'age_over_NN',
+  meaning: 'Age attestation: Nearest "true" attestation above request',
+  definition: '',
+  presence: 'O',
+  encodingFormat: ['bool'],
+};
