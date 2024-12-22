@@ -66,6 +66,22 @@ type DataElement = {
 };
 
 /**
+ * Mandatory Data Elements
+ *
+ * - [x] family_name
+ * - [x] given_name
+ * - [x] birth_date
+ * - [x] issue_date
+ * - [x] expiry_date
+ * - [x] issuing_country
+ * - [x] issuing_authority
+ * - [x] document_number
+ * - [x] portrait
+ * - [ ] driving_privileges
+ * - [x] un_distinguishing_sign
+ */
+
+/**
  * Required Data Elements
  */
 const DataElementFamilyName: DataElement = {
