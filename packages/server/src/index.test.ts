@@ -5,7 +5,6 @@ import { generateRequestOptions } from './index.ts';
 import { _generateNonceInternals } from './crypto/generateNonce.ts';
 
 Deno.test('Should generate options', () => {
-  // Pretend globalThis.crypto doesn't exist
   const mockGenerateNonce = stub(
     _generateNonceInternals,
     'stubThis',
