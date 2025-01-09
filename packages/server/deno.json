@@ -20,7 +20,7 @@
         "build"
       ]
     },
-    "publish:jsr": "deno publish",
+    "publish:jsr": "deno publish --allow-slow-types",
     "publish:npm": "(cd npm; npm publish)"
   },
   "fmt": {
