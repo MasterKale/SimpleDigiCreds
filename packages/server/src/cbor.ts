@@ -9,4 +9,6 @@
  *   operation are communicated in a tagged CBOR bytestring. For any cryptographic operation, an
  *   mdoc, mdoc reader or issuing authority infrastructure shall use these bytestrings as they were
  *   sent or received, without attempting to re-create them from the underlying maps.
+ * - RFC 7049 WAS OBSOLETED BY RFC 8949 (https://www.rfc-editor.org/rfc/rfc8949)
+ * - jsr:@std/cbor (https://jsr.io/@std/cbor) was written to RFC 8949 so I can probably use that in here...
  */
