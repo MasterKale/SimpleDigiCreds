@@ -81,8 +81,6 @@ const identifiers = [
   'age_over_NN',
 ] as const;
 export type Identifier = typeof identifiers[number];
-// Punting on age_over_NN for now
-export type SupportedIdentifier = Exclude<Identifier, 'age_over_NN'>;
 
 /**
  * Mandatory Data Elements

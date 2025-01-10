@@ -116,7 +116,7 @@ export type OID4VPClaimQueryMdoc = {
   /** A valid namespace in the mdoc specification */
   namespace: 'org.iso.18013.5.1';
   /** See {@link Identifier} for valid claim name values */
-  claim_name: Identifier;
+  claim_name: OID4VPSupportedMdocClaimName;
 };
 
 /**
@@ -137,3 +137,8 @@ export type OID4VPClaimQueryMdoc = {
  * ...the path pointer to the value `"42 Market Street"` would be `["address", "street_address"]`
  */
 export type PathPointer = string[];
+
+/**
+ * Valid mdoc identifiers that can be used in an OID4VP request as a value for `claim_name`
+ */
+export type OID4VPSupportedMdocClaimName = Exclude<Identifier, 'age_over_NN'> | 'age_over_21';
