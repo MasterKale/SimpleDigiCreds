@@ -56,7 +56,7 @@ export type fulldate = string; // "YYYY-MM-DDT00:00:00Z" (a.k.a. ISO8601)
  */
 type EncodingFormat = 'tstr' | 'uint' | 'bstr' | 'bool' | 'tdate' | 'full-date';
 type DataElement = {
-  identifier: string;
+  identifier: Identifier;
   meaning: string;
   definition: string;
   presence: 'M' | 'O';
@@ -64,6 +64,25 @@ type DataElement = {
   characterSet?: 'latin1';
   maxLength?: number;
 };
+
+const identifiers = [
+  'family_name',
+  'given_name',
+  'birth_date',
+  'issue_date',
+  'expiry_date',
+  'issuing_country',
+  'issuing_authority',
+  'document_number',
+  'portrait',
+  'un_distinguishing_sign',
+  'age_in_years',
+  'age_birth_year',
+  'age_over_NN',
+] as const;
+export type Identifier = typeof identifiers[number];
+// Punting on age_over_NN for now
+export type SupportedIdentifier = Exclude<Identifier, 'age_over_NN'>;
 
 /**
  * Mandatory Data Elements
@@ -84,7 +103,7 @@ type DataElement = {
 /**
  * Required Data Elements
  */
-const DataElementFamilyName: DataElement = {
+const dataElementFamilyName: DataElement = {
   identifier: 'family_name',
   meaning: 'Family name',
   definition: 'Last name, surname, or primary identifier, of the mDL holder',
@@ -94,7 +113,7 @@ const DataElementFamilyName: DataElement = {
   maxLength: 150,
 };
 
-const DataElementGivenName: DataElement = {
+const dataElementGivenName: DataElement = {
   identifier: 'given_name',
   meaning: 'Given names',
   definition: 'First name(s), other name(s), or secondary identifier, of the mDL holder',
@@ -104,7 +123,7 @@ const DataElementGivenName: DataElement = {
   maxLength: 150,
 };
 
-const DataElementBirthDate: DataElement = {
+const dataElementBirthDate: DataElement = {
   identifier: 'birth_date',
   meaning: 'Date of birth',
   definition:
@@ -113,7 +132,7 @@ const DataElementBirthDate: DataElement = {
   encodingFormat: ['full-date'],
 };
 
-const DataElementIssueDate: DataElement = {
+const dataElementIssueDate: DataElement = {
   identifier: 'issue_date',
   meaning: 'Date of issue',
   definition: 'Date when mDL was issued',
@@ -121,7 +140,7 @@ const DataElementIssueDate: DataElement = {
   encodingFormat: ['tdate', 'full-date'],
 };
 
-const DataElementExpiryDate: DataElement = {
+const dataElementExpiryDate: DataElement = {
   identifier: 'expiry_date',
   meaning: 'Date of expiry',
   definition: 'Date when mDL expires',
@@ -129,7 +148,7 @@ const DataElementExpiryDate: DataElement = {
   encodingFormat: ['tdate', 'full-date'],
 };
 
-const DataElementIssuingCountry: DataElement = {
+const dataElementIssuingCountry: DataElement = {
   identifier: 'issuing_country',
   meaning: 'Issuing country',
   definition:
@@ -138,7 +157,7 @@ const DataElementIssuingCountry: DataElement = {
   encodingFormat: ['tstr'],
 };
 
-const DataElementIssuingAuthority: DataElement = {
+const dataElementIssuingAuthority: DataElement = {
   identifier: 'issuing_authority',
   meaning: 'Issuing authority',
   definition: 'Issuing authority name.',
@@ -148,7 +167,7 @@ const DataElementIssuingAuthority: DataElement = {
   maxLength: 150,
 };
 
-const DataElementDocumentNumber: DataElement = {
+const dataElementDocumentNumber: DataElement = {
   identifier: 'document_number',
   meaning: 'Licence number',
   definition: 'The number assigned or calculated by the issuing authority',
@@ -158,7 +177,7 @@ const DataElementDocumentNumber: DataElement = {
   maxLength: 150,
 };
 
-const DataElementPortrait: DataElement = {
+const dataElementPortrait: DataElement = {
   identifier: 'portrait',
   meaning: 'Portrait of mDL holder',
   definition: "A reproduction of the mDL holder's portrait.",
@@ -167,7 +186,7 @@ const DataElementPortrait: DataElement = {
 };
 
 // TODO: See 7.2.4 for encoding format
-// const DataElementDrivingPrivileges: DataElement = {
+// const dataElementDrivingPrivileges: DataElement = {
 //   identifier: 'driving_privileges',
 //   meaning: 'Categories of vehicles/restrictions/conditions',
 //   definition: 'Driving privileges of the mDL holder',
@@ -175,7 +194,7 @@ const DataElementPortrait: DataElement = {
 //   encodingFormat: [],
 // };
 
-const DataElementUNDistinguishingSign: DataElement = {
+const dataElementUNDistinguishingSign: DataElement = {
   identifier: 'un_distinguishing_sign',
   meaning: 'UN distinguishing sign',
   definition:
@@ -210,7 +229,7 @@ const DataElementUNDistinguishingSign: DataElement = {
  * - [ ] signature_usual_mark
  */
 
-const DataElementAgeInYears: DataElement = {
+const dataElementAgeInYears: DataElement = {
   identifier: 'age_in_years',
   meaning: 'Age attestation: How old are you (in years)?',
   definition: 'The age of the mDL holder',
@@ -218,7 +237,7 @@ const DataElementAgeInYears: DataElement = {
   encodingFormat: ['uint'],
 };
 
-const DataElementAgeBirthYear: DataElement = {
+const dataElementAgeBirthYear: DataElement = {
   identifier: 'age_birth_year',
   meaning: 'Age attestation: In what year were you born?',
   definition: 'The year when the mDL holder was born',
@@ -238,7 +257,7 @@ const DataElementAgeBirthYear: DataElement = {
  * - Request can include two age_over_NN statements to support determining whether age falls within a range
  * - When mDL does not have an age_over_NN value, mLD Reader can make back-up request with "age_in_years" and "birth_date"
  */
-const DataElementAgeOverNN: DataElement = {
+const dataElementAgeOverNN: DataElement = {
   identifier: 'age_over_NN',
   meaning: 'Age attestation: Nearest "true" attestation above request',
   definition: '',
