@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.3
+
+- **[server]** Export more types for better docs
+
 ## v0.0.2
 
 - **[server]** Supports a wider range of mdoc claims

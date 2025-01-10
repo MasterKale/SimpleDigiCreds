@@ -1,6 +1,6 @@
 {
   "name": "@simpledigicreds/server",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "exports": "./src/index.ts",
   "imports": {
     "@std/encoding": "jsr:@std/encoding@^1.0.6"
@@ -20,7 +20,7 @@
         "build"
       ]
     },
-    "publish:jsr": "deno publish --allow-slow-types",
+    "publish:jsr": "deno publish",
     "publish:npm": "(cd npm; npm publish)"
   },
   "fmt": {
