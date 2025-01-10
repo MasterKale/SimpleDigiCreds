@@ -37,11 +37,13 @@ export type DCAPIRequestOptions = {
 
 /**
  * Generate credential presentation request options suitable for passing into
- * `navigator.credentials.get()` as per the Digital Credentials API. Only supports OID4VP + mdoc
- * right now.
+ * `navigator.credentials.get()` as per the Digital Credentials API.
  *
- * - Tying together DC API (browser), OID4VP (protocol), and mdoc (document format)
- * - Unsigned requests only for now
+ * Supported Protocols:
+ * - OID4VP
+ *
+ * Supported Document Formats:
+ * - mdoc
  */
 export function generateRequestOptions(
   { desiredClaims, requestOrigin }: {
