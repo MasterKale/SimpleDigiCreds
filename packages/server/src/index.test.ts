@@ -12,7 +12,7 @@ Deno.test('Should generate options', () => {
   );
 
   const options = generateRequestOptions({
-    desiredClaims: ['familyName', 'givenName', 'ageOver21'],
+    desiredClaims: ['family_name', 'given_name', 'age_over_21'],
     requestOrigin: 'https://digital-credentials.dev',
   });
 
