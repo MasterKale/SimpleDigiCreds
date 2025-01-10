@@ -3,7 +3,7 @@ import { encodeBase64Url } from '@std/encoding';
 /**
  * Generate a random value suitable for use as a nonce to prevent replay attacks
  */
-export function generateNonce() {
+export function generateNonce(): string {
   const nonce = new Uint8Array(32);
 
   globalThis.crypto.getRandomValues(nonce);
