@@ -1,3 +1,5 @@
+import type { Identifier } from './mdoc.ts';
+
 /**
  * Protocol for requesting documents
  *
@@ -68,3 +70,70 @@
  *   data element identifier of the data element within the provided namespace in the mdoc, e.g.,
  *   first_name.
  */
+/**
+ * 6.1. Credential Query
+ * https://openid.github.io/OpenID4VP/openid-4-verifiable-presentations-wg-draft.html#section-6.1
+ */
+export type OID4VPCredentialQuery = {
+  /** A unique string comprised of alphanumeric, underscore (_) or hyphen (-) characters */
+  id: string;
+  /** The format of the requested Verifiable Credential */
+  format: string; // TODO: This can be constrained per query subtypes
+  /** Format-specific metadata */
+  meta?: unknown; // TODO: This can be defined per query subtype
+  claims?: OID4VPClaimQuery[];
+};
+
+export type OID4VPCredentialQueryMdoc = {
+  /** A unique string comprised of alphanumeric, underscore (_) or hyphen (-) characters */
+  id: string;
+  /** The format of the requested Verifiable Credential */
+  format: 'mso_mdoc';
+  /** mdoc-specific metadata */
+  meta: { doctype_value: 'org.iso.18013.5.1.mDL' };
+  claims: OID4VPClaimQueryMdoc[];
+};
+
+/**
+ * 6.3. Claim Query
+ * https://openid.github.io/OpenID4VP/openid-4-verifiable-presentations-wg-draft.html#section-6.3
+ */
+export type OID4VPClaimQuery = {
+  /** An array of strings indicating a property within a JSON credential format. See {@link PathPointer} for more info */
+  path: PathPointer;
+  /** A unique string comprised of alphanumeric, underscore (_) or hyphen (-) characters. REQUIRED if `claim_sets` is present */
+  id?: string;
+  /** Expected values for this claim. This claim will only be returned if the wallet can match one of these values */
+  values?: (string | number | boolean)[];
+};
+
+/**
+ * B.3.1.2. Parameters in the Claims Query (mdoc)
+ *
+ * https://openid.github.io/OpenID4VP/openid-4-verifiable-presentations-wg-draft.html#appendix-B.3.1.2
+ */
+export type OID4VPClaimQueryMdoc = {
+  /** A valid namespace in the mdoc specification */
+  namespace: 'org.iso.18013.5.1';
+  /** See {@link Identifier} for valid claim name values */
+  claim_name: Identifier;
+};
+
+/**
+ * An array of strings, with each string representing one level deeper within a JSON-like structure.
+ *
+ * For example, for the following document...
+ *
+ * ```json
+ * {
+ *   "address": {
+ *     "street_address": "42 Market Street",
+ *     "locality": "Milliways",
+ *     "postal_code": "12345"
+ *   }
+ * }
+ * ```
+ *
+ * ...the path pointer to the value `"42 Market Street"` would be `["address", "street_address"]`
+ */
+export type PathPointer = string[];
