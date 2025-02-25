@@ -3,7 +3,7 @@ import type { Identifier } from './mdoc.ts';
 /**
  * Protocol for requesting documents
  *
- * https://openid.github.io/OpenID4VP/openid-4-verifiable-presentations-wg-draft.html#name-openid4vp-over-the-digital-
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#name-openid4vp-over-the-digital-
  *
  * A.1. Protocol
  *
@@ -44,7 +44,7 @@ import type { Identifier } from './mdoc.ts';
  *     Platform.
  *
  * B.3. Mobile Documents or mdocs (ISO/IEC 18013 and ISO/IEC 23220 series)
- * https://openid.github.io/OpenID4VP/openid-4-verifiable-presentations-wg-draft.html#appendix-B.3
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3
  *
  * - The Credential format identifier for Credentials in the mdoc format is `mso_mdoc`
  *
@@ -72,7 +72,7 @@ import type { Identifier } from './mdoc.ts';
  */
 /**
  * 6.1. Credential Query
- * https://openid.github.io/OpenID4VP/openid-4-verifiable-presentations-wg-draft.html#section-6.1
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#section-6.1
  */
 export type OID4VPCredentialQuery = {
   /** A unique string comprised of alphanumeric, underscore (_) or hyphen (-) characters */
@@ -95,8 +95,8 @@ export type OID4VPCredentialQueryMdoc = {
 };
 
 /**
- * 6.3. Claim Query
- * https://openid.github.io/OpenID4VP/openid-4-verifiable-presentations-wg-draft.html#section-6.3
+ * 6.3. Claims Query
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#section-6.3
  */
 export type OID4VPClaimQuery = {
   /** An array of strings indicating a property within a JSON credential format. See {@link PathPointer} for more info */
@@ -109,14 +109,11 @@ export type OID4VPClaimQuery = {
 
 /**
  * B.3.1.2. Parameters in the Claims Query (mdoc)
- *
- * https://openid.github.io/OpenID4VP/openid-4-verifiable-presentations-wg-draft.html#appendix-B.3.1.2
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3.1.2
  */
-export type OID4VPClaimQueryMdoc = {
-  /** A valid namespace in the mdoc specification */
-  namespace: 'org.iso.18013.5.1';
-  /** See {@link Identifier} for valid claim name values */
-  claim_name: OID4VPSupportedMdocClaimName;
+export type OID4VPClaimQueryMdoc = OID4VPClaimQuery & {
+  /** A boolean that is equivalent to IntentToRetain variable defined in the mdoc specification */
+  intent_to_retain?: boolean;
 };
 
 /**

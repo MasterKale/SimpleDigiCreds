@@ -8,7 +8,7 @@ import type {
 /**
  * OID4VP-specific request parameters
  *
- * https://openid.github.io/OpenID4VP/openid-4-verifiable-presentations-wg-draft.html#appendix-A.2
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-A.2
  */
 export type DCAPIRequestOID4VP = {
   /** The value `"vp_token"` */
@@ -58,8 +58,7 @@ export function generateRequestOptions(
       doctype_value: 'org.iso.18013.5.1.mDL',
     },
     claims: desiredClaims.map((claimName) => ({
-      namespace: 'org.iso.18013.5.1',
-      claim_name: claimName,
+      path: ['org.iso.18013.5.1', claimName],
     })),
   };
 
@@ -71,7 +70,7 @@ export function generateRequestOptions(
           response_mode: 'dc_api',
           client_id: `web-origin:${requestOrigin}`,
           nonce: generateNonce(),
-          // https://openid.github.io/OpenID4VP/openid-4-verifiable-presentations-wg-draft.html#dcql_query
+          // https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#dcql_query
           dcql_query: {
             credentials: [
               mdocCredentialRequest,
