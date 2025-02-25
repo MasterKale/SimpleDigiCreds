@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SimpleDigiCreds Example Site</title>
+    <link rel="stylesheet" href="./static/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>SimpleDigiCreds Example Site</h1>
+      </header>
+      <main>
+        <button id="request">Request Credential</button>
+        <p id="success" class="success"></p>
+        <p id="error" class="error"></p>
+        <details open>
+          <summary>Console</summary>
+          <textarea id="debug" spellcheck="false"></textarea>
+        </details>
+      </main>
+    </div>
+    <script type="module">
+      const elemDebug = document.querySelector("#debug");
+
+      /**
+       * A simple way to control how debug content is written to a debug console element
+       *
+       * @param {string?} title
+       * @param {string?} output
+       */
+      function printDebug(title, output) {
+        if (elemDebug.innerHTML !== "") {
+          elemDebug.innerHTML += "\n";
+        }
+
+        if (title) {
+          elemDebug.innerHTML += `// ${title}\n`;
+        }
+
+        if (output) {
+          elemDebug.innerHTML += `${output}\n`;
+        }
+      }
+
+      // printDebug("App Status", "Initialized");
+      // printDebug(undefined, "App Status: Initialized");
+      // printDebug("App Status: Initialized");
+
+      document.getElementById("request").addEventListener("click", async () => {
+        const options = await fetch("/options");
+        const optionsJSON = await options.json();
+
+        printDebug("Request Options", JSON.stringify(optionsJSON, null, 2));
+
+        printDebug("Response", JSON.stringify({}, null, 2));
+      });
+    </script>
+  </body>
+</html>
