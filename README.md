@@ -11,8 +11,8 @@ This project makes it easier to combine **OID4VP + mdoc** for meaningful identit
 [Digital Credentials API](https://wicg.github.io/digital-credentials/). The following packages are
 maintained here to achieve this:
 
-- [@simpledigicreds/browser](https://github.com/MasterKale/SimpleDigiCreds/tree/master/packages/browser)
-- [@simpledigicreds/server](https://github.com/MasterKale/SimpleDigiCreds/tree/master/packages/server)
+- [@simpledigicreds/browser](https://github.com/MasterKale/SimpleDigiCreds/tree/main/packages/browser)
+- [@simpledigicreds/server](https://github.com/MasterKale/SimpleDigiCreds/tree/main/packages/server)
 
 ## Installation
 
