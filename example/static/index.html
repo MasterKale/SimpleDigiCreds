@@ -25,7 +25,9 @@
       </main>
     </div>
     <script type="module">
-      const elemDebug = document.querySelector("#debug");
+      const elemDebug = document.getElementById("debug");
+      const elemSuccess = document.getElementById("success");
+      const elemError = document.getElementById("error");
 
       /**
        * A simple way to control how debug content is written to a debug console element
@@ -55,14 +57,44 @@
         document
           .getElementById("request")
           .addEventListener("click", async () => {
+            // Reset success/error messages
+            elemSuccess.innerHTML = "";
+            elemError.innerHTML = "";
+            elemDebug.innerHTML = "";
+
             const options = await fetch("/options");
             const optionsJSON = await options.json();
 
             printDebug("Request Options", JSON.stringify(optionsJSON, null, 2));
 
-            const response = await navigator.credentials.get(optionsJSON);
+            let response;
+            try {
+              response = await navigator.credentials.get(optionsJSON);
+              printDebug("Response", response.data);
+            } catch (err) {
+              elemError.innerText = `${err}`;
+              console.error(err);
+              throw new Error(error);
+            }
 
-            printDebug("Response", JSON.stringify(response, null, 2));
+            const verification = await fetch("/verify", {
+              method: "post",
+              body: response.data,
+            });
+            const verificationJSON = await verification.json();
+
+            printDebug(
+              "Verification Result",
+              JSON.stringify(verificationJSON, null, 2)
+            );
+
+            if (verificationJSON && verificationJSON.verified) {
+              elemSuccess.innerHTML = "Successfully requested a credential!";
+            } else {
+              elemError.innerHTML = `Oh no, something went wrong! Response: <pre>${JSON.stringify(
+                verificationJSON
+              )}</pre>`;
+            }
           });
       }
     </script>
