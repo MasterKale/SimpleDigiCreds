@@ -12,13 +12,16 @@
         <h1>SimpleDigiCreds Example Site</h1>
       </header>
       <main>
-        <button id="request">Request Credential</button>
-        <p id="success" class="success"></p>
-        <p id="error" class="error"></p>
-        <details open>
-          <summary>Console</summary>
-          <textarea id="debug" spellcheck="false"></textarea>
-        </details>
+        <section class="controls">
+          <button id="request">Request Credential</button>
+          <p id="success" class="success"></p>
+          <p id="error" class="error"></p>
+          <details open>
+            <summary>Console</summary>
+            <textarea id="debug" spellcheck="false"></textarea>
+          </details>
+        </section>
+        <p class="systemError"></p>
       </main>
     </div>
     <script type="module">
@@ -44,18 +47,24 @@
         }
       }
 
-      // printDebug("App Status", "Initialized");
-      // printDebug(undefined, "App Status: Initialized");
-      // printDebug("App Status: Initialized");
+      if (typeof window.DigitalCredential === "undefined") {
+        document.querySelector(".controls").style.display = "none";
+        document.querySelector(".systemError").innerText =
+          "It seems this browser doesn't support the Digital Credentials API yet...do you need to enable a feature flag?";
+      } else {
+        document
+          .getElementById("request")
+          .addEventListener("click", async () => {
+            const options = await fetch("/options");
+            const optionsJSON = await options.json();
 
-      document.getElementById("request").addEventListener("click", async () => {
-        const options = await fetch("/options");
-        const optionsJSON = await options.json();
+            printDebug("Request Options", JSON.stringify(optionsJSON, null, 2));
 
-        printDebug("Request Options", JSON.stringify(optionsJSON, null, 2));
+            const response = await navigator.credentials.get(optionsJSON);
 
-        printDebug("Response", JSON.stringify({}, null, 2));
-      });
+            printDebug("Response", JSON.stringify(response, null, 2));
+          });
+      }
     </script>
   </body>
 </html>
