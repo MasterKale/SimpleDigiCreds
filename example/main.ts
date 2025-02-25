@@ -39,7 +39,7 @@ app.post("/verify", async (ctx) => {
   console.log("verifying presentation", body);
 
   return ctx.json({
-    TODO: "this",
+    verified: "TODO",
   });
 });
 
