@@ -1,7 +1,8 @@
-import { assertEquals, assertRejects } from 'jsr:@std/assert';
+import { assertEquals, assertInstanceOf, assertRejects } from 'jsr:@std/assert';
 
 import type { DCAPIRequestOptions } from './generateRequestOptions.ts';
 import { verifyResponse } from './verifyResponse.ts';
+import { SimpleDigiCredsError } from './simpleDigiCredsError.ts';
 
 const options: DCAPIRequestOptions = {
   digital: {
@@ -29,7 +30,32 @@ const options: DCAPIRequestOptions = {
   },
 };
 
-Deno.test('should error on invalid DC API response', () => {
+Deno.test('should error on missing `vp_token`', async () => {
   const response = {};
-  assertRejects(() => verifyResponse({ response, options }), 'invalid');
+  const rejected = await assertRejects(() => verifyResponse({ response, options }));
+
+  assertInstanceOf(rejected, SimpleDigiCredsError);
+  assertEquals(rejected.code, 'InvalidDCAPIResponse');
+  assertEquals(rejected.message, 'Required object `response.vp_token` was missing');
+});
+
+Deno.test('should error on bad `vp_token`', async () => {
+  const response = { vp_token: '' };
+  const rejected = await assertRejects(() => verifyResponse({ response, options }));
+
+  assertInstanceOf(rejected, SimpleDigiCredsError);
+  assertEquals(rejected.code, 'InvalidDCAPIResponse');
+  assertEquals(rejected.message, 'Required object `response.vp_token` was missing');
+});
+
+Deno.test('should error on bad `vp_token` entries', async () => {
+  const response = { vp_token: { cred1: '@@@@@' } };
+  const rejected = await assertRejects(() => verifyResponse({ response, options }));
+
+  assertInstanceOf(rejected, SimpleDigiCredsError);
+  assertEquals(rejected.code, 'InvalidDCAPIResponse');
+  assertEquals(
+    rejected.message,
+    'Object `response.tp_token` contained non-base64url-encoded entries',
+  );
 });

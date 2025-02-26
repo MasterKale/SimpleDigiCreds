@@ -2,10 +2,7 @@ import type { DCAPIRequestOptions } from './generateRequestOptions.ts';
 import { SimpleDigiCredsError } from './simpleDigiCredsError.ts';
 import { type DCAPIVerifiedResponse, isDCAPIResponse } from './types.ts';
 
-export async function verifyResponse({
-  response,
-  options,
-}: {
+export async function verifyResponse({ response, options }: {
   response: unknown;
   options: DCAPIRequestOptions;
 }): Promise<DCAPIVerifiedResponse> {
@@ -17,6 +14,8 @@ export async function verifyResponse({
       code: 'InvalidDCAPIResponse',
     });
   }
+
+  // TODO: We've verified the shape of the response, now verify it
 
   return {};
 }
