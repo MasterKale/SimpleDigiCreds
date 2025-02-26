@@ -1,8 +1,8 @@
 import { assertEquals, assertInstanceOf, assertRejects } from 'jsr:@std/assert';
 
-import type { DCAPIRequestOptions } from './generateRequestOptions.ts';
+import type { DCAPIRequestOptions } from './dcapi.ts';
 import { verifyResponse } from './verifyResponse.ts';
-import { SimpleDigiCredsError } from './simpleDigiCredsError.ts';
+import { SimpleDigiCredsError } from './helpers/simpleDigiCredsError.ts';
 
 const options: DCAPIRequestOptions = {
   digital: {
@@ -58,4 +58,8 @@ Deno.test('should error on bad `vp_token` entries', async () => {
     rejected.message,
     'Object `response.tp_token` contained non-base64url-encoded entries',
   );
+});
+
+Deno.test('should verify a well-formed presentation', async () => {
+  // const response =
 });

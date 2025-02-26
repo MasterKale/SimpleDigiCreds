@@ -1,14 +1,11 @@
 import * as base64 from '@hexagon/base64';
+
+import type { DCAPIResponse } from '../dcapi.ts';
 import { SimpleDigiCredsError } from './simpleDigiCredsError.ts';
 
-export type DCAPIResponse = {
-  vp_token: { [key: string]: string };
-};
-
-export type DCAPIVerifiedResponse = {
-  [credID: string]: { [claimName: string]: unknown };
-};
-
+/**
+ * Take a response from the Digital Credential API and make sure it's the expected shape
+ */
 export function isDCAPIResponse(response: unknown): response is DCAPIResponse {
   if (!response) {
     throw new SimpleDigiCredsError({

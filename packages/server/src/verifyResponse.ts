@@ -1,7 +1,10 @@
-import type { DCAPIRequestOptions } from './generateRequestOptions.ts';
-import { SimpleDigiCredsError } from './simpleDigiCredsError.ts';
-import { type DCAPIVerifiedResponse, isDCAPIResponse } from './types.ts';
+import type { DCAPIRequestOptions, DCAPIVerifiedResponse } from './dcapi.ts';
+import { SimpleDigiCredsError } from './helpers/simpleDigiCredsError.ts';
+import { isDCAPIResponse } from './helpers/isDCAPIResponse.ts';
 
+/**
+ * Verify and return a credential presentation out of a call to the Digital Credentials API
+ */
 export async function verifyResponse({ response, options }: {
   response: unknown;
   options: DCAPIRequestOptions;
