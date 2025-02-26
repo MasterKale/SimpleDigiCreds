@@ -21,8 +21,8 @@ export type DCAPIRequestOID4VP = {
 };
 
 /**
- * Options suitable for passing into `navigator.credentials.get()` in the browser to request the
- * presentation of a verifiable credential via the Digital Credentials API
+ * Options suitable for passing into `navigator.credentials.get({ digital: { ... } })` in the
+ * browser to request the presentation of a verifiable credential via the Digital Credentials API
  */
 export type DCAPIRequestOptions = {
   digital: {
@@ -30,10 +30,9 @@ export type DCAPIRequestOptions = {
   };
 };
 
+/**
+ * The shape of the value returned from a call to `navigator.credentials.get({ digital: { ... } })`
+ */
 export type DCAPIResponse = {
   vp_token: { [key: string]: string };
-};
-
-export type DCAPIVerifiedResponse = {
-  [credID: string]: { [claimName: string]: unknown };
 };
