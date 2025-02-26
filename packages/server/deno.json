@@ -3,6 +3,7 @@
   "version": "0.0.3",
   "exports": "./src/index.ts",
   "imports": {
+    "@hexagon/base64": "npm:@hexagon/base64@^2.0.4",
     "@std/encoding": "jsr:@std/encoding@^1.0.6"
   },
   "tasks": {
