@@ -5,6 +5,8 @@
     "jsr:@deno/cache-dir@~0.10.3": "0.10.3",
     "jsr:@deno/dnt@~0.41.3": "0.41.3",
     "jsr:@deno/graph@~0.73.1": "0.73.1",
+    "jsr:@levischuck/tiny-cbor@*": "0.2.11",
+    "jsr:@levischuck/tiny-cbor@~0.2.11": "0.2.11",
     "jsr:@std/assert@*": "1.0.11",
     "jsr:@std/assert@0.223": "0.223.0",
     "jsr:@std/assert@0.226": "0.226.0",
@@ -14,7 +16,7 @@
     "jsr:@std/bytes@0.223": "0.223.0",
     "jsr:@std/data-structures@^1.0.4": "1.0.4",
     "jsr:@std/data-structures@^1.0.6": "1.0.6",
-    "jsr:@std/encoding@^1.0.6": "1.0.7",
+    "jsr:@std/encoding@^1.0.7": "1.0.7",
     "jsr:@std/fmt@0.223": "0.223.0",
     "jsr:@std/fmt@1": "1.0.5",
     "jsr:@std/fs@0.223": "0.223.0",
@@ -63,6 +65,9 @@
     },
     "@deno/graph@0.73.1": {
       "integrity": "cd69639d2709d479037d5ce191a422eabe8d71bb68b0098344f6b07411c84d41"
+    },
+    "@levischuck/tiny-cbor@0.2.11": {
+      "integrity": "85163de7eef1c48c377723f899e0df524638c3b9f8a045a1f6a1f04977ab7cf9"
     },
     "@std/assert@0.223.0": {
       "integrity": "eb8d6d879d76e1cc431205bd346ed4d88dc051c6366365b1af47034b0670be24"
@@ -214,7 +219,8 @@
     "members": {
       "packages/server": {
         "dependencies": [
-          "jsr:@std/encoding@^1.0.6",
+          "jsr:@levischuck/tiny-cbor@~0.2.11",
+          "jsr:@std/encoding@^1.0.7",
           "npm:@hexagon/base64@^2.0.4"
         ]
       }
