@@ -1,4 +1,4 @@
-import type { CBORType } from 'jsr:@levischuck/tiny-cbor';
+import type { CBORType } from '@levischuck/tiny-cbor';
 
 /**
  * Fundamental values that are needed to discern the more specific COSE public key types below.

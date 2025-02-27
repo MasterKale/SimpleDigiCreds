@@ -1,7 +1,7 @@
-import { CBORTag, encodeCBOR } from 'jsr:@levischuck/tiny-cbor';
-import { DCAPIRequestOID4VP } from 'jsr:@simpledigicreds/server';
+import { encodeCBOR } from '@levischuck/tiny-cbor';
 
-import { DCAPIOID4VPSessionTranscript } from './types.ts';
+import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
+import type { DCAPIOID4VPSessionTranscript } from './types.ts';
 
 /**
  * See OID4VP for SessionTranscript composition: https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3.4

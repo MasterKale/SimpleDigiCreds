@@ -37,6 +37,7 @@
     "npm:@hexagon/base64@^2.0.4": "2.0.4",
     "npm:@peculiar/asn1-ecc@^2.3.15": "2.3.15",
     "npm:@peculiar/asn1-rsa@*": "2.3.15",
+    "npm:@peculiar/asn1-rsa@^2.3.15": "2.3.15",
     "npm:@peculiar/asn1-schema@^2.3.15": "2.3.15",
     "npm:@peculiar/asn1-x509@^2.3.15": "2.3.15",
     "npm:create-hono@*": "0.15.3",
@@ -282,6 +283,7 @@
           "jsr:@std/encoding@^1.0.7",
           "npm:@hexagon/base64@^2.0.4",
           "npm:@peculiar/asn1-ecc@^2.3.15",
+          "npm:@peculiar/asn1-rsa@^2.3.15",
           "npm:@peculiar/asn1-schema@^2.3.15",
           "npm:@peculiar/asn1-x509@^2.3.15"
         ]

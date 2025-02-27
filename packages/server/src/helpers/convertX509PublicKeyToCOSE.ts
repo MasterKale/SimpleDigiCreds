@@ -9,7 +9,7 @@ import {
   type COSEPublicKeyEC2,
   type COSEPublicKeyRSA,
 } from '../cose.ts';
-import { RSAPublicKey } from 'npm:@peculiar/asn1-rsa';
+import { RSAPublicKey } from '@peculiar/asn1-rsa';
 
 import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg.ts';
 

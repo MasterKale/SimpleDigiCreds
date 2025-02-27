@@ -1,4 +1,4 @@
-import { assertEquals, assertInstanceOf, assertRejects } from 'jsr:@std/assert';
+import { assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
 
 import type { DCAPIRequestOptions, DCAPIResponse } from './dcapi.ts';
 import { verifyResponse } from './verifyResponse.ts';
