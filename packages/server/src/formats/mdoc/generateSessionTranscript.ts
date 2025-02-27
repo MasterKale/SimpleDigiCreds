@@ -2,6 +2,7 @@ import { encodeCBOR } from '@levischuck/tiny-cbor';
 
 import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
 import type { DCAPIOID4VPSessionTranscript } from './types.ts';
+import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
 
 /**
  * See OID4VP for SessionTranscript composition:
@@ -16,8 +17,18 @@ export async function generateSessionTranscript(
     nonce: string,
   ];
 
+  // Get the origin out of "web-origin:http://localhost:8000"
+  const clientIDParts = request.client_id.match(/web-origin:(?<origin>.*)/i);
+
+  if (!clientIDParts?.groups?.origin) {
+    throw new SimpleDigiCredsError({
+      message: `Could not find an origin in client ID "${request.client_id}"`,
+      code: 'InvalidDCAPIResponse',
+    });
+  }
+
   const handoverInfo: OpenID4VPDCAPIHandoverInfo = [
-    'http://localhost:8000',
+    clientIDParts.groups.origin,
     request.client_id,
     request.nonce,
   ];
