@@ -11,6 +11,8 @@ export function verifyMdocPresentation(
   const decodedResponse = decodeCBOR(responseBytes) as DecodedCredentialResponse;
   const document = decodedResponse.get('documents')[0];
 
+  // TODO: The rest of the owl
+
   return {};
 }
 
