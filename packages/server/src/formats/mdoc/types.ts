@@ -177,3 +177,42 @@ export type COSESign1HeaderProtected = CBORType;
 export type COSESign1HeaderUnprotected = Map<string | number, CBORType>;
 export type COSESign1Payload = Uint8Array | undefined;
 export type COSESign1Signature = Uint8Array;
+
+/**
+ * Sig_structure
+ *
+ * https://datatracker.ietf.org/doc/html/rfc8152#section-4.4
+ *
+ * Structure:
+ * ```
+ * [context, body_protected, sign_protected, external_aad, payload]
+ * ```
+ */
+export type COSESign1SigStructure = [
+  context: 'Signature1',
+  body_protected: Uint8Array,
+  sign_protected: Uint8Array, // (should be empty)
+  external_aad: Uint8Array,
+  payload: Uint8Array,
+];
+
+/**
+ * For some reason mdoc signature verification requires you to omit `external_aad` from
+ * `COSESign1SigStructure`, despite the mdoc spec saying that "The external_aad structure shall be
+ * a bytestring of size zero"
+ */
+export type MdocCOSESign1SigStructure = [
+  context: 'Signature1',
+  body_protected: Uint8Array,
+  sign_protected: Uint8Array, // (should be empty)
+  payload: Uint8Array,
+];
+
+/**
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3.4.1
+ */
+export type DCAPIOID4VPSessionTranscript = [
+  deviceEngagementBytes: null,
+  eReaderKeyBytes: null,
+  handover: ['OpenID4VPDCAPIHandover', Uint8Array],
+];

@@ -1,6 +1,7 @@
 import { decodeCBOR } from '@levischuck/tiny-cbor';
 
 import type { DecodedCredentialResponse } from './types.ts';
+import { verifyIssuerSigned } from './verifyIssuerSigned.ts';
 
 /**
  * Verify an mdoc presentation as returned through the DC API
@@ -12,6 +13,11 @@ export async function verifyMdocPresentation(
   const document = decodedResponse.get('documents')[0];
 
   // TODO: The rest of the owl
+  const { verified: issuerSignedVerified } = await verifyIssuerSigned(document);
+  if (!issuerSignedVerified) {
+    console.error(`could not verify IssuerSigned" (mdoc)`);
+    return {};
+  }
 
   return {};
 }
@@ -32,20 +38,3 @@ export async function verifyMdocPresentation(
  * ```
  */
 export type VerifiedNamespace = { [namespaceID: string]: [elemID: string, elemValue: unknown][] };
-
-const identifiers = [
-  'family_name',
-  'given_name',
-  'birth_date',
-  'issue_date',
-  'expiry_date',
-  'issuing_country',
-  'issuing_authority',
-  'document_number',
-  'portrait',
-  'un_distinguishing_sign',
-  'age_in_years',
-  'age_birth_year',
-  'age_over_NN',
-] as const;
-export type Identifier = typeof identifiers[number];
