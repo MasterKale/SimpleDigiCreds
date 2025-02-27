@@ -4,6 +4,7 @@ import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
 import type { DecodedCredentialResponse } from './types.ts';
 import { verifyIssuerSigned } from './verifyIssuerSigned.ts';
 import { verifyDeviceSigned } from './verifyDeviceSigned.ts';
+import { type VerifiedNamespace, verifyNameSpaces } from './verifyNameSpaces.ts';
 
 /**
  * Verify an mdoc presentation as returned through the DC API
@@ -29,24 +30,11 @@ export async function verifyMdocPresentation(
     return {};
   }
 
-  // TODO: The rest of the owl
+  // Verify the actual claim values
+  const verifiedItems = await verifyNameSpaces(document, request);
 
-  return {};
+  // TODO: In case it's a bad idea to flatten claims like we're doing above
+  // verifiedValues[id] = verifiedItems;
+
+  return verifiedItems;
 }
-
-/**
- * A map of namespaces and their verified, issuer-signed element identifiers and values
- *
- * Example:
- *
- * ```
- * {
- *   "org.iso.18013.5.1": [
- *     [ "given_name", "Jon" ],
- *     [ "family_name", "Smith" ],
- *     [ "age_over_21", true ]
- *   ]
- * }
- * ```
- */
-export type VerifiedNamespace = { [namespaceID: string]: [elemID: string, elemValue: unknown][] };
