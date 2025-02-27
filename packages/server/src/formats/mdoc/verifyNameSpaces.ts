@@ -8,6 +8,8 @@ export async function verifyNameSpaces(
   document: DecodedDocument,
   options: DCAPIRequestOID4VP,
 ): Promise<VerifiedNamespace> {
+  // TODO: Figure out if we should constrain returned values to whatever was explicitly requested,
+  // or if we simply return everything that came back in the doc.
   console.log(options);
 
   const issuerSigned = document.get('issuerSigned');
