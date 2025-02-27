@@ -80,6 +80,71 @@ export type DecodedIssuerSigned = {
  */
 export type DecodedIssuerSignedNameSpaces = Map<string, CBORTag[]>;
 
+export type IssuerAuth = COSESign1<
+  MdocIssuerAuthProtectedBytes,
+  CBORX5Chain,
+  MobileSecurityObjectBytes
+>;
+
+export type MdocIssuerAuthProtectedBytes = Uint8Array;
+export type MdocIssuerAuthProtected = {
+  /**
+   * From mdoc 9.1.3.6:
+   *
+   * “ES256” (ECDSA with SHA-256), “ES384” (ECDSA with SHA-384), “ES512” (ECDSA with
+   * SHA-512) or “EdDSA” (EdDSA).
+   */
+  get(
+    key: COSEHEADER.ALG,
+  ): COSEALG.ES256 | COSEALG.ES384 | COSEALG.ES512 | COSEALG.EdDSA;
+};
+
+export type MdocDeviceAuthProtectedBytes = Uint8Array;
+export type MdocDeviceAuthProtected = {
+  /**
+   * From mdoc 9.1.3.6:
+   *
+   * “ES256” (ECDSA with SHA-256), “ES384” (ECDSA with SHA-384), “ES512” (ECDSA with
+   * SHA-512) or “EdDSA” (EdDSA).
+   */
+  get(
+    key: COSEHEADER.ALG,
+  ): COSEALG.ES256 | COSEALG.ES384 | COSEALG.ES512 | COSEALG.EdDSA;
+};
+
+export type MobileSecurityObjectBytes = Uint8Array;
+export type MobileSecurityObject = {
+  get(key: 'version'): string; // Version of the MobileSecurityObject
+  get(key: 'digestAlgorithm'): 'SHA-256' | 'SHA-384' | 'SHA-512'; // Message digest algorithm used
+  get(key: 'valueDigests'): ValueDigests; // Digests of all data elements per namespace
+  get(key: 'deviceKeyInfo'): DeviceKeyInfo;
+  get(key: 'docType'): string; // docType as used in Documents
+  get(key: 'validityInfo'): ValidityInfo;
+};
+
+export type ValidityInfo = {
+  get(key: 'signed'): CBORTag;
+  get(key: 'validFrom'): CBORTag;
+  get(key: 'validUntil'): CBORTag;
+};
+
+export type ValueDigests = Map<string, Map<number, Uint8Array>>;
+
+/**  */
+export type DeviceKeyInfo = {
+  get(key: 'deviceKey'): COSEPublicKeyEC2 | COSEPublicKeyOKP;
+  get(key: 'keyAuthorizations'): KeyAuthorizations;
+};
+
+/** */
+export type KeyAuthorizations = {
+  get(key: 'nameSpaces'): AuthorizedNameSpaces | undefined;
+  get(key: 'dataElements'): AuthorizedDataElements | undefined;
+};
+
+export type AuthorizedNameSpaces = unknown; // Spec type: `[+ NameSpace]`
+export type AuthorizedDataElements = unknown; // Spec type: `{+ NameSpace => DataElementsArray}`
+
 export type DecodedIssuerSignedItem = {
   get(key: 'digestID'): number;
   get(key: 'random'): Uint8Array;
