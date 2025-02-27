@@ -41,7 +41,7 @@ export async function verifyResponse({ response, options }: {
       if (isMdocRequest(requestedCred)) {
         // Begin verifying the mdoc
         const responseBytes = decodeBase64Url(matchingResponse);
-        const verifiedNamespace = await verifyMdocPresentation(responseBytes);
+        const verifiedNamespace = await verifyMdocPresentation(responseBytes, request);
 
         // Extract the verified data
         const verifiedData = Object.values(verifiedNamespace);
