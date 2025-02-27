@@ -41,7 +41,7 @@ export async function verifyResponse({ response, options }: {
 
         // Begin verifying the mdoc
         const responseBytes = decodeBase64Url(matchingResponse);
-        const verifiedNamespace = verifyMdocPresentation(responseBytes);
+        const verifiedNamespace = await verifyMdocPresentation(responseBytes);
 
         // Extract the verified data
         const verifiedData = Object.values(verifiedNamespace);

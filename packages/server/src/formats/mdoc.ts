@@ -5,9 +5,9 @@ import { CBORX5Chain, COSEALG, COSEHEADER, COSEPublicKeyEC2, COSEPublicKeyOKP } 
 /**
  * Verify an mdoc presentation as returned through the DC API
  */
-export function verifyMdocPresentation(
+export async function verifyMdocPresentation(
   responseBytes: Uint8Array,
-): VerifiedNamespace {
+): Promise<VerifiedNamespace> {
   const decodedResponse = decodeCBOR(responseBytes) as DecodedCredentialResponse;
   const document = decodedResponse.get('documents')[0];
 
