@@ -36,15 +36,15 @@ export async function verifyDeviceSigned(
     );
   }
 
-  const sessionTranscriptCBORBstr = await generateSessionTranscript(request);
+  const sessionTranscript = await generateSessionTranscript(request);
 
   const deviceSignedNameSpaces = deviceSigned.get('nameSpaces');
 
   const deviceAuthentication = [
     'DeviceAuthentication',
-    sessionTranscriptCBORBstr,
+    sessionTranscript,
     document.get('docType'),
-    encodeCBOR(deviceSignedNameSpaces),
+    deviceSignedNameSpaces,
   ];
   const deviceAuthenticationCBOR = encodeCBOR(deviceAuthentication);
   const deviceAuthenticationCBORBstr = encodeCBOR(new CBORTag(24, deviceAuthenticationCBOR));
