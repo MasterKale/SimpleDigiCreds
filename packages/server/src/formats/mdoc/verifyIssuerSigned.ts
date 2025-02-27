@@ -8,6 +8,7 @@ import type {
   MdocCOSESign1SigStructure,
   MdocIssuerAuthProtected,
 } from './types.ts';
+import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
 
 export async function verifyIssuerSigned(document: DecodedDocument) {
   const issuerSigned = document.get('issuerSigned');
@@ -26,9 +27,10 @@ export async function verifyIssuerSigned(document: DecodedDocument) {
   );
 
   if (!isCOSEPublicKeyEC2(cosePublicKey)) {
-    throw new Error(
-      `Unsupported public key type ${cosePublicKey.get(COSEKEYS.kty)}`,
-    );
+    throw new SimpleDigiCredsError({
+      message: `Unsupported public key type ${cosePublicKey.get(COSEKEYS.kty)}`,
+      code: 'MdocVerificationError',
+    });
   }
 
   const issuerData: MdocCOSESign1SigStructure = [

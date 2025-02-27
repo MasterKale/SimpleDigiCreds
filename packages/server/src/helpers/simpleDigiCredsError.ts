@@ -19,4 +19,6 @@ export class SimpleDigiCredsError extends Error {
   }
 }
 
-export type SimpleDigiCredsErrorCode = 'InvalidDCAPIResponse';
+export type SimpleDigiCredsErrorCode =
+  | 'InvalidDCAPIResponse'
+  | 'MdocVerificationError';

@@ -2,7 +2,6 @@ import { CBORTag, decodeCBOR, encodeCBOR } from '@levischuck/tiny-cbor';
 
 import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
 import { generateSessionTranscript } from './generateSessionTranscript.ts';
-
 import { verifyEC2 } from '../../helpers/verifyEC2.ts';
 import { COSEALG, COSEHEADER, COSEKEYS, isCOSEPublicKeyEC2 } from '../../cose.ts';
 import type {
@@ -11,6 +10,7 @@ import type {
   MdocIssuerAuthProtected,
   MobileSecurityObject,
 } from './types.ts';
+import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
 
 export async function verifyDeviceSigned(
   document: DecodedDocument,
@@ -31,9 +31,10 @@ export async function verifyDeviceSigned(
   const documentDocType = document.get('docType');
   const decodedMSODocType = decodedMSO.get('docType');
   if (decodedMSODocType !== documentDocType) {
-    throw new Error(
-      `mso docType "${decodedMSODocType}" did not match doc docType "${documentDocType}"`,
-    );
+    throw new SimpleDigiCredsError({
+      message: `mso docType "${decodedMSODocType}" did not match doc docType "${documentDocType}"`,
+      code: 'MdocVerificationError',
+    });
   }
 
   const sessionTranscript = await generateSessionTranscript(request);
@@ -71,9 +72,10 @@ export async function verifyDeviceSigned(
   }
 
   if (!isCOSEPublicKeyEC2(devicePublicKey)) {
-    throw new Error(
-      `Unsupported public key type ${devicePublicKey.get(COSEKEYS.kty)}`,
-    );
+    throw new SimpleDigiCredsError({
+      message: `Unsupported public key type ${devicePublicKey.get(COSEKEYS.kty)}`,
+      code: 'MdocVerificationError',
+    });
   }
 
   const decodedMdocIssuerAuthProtected = decodeCBOR(issuerAuth[0]) as MdocIssuerAuthProtected;
@@ -85,8 +87,6 @@ export async function verifyDeviceSigned(
     signature: deviceSignature[3],
     shaHashOverride: hashAlg,
   });
-
-  // TODO: Figure out what to do with valueDigests
 
   return { verified };
 }

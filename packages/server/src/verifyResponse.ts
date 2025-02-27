@@ -55,7 +55,10 @@ export async function verifyResponse({ response, options }: {
           verifiedValues[id][claimName] = claimValue;
         }
       } else {
-        throw new Error(`Unsupported request structure for cred id "${requestedCred.id}")`);
+        throw new SimpleDigiCredsError({
+          message: `Unsupported request structure for cred id "${requestedCred.id}")`,
+          code: 'InvalidDCAPIResponse',
+        });
       }
     }
   }

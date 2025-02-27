@@ -23,7 +23,7 @@ export async function generateSessionTranscript(
   if (!clientIDParts?.groups?.origin) {
     throw new SimpleDigiCredsError({
       message: `Could not find an origin in client ID "${request.client_id}"`,
-      code: 'InvalidDCAPIResponse',
+      code: 'MdocVerificationError',
     });
   }
 
