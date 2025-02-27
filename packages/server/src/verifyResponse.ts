@@ -4,7 +4,7 @@ import type { DCAPIRequestOptions } from './dcapi.ts';
 import type { OID4VPClaimQuery, OID4VPCredentialQueryMdoc } from './protocols/oid4vp.ts';
 import { SimpleDigiCredsError } from './helpers/simpleDigiCredsError.ts';
 import { isDCAPIResponse } from './helpers/isDCAPIResponse.ts';
-import { verifyMdocPresentation } from './formats/mdoc.ts';
+import { verifyMdocPresentation } from './formats/mdoc/index.ts';
 
 /**
  * Verify and return a credential presentation out of a call to the Digital Credentials API

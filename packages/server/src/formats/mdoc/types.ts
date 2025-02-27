@@ -1,38 +1,22 @@
-import { type CBORTag, type CBORType, decodeCBOR } from '@levischuck/tiny-cbor';
+import type { CBORTag, CBORType } from '@levischuck/tiny-cbor';
 
-import { CBORX5Chain, COSEALG, COSEHEADER, COSEPublicKeyEC2, COSEPublicKeyOKP } from '../cose.ts';
-
-/**
- * Verify an mdoc presentation as returned through the DC API
- */
-export async function verifyMdocPresentation(
-  responseBytes: Uint8Array,
-): Promise<VerifiedNamespace> {
-  const decodedResponse = decodeCBOR(responseBytes) as DecodedCredentialResponse;
-  const document = decodedResponse.get('documents')[0];
-
-  // TODO: The rest of the owl
-
-  return {};
-}
+import type {
+  CBORX5Chain,
+  COSEALG,
+  COSEHEADER,
+  COSEPublicKeyEC2,
+  COSEPublicKeyOKP,
+} from '../../cose.ts';
 
 /**
- * A map of namespaces and their verified, issuer-signed element identifiers and values
- *
- * Example:
- *
- * ```
- * {
- *   "org.iso.18013.5.1": [
- *     [ "given_name", "Jon" ],
- *     [ "family_name", "Smith" ],
- *     [ "age_over_21", true ]
- *   ]
- * }
- * ```
+ * 7.1 mDL document type and namespace
  */
-export type VerifiedNamespace = { [namespaceID: string]: [elemID: string, elemValue: unknown][] };
+export type NamespaceMDLv1 = 'org.iso.18013.5.1';
+export type DocumentTypeMDLv1 = `${NamespaceMDLv1}.mDL`;
 
+/**
+ * List of mdoc identifiers
+ */
 const identifiers = [
   'family_name',
   'given_name',
@@ -49,12 +33,6 @@ const identifiers = [
   'age_over_NN',
 ] as const;
 export type Identifier = typeof identifiers[number];
-
-/**
- * 7.1 mDL document type and namespace
- */
-export type NamespaceMDLv1 = 'org.iso.18013.5.1';
-export type DocumentTypeMDLv1 = `${NamespaceMDLv1}.mDL`;
 
 /**
  * CBOR-related data structure definitions

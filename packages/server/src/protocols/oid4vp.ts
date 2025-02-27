@@ -1,4 +1,4 @@
-import type { Identifier } from '../formats/mdoc.ts';
+import type { Identifier } from '../formats/mdoc/types.ts';
 
 /**
  * Protocol for requesting documents

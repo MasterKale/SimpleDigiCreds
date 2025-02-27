@@ -11,4 +11,4 @@ export type {
   PathPointer,
 } from './protocols/oid4vp.ts';
 
-export type { DocumentTypeMDLv1, Identifier, NamespaceMDLv1 } from './formats/mdoc.ts';
+export type { DocumentTypeMDLv1, Identifier, NamespaceMDLv1 } from './formats/mdoc/types.ts';
