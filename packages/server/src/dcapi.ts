@@ -1,4 +1,4 @@
-import type { OID4VPClaimQuery, OID4VPCredentialQueryMdoc } from './protocols/oid4vp.ts';
+import type { OID4VPCredentialQuery, OID4VPCredentialQueryMdoc } from './protocols/oid4vp.ts';
 
 /**
  * OID4VP-specific request parameters
@@ -16,7 +16,7 @@ export type DCAPIRequestOID4VP = {
   nonce: string;
   /** An array of credentials being requested */
   dcql_query: {
-    credentials: (OID4VPClaimQuery | OID4VPCredentialQueryMdoc)[];
+    credentials: (OID4VPCredentialQuery | OID4VPCredentialQueryMdoc)[];
   };
 };
 
