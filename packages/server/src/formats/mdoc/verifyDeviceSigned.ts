@@ -40,6 +40,9 @@ export async function verifyDeviceSigned(
 
   const deviceSignedNameSpaces = deviceSigned.get('nameSpaces');
 
+  /**
+   * The shape of this is defined in mdoc
+   */
   const deviceAuthentication = [
     'DeviceAuthentication',
     sessionTranscript,
