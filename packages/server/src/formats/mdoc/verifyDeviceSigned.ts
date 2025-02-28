@@ -26,7 +26,22 @@ export async function verifyDeviceSigned(
   const decodedMSO = decodeCBOR(decodedMSOBytes.value as Uint8Array) as MobileSecurityObject;
 
   // console.log('decodedMSO:', decodedMSO);
-  // TODO: Validate `decodedMSO.validityInfo.validFrom` and `decodedMSO.validityInfo.validUntil`
+
+  // Make sure the credential is chronologically valid
+  const validityInfo = decodedMSO.get('validityInfo');
+  const validFrom = validityInfo.get('validFrom').value as string;
+  const validUntil = validityInfo.get('validUntil').value as string;
+
+  const dateValidFrom = new Date(Date.parse(validFrom));
+  const dateValidUntil = new Date(Date.parse(validUntil));
+  const now = new Date(Date.now());
+
+  if (dateValidFrom > now || dateValidUntil < now) {
+    throw new SimpleDigiCredsError({
+      message: `Credential is not yet valid or is expired`,
+      code: 'MdocVerificationError',
+    });
+  }
 
   const documentDocType = document.get('docType');
   const decodedMSODocType = decodedMSO.get('docType');
