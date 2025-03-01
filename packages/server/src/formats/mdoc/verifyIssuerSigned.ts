@@ -1,18 +1,20 @@
 import { decodeCBOR, encodeCBOR } from '@levischuck/tiny-cbor';
-import * as base64 from '@hexagon/base64';
 import { AsnParser } from '@peculiar/asn1-schema';
 import { Certificate } from '@peculiar/asn1-x509';
 
 import { COSEHEADER, COSEKEYS, isCOSEPublicKeyEC2 } from '../../cose.ts';
-import { convertX509PublicKeyToCOSE } from '../../helpers/convertX509PublicKeyToCOSE.ts';
-import { verifyEC2 } from '../../helpers/verifyEC2.ts';
+import {
+  convertCertBufferToPEM,
+  convertX509PublicKeyToCOSE,
+  isX509Array,
+  SimpleDigiCredsError,
+  verifyEC2,
+} from '../../helpers/index.ts';
 import type {
   DecodedDocument,
   MdocCOSESign1SigStructure,
   MdocIssuerAuthProtected,
 } from './types.ts';
-import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
-import { isX509Array } from '../../helpers/isX509Array.ts';
 
 export async function verifyIssuerSigned(document: DecodedDocument) {
   const issuerSigned = document.get('issuerSigned');
@@ -31,11 +33,11 @@ export async function verifyIssuerSigned(document: DecodedDocument) {
   } else {
     leafCert = x5chain;
     // console.log('x5chain:', issuerAuth[1].get(COSEHEADER.X5CHAIN));
-    console.log('b64:', base64.fromArrayBuffer(x5chain));
-    const x509 = AsnParser.parse(x5chain, Certificate);
-    console.log(x509.tbsCertificate.issuer);
-    console.log(x509.tbsCertificate.subject);
-    console.log(x509.tbsCertificate.signature);
+    console.log('PEM:\n', convertCertBufferToPEM(x5chain));
+    // const x509 = AsnParser.parse(x5chain, Certificate);
+    // console.log(x509.tbsCertificate.issuer);
+    // console.log(x509.tbsCertificate.subject);
+    // console.log(x509.tbsCertificate.signature);
   }
 
   const cosePublicKey = convertX509PublicKeyToCOSE(leafCert);

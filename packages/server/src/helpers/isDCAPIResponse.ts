@@ -1,7 +1,5 @@
-import * as base64 from '@hexagon/base64';
-
 import type { DCAPIResponse } from '../dcapi.ts';
-import { SimpleDigiCredsError } from './simpleDigiCredsError.ts';
+import { base64url, SimpleDigiCredsError } from './index.ts';
 
 /**
  * Take a response from the Digital Credential API and make sure it's the expected shape
@@ -37,7 +35,7 @@ export function isDCAPIResponse(response: unknown): response is DCAPIResponse {
       break;
     }
 
-    entriesValid = typeof cred === 'string' && base64.validate(cred, true);
+    entriesValid = typeof cred === 'string' && base64url.isBase64URLString(cred);
   }
 
   if (!entriesValid) {
