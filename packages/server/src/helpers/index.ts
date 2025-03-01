@@ -1,3 +1,4 @@
+export * as base64url from './base64url.ts';
 export { convertCertBufferToPEM } from './convertCertBufferToPEM.ts';
 export { convertX509PublicKeyToCOSE } from './convertX509PublicKeyToCOSE.ts';
 export { generateNonce } from './generateNonce.ts';
