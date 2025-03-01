@@ -213,7 +213,7 @@ export type COSESign1Signature = Uint8Array;
  * https://www.rfc-editor.org/rfc/rfc9360.html#tab-1
  */
 export type CBORX5Chain = {
-  get(key: COSEHEADER.X5CHAIN): COSEX509DERBytes;
+  get(key: COSEHEADER.X5CHAIN): COSEX509DERBytes | COSEX509DERBytes[];
 };
 
 /**
