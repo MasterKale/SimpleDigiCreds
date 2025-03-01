@@ -1,8 +1,6 @@
-import { encodeBase64Url } from '@std/encoding';
-
 import { type COSEALG, COSECRV, COSEKEYS, type COSEPublicKeyEC2 } from '../cose.ts';
 import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';
-import { importKey } from './importKey.ts';
+import { base64url, importKey } from './index.ts';
 import type { SubtleCryptoAlg, SubtleCryptoCrv } from './types.ts';
 
 /**
@@ -52,8 +50,8 @@ export async function verifyEC2(opts: {
   const keyData: JsonWebKey = {
     kty: 'EC',
     crv: _crv,
-    x: encodeBase64Url(x),
-    y: encodeBase64Url(y),
+    x: base64url.bufferToBase64URL(x),
+    y: base64url.bufferToBase64URL(y),
     ext: false,
   };
 

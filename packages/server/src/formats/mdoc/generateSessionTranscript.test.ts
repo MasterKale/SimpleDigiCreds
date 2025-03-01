@@ -1,8 +1,8 @@
 import { assertEquals } from '@std/assert';
-import { decodeHex } from '@std/encoding';
 
 import type { DCAPIRequestOptions } from '../../dcapi.ts';
 import { generateSessionTranscript } from './generateSessionTranscript.ts';
+import { base64url } from '../../helpers/index.ts';
 
 Deno.test('should generate OID4VP-specific session transcript', async () => {
   const options: DCAPIRequestOptions = {
@@ -40,7 +40,7 @@ Deno.test('should generate OID4VP-specific session transcript', async () => {
       null,
       [
         'OpenID4VPDCAPIHandover',
-        decodeHex('fcfc8e99167eb7cf45197b6da20ef77015c2d4419ef5d414202577a1d33d8a19'),
+        base64url.base64URLToBuffer('_PyOmRZ-t89FGXttog73cBXC1EGe9dQUICV3odM9ihk'),
       ],
     ],
   );

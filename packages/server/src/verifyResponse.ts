@@ -1,10 +1,7 @@
-import { decodeBase64Url } from '@std/encoding';
-
 import type { DCAPIRequestOptions } from './dcapi.ts';
 import type { OID4VPCredentialQuery, OID4VPCredentialQueryMdoc } from './protocols/oid4vp.ts';
-import { SimpleDigiCredsError } from './helpers/simpleDigiCredsError.ts';
-import { isDCAPIResponse } from './helpers/isDCAPIResponse.ts';
 import { verifyMdocPresentation } from './formats/mdoc/index.ts';
+import { base64url, isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
 
 /**
  * Verify and return a credential presentation out of a call to the Digital Credentials API
@@ -40,7 +37,7 @@ export async function verifyResponse({ response, options }: {
 
       if (isMdocRequest(requestedCred)) {
         // Begin verifying the mdoc
-        const responseBytes = decodeBase64Url(matchingResponse);
+        const responseBytes = base64url.base64URLToBuffer(matchingResponse);
         const verifiedNamespace = await verifyMdocPresentation(responseBytes, request);
 
         // Extract the verified data
