@@ -2,7 +2,6 @@
   "editor.formatOnSave": true,
   "deno.enable": true,
   "deno.path": "/opt/homebrew/bin/deno",
-  "deno.config": "./deno.json",
   "[typescript]": {
     "editor.defaultFormatter": "denoland.vscode-deno"
   },

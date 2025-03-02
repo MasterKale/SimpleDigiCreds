@@ -1,6 +1,8 @@
-export { generateRequestOptions } from './generateRequestOptions.ts';
-
-export type { DCAPIRequestOID4VP, DCAPIRequestOptions } from './dcapi.ts';
+export {
+  type DCAPIRequestOID4VP,
+  type DCAPIRequestOptions,
+  generateRequestOptions,
+} from './generateRequestOptions.ts';
 
 export type {
   OID4VPClaimQuery,
@@ -9,6 +11,6 @@ export type {
   OID4VPCredentialQueryMdoc,
   OID4VPSupportedMdocClaimName,
   PathPointer,
-} from './protocols/oid4vp.ts';
+} from './oid4vp.ts';
 
-export type { DocumentTypeMDLv1, Identifier, NamespaceMDLv1 } from './formats/mdoc/types.ts';
+export type { DocumentTypeMDLv1, Identifier, NamespaceMDLv1 } from './mdoc.ts';

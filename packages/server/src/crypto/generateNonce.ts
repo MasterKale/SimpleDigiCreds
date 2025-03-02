@@ -1,4 +1,4 @@
-import { base64url } from './index.ts';
+import { encodeBase64Url } from '@std/encoding';
 
 /**
  * Generate a random value suitable for use as a nonce to prevent replay attacks
@@ -8,7 +8,7 @@ export function generateNonce(): string {
 
   globalThis.crypto.getRandomValues(nonce);
 
-  const nonceString = base64url.bufferToBase64URL(nonce);
+  const nonceString = encodeBase64Url(nonce);
 
   return _generateNonceInternals.stubThis(nonceString);
 }

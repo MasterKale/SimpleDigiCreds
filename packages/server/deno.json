@@ -3,12 +3,7 @@
   "version": "0.0.3",
   "exports": "./src/index.ts",
   "imports": {
-    "@hexagon/base64": "npm:@hexagon/base64@^2.0.4",
-    "@levischuck/tiny-cbor": "jsr:@levischuck/tiny-cbor@^0.2.11",
-    "@peculiar/asn1-ecc": "npm:@peculiar/asn1-ecc@^2.3.15",
-    "@peculiar/asn1-rsa": "npm:@peculiar/asn1-rsa@^2.3.15",
-    "@peculiar/asn1-schema": "npm:@peculiar/asn1-schema@^2.3.15",
-    "@peculiar/asn1-x509": "npm:@peculiar/asn1-x509@^2.3.15"
+    "@std/encoding": "jsr:@std/encoding@^1.0.6"
   },
   "tasks": {
     "test": "deno test -A src/",

@@ -1,7 +1,7 @@
-import type { Identifier } from '../formats/mdoc/types.ts';
+import type { Identifier } from './mdoc.ts';
 
 /**
- * OID4VP: Protocol for requesting documents
+ * Protocol for requesting documents
  *
  * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#name-openid4vp-over-the-digital-
  *
@@ -87,9 +87,9 @@ export type OID4VPCredentialQuery = {
 export type OID4VPCredentialQueryMdoc = {
   /** A unique string comprised of alphanumeric, underscore (_) or hyphen (-) characters */
   id: string;
-  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3-2 */
+  /** The format of the requested Verifiable Credential */
   format: 'mso_mdoc';
-  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3.1.1-2.2 */
+  /** mdoc-specific metadata */
   meta: { doctype_value: 'org.iso.18013.5.1.mDL' };
   claims: OID4VPClaimQueryMdoc[];
 };

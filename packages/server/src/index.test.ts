@@ -2,7 +2,7 @@ import { assertEquals } from '@std/assert';
 import { stub } from '@std/testing/mock';
 
 import { generateRequestOptions } from './index.ts';
-import { _generateNonceInternals } from './helpers/generateNonce.ts';
+import { _generateNonceInternals } from './crypto/generateNonce.ts';
 
 Deno.test('Should generate options', () => {
   const mockGenerateNonce = stub(
@@ -35,9 +35,18 @@ Deno.test('Should generate options', () => {
                     doctype_value: 'org.iso.18013.5.1.mDL',
                   },
                   claims: [
-                    { path: ['org.iso.18013.5.1', 'family_name'] },
-                    { path: ['org.iso.18013.5.1', 'given_name'] },
-                    { path: ['org.iso.18013.5.1', 'age_over_21'] },
+                    {
+                      namespace: 'org.iso.18013.5.1',
+                      claim_name: 'family_name',
+                    },
+                    {
+                      namespace: 'org.iso.18013.5.1',
+                      claim_name: 'given_name',
+                    },
+                    {
+                      namespace: 'org.iso.18013.5.1',
+                      claim_name: 'age_over_21',
+                    },
                   ],
                 },
               ],
