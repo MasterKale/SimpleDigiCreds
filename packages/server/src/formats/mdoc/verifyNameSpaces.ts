@@ -10,7 +10,7 @@ export async function verifyNameSpaces(
 ): Promise<VerifiedNamespace> {
   // TODO: Figure out if we should constrain returned values to whatever was explicitly requested,
   // or if we simply return everything that came back in the doc.
-  console.log(options);
+  // console.log(options);
 
   const issuerSigned = document.get('issuerSigned');
   const issuerAuth = issuerSigned.get('issuerAuth');

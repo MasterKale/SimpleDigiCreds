@@ -27,7 +27,7 @@ export async function verifyResponse({ response, options }: {
 
     for (const requestedCred of dcql_query.credentials) {
       const { id } = requestedCred;
-      console.log(requestedCred);
+      // console.log(requestedCred);
 
       const matchingResponse = response.vp_token[id];
 
