@@ -2,7 +2,7 @@ import { assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
 
 import type { DCAPIRequestOptions, DCAPIResponse } from './dcapi.ts';
 import { verifyResponse } from './verifyResponse.ts';
-import { SimpleDigiCredsError } from './helpers/simpleDigiCredsError.ts';
+import { base64url, SimpleDigiCredsError } from './helpers/index.ts';
 
 const options: DCAPIRequestOptions = {
   digital: {
@@ -96,14 +96,21 @@ Deno.test('should verify a well-formed presentation', async () => {
 
   const verified = await verifyResponse({ response, options });
 
-  console.log(verified);
-
   assertEquals(
     verified,
     {
       cred1: {
-        given_name: 'Jon',
-        family_name: 'Smith',
+        verifiedClaims: {
+          given_name: 'Jon',
+          family_name: 'Smith',
+        },
+        meta: {
+          issuerAuth: [
+            base64url.base64URLToBuffer(
+              'MIICwDCCAmegAwIBAgIUHn8bMq1PNO_ksMwHt7DjM6cLGE0wCgYIKoZIzj0EAwIweTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDU1vdW50YWluIFZpZXcxHDAaBgNVBAoME0RpZ2l0YWwgQ3JlZGVudGlhbHMxHzAdBgNVBAMMFmRpZ2l0YWxjcmVkZW50aWFscy5kZXYwHhcNMjUwMjE5MjMzMDE4WhcNMjYwMjE5MjMzMDE4WjB5MQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNTW91bnRhaW4gVmlldzEcMBoGA1UECgwTRGlnaXRhbCBDcmVkZW50aWFsczEfMB0GA1UEAwwWZGlnaXRhbGNyZWRlbnRpYWxzLmRldjBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABOt5Nivi1_OXw1AEfYPh42Is41VrNg9qaMdYuw3cavhsCa-aXV0NmTl2EsNaJ5GWmMoAD8ikwAFszYhIeNgF42mjgcwwgckwHwYDVR0jBBgwFoAUok_0idl8Ruhuo4bZR0jOzL7cz_UwHQYDVR0OBBYEFN_-aloS6cBixLyYpyXS2XD3emAoMDQGA1UdHwQtMCswKaAnoCWGI2h0dHBzOi8vZGlnaXRhbC1jcmVkZW50aWFscy5kZXYvY3JsMCoGA1UdEgQjMCGGH2h0dHBzOi8vZGlnaXRhbC1jcmVkZW50aWFscy5kZXYwDgYDVR0PAQH_BAQDAgeAMBUGA1UdJQEB_wQLMAkGByiBjF0FAQIwCgYIKoZIzj0EAwIDRwAwRAIgYcXL9XzB43vy4LEz2h8gMQRdcJtaIRQOemgwm8sHQucCIHCvouHEm_unjBXMCeUZ7QR_ympjGyHITw25_B9H9QsC',
+            ),
+          ],
+        },
       },
     },
   );

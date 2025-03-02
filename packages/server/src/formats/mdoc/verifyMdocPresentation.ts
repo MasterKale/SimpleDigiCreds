@@ -12,29 +12,43 @@ import { type VerifiedNamespace, verifyNameSpaces } from './verifyNameSpaces.ts'
 export async function verifyMdocPresentation(
   responseBytes: Uint8Array,
   request: DCAPIRequestOID4VP,
-): Promise<VerifiedNamespace> {
+): Promise<VerifiedMdocPresentation> {
   const decodedResponse = decodeCBOR(responseBytes) as DecodedCredentialResponse;
   const document = decodedResponse.get('documents')[0];
 
   // Verify the issuer-signed data
-  const { verified: issuerSignedVerified } = await verifyIssuerSigned(document);
+  const { verified: issuerSignedVerified, x5chain: issuerX5C } = await verifyIssuerSigned(document);
   if (!issuerSignedVerified) {
     console.error('could not verify IssuerSigned (mdoc)');
-    return {};
+    return {
+      verifiedClaims: {},
+      issuerX5C: [],
+    };
   }
 
   // Verify the device-signed data within the verified issuer-signed data
   const { verified: deviceSignedVerified } = await verifyDeviceSigned(document, request);
   if (!deviceSignedVerified) {
     console.error('could not verify DeviceSigned (mdoc)');
-    return {};
+    return {
+      verifiedClaims: {},
+      issuerX5C: [],
+    };
   }
 
   // Verify the actual claim values
-  const verifiedItems = await verifyNameSpaces(document, request);
+  const verifiedClaims = await verifyNameSpaces(document, request);
 
   // TODO: In case it's a bad idea to flatten claims like we're doing above
   // verifiedValues[id] = verifiedItems;
 
-  return verifiedItems;
+  return {
+    verifiedClaims,
+    issuerX5C,
+  };
 }
+
+type VerifiedMdocPresentation = {
+  verifiedClaims: VerifiedNamespace;
+  issuerX5C: Uint8Array[];
+};

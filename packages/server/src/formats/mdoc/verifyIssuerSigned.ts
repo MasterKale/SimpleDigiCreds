@@ -1,6 +1,4 @@
 import { decodeCBOR, encodeCBOR } from '@levischuck/tiny-cbor';
-import { AsnParser } from '@peculiar/asn1-schema';
-import { Certificate } from '@peculiar/asn1-x509';
 
 import { COSEHEADER, COSEKEYS, isCOSEPublicKeyEC2 } from '../../cose.ts';
 import { SimpleDigiCredsError, verifyEC2, x509 } from '../../helpers/index.ts';
@@ -10,28 +8,19 @@ import type {
   MdocIssuerAuthProtected,
 } from './types.ts';
 
-export async function verifyIssuerSigned(document: DecodedDocument) {
+export async function verifyIssuerSigned(document: DecodedDocument): Promise<VerifiedIssuerSigned> {
   const issuerSigned = document.get('issuerSigned');
   const issuerAuth = issuerSigned.get('issuerAuth');
-  // console.log('issuerAuth[0, protected] (decoded):', decodedMdocIssuerAuthProtected);
-  // console.log('issuerAuth[1]:', issuerAuth[1]);
-  // const x5c = AsnParser.parse(issuerAuth[1].get(COSEHEADER.X5CHAIN), Certificate);
-  // console.log('issuerAuth[1, unprotected] (decoded):', x5c);
-  // console.log('issuerAuth[2]:', issuerAuth[2]);
-  // console.log('issuerAuth[3, signature]:', issuerAuth[3]);
 
   const x5chain = issuerAuth[1].get(COSEHEADER.X5CHAIN);
   let leafCert: Uint8Array;
+  let _normalizedX5C: Uint8Array[];
   if (x509.isX509Array(x5chain)) {
     leafCert = x5chain[0];
+    _normalizedX5C = x5chain;
   } else {
     leafCert = x5chain;
-    // console.log('x5chain:', issuerAuth[1].get(COSEHEADER.X5CHAIN));
-    console.log('PEM:\n', x509.convertX509BufferToPEM(x5chain));
-    // const x509 = AsnParser.parse(x5chain, Certificate);
-    // console.log(x509.tbsCertificate.issuer);
-    // console.log(x509.tbsCertificate.subject);
-    // console.log(x509.tbsCertificate.signature);
+    _normalizedX5C = [x5chain];
   }
 
   const cosePublicKey = x509.convertX509PublicKeyToCOSE(leafCert);
@@ -60,5 +49,10 @@ export async function verifyIssuerSigned(document: DecodedDocument) {
     shaHashOverride: hashAlg,
   });
 
-  return { verified };
+  return { verified, x5chain: _normalizedX5C };
 }
+
+type VerifiedIssuerSigned = {
+  verified: boolean;
+  x5chain: Uint8Array[];
+};

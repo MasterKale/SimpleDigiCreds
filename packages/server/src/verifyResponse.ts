@@ -27,6 +27,7 @@ export async function verifyResponse({ response, options }: {
 
     for (const requestedCred of dcql_query.credentials) {
       const { id } = requestedCred;
+      console.log(requestedCred);
 
       const matchingResponse = response.vp_token[id];
 
@@ -38,18 +39,23 @@ export async function verifyResponse({ response, options }: {
       if (isMdocRequest(requestedCred)) {
         // Begin verifying the mdoc
         const responseBytes = base64url.base64URLToBuffer(matchingResponse);
-        const verifiedNamespace = await verifyMdocPresentation(responseBytes, request);
+        const verifiedPresentation = await verifyMdocPresentation(responseBytes, request);
 
         // Extract the verified data
-        const verifiedData = Object.values(verifiedNamespace);
-        if (verifiedData.length < 1) {
-          console.warn('document had no verified data, skipping');
+        const verifiedClaims = Object.values(verifiedPresentation.verifiedClaims);
+        if (verifiedClaims.length < 1) {
+          console.warn('document had no verifiable claims, skipping');
           continue;
         }
 
-        verifiedValues[id] = {};
-        for (const [claimName, claimValue] of verifiedData[0]) {
-          verifiedValues[id][claimName] = claimValue;
+        verifiedValues[id] = {
+          verifiedClaims: {},
+          meta: {
+            issuerAuth: verifiedPresentation.issuerX5C,
+          },
+        };
+        for (const [claimName, claimValue] of verifiedClaims[0]) {
+          verifiedValues[id].verifiedClaims[claimName] = claimValue;
         }
       } else {
         throw new SimpleDigiCredsError({
@@ -64,23 +70,38 @@ export async function verifyResponse({ response, options }: {
 }
 
 /**
- * Claims that could be successfully verified, mapped by requested credential ID
+ * Claims that could be successfully verified, mapped by requested credential ID. Also includes
+ * values that can be used to verify the issuer and wallet when available.
  *
  * Example:
  *
  * ```
  * {
  *   cred1: {
- *     given_name: 'Jon',
- *     family_name: 'Smith',
- *     age_over_21: true,
+ *     verifiedClaims: {
+ *       given_name: 'Jon',
+ *       family_name: 'Smith',
+ *       age_over_21: true,
+ *     },
+ *     meta: {
+ *       issuerAuth: [...],
+ *       walletAuth: [...],
+ *     },
  *   }
  * }
  * ```
  */
 export type VerifiedResponse = {
-  [credID: string]: { [claimName: string]: unknown };
+  [credID: string]: {
+    verifiedClaims: VerifiedClaims;
+    meta: {
+      issuerAuth?: unknown;
+      walletAuth?: unknown;
+    };
+  };
 };
+
+type VerifiedClaims = { [claimName: string]: unknown };
 
 /**
  * Help clarify the format of the credential being requested
