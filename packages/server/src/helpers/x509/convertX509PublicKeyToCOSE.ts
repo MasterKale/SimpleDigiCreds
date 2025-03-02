@@ -8,14 +8,12 @@ import {
   type COSEPublicKey,
   type COSEPublicKeyEC2,
   type COSEPublicKeyRSA,
-} from '../cose.ts';
+} from '../../cose.ts';
 import { RSAPublicKey } from '@peculiar/asn1-rsa';
 
 import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg.ts';
 
-export function convertX509PublicKeyToCOSE(
-  x509Certificate: Uint8Array,
-): COSEPublicKey {
+export function convertX509PublicKeyToCOSE(x509Certificate: Uint8Array): COSEPublicKey {
   let cosePublicKey: COSEPublicKey = new Map();
 
   /**

@@ -1,10 +1,10 @@
 import { assert, assertEquals } from '@std/assert';
 
-import { convertCertBufferToPEM } from './convertCertBufferToPEM.ts';
+import { convertX509BufferToPEM } from './convertX509BufferToPEM.ts';
 
 Deno.test('should return pem when input is buffer', () => {
   const input = new Uint8Array(128).fill(0);
-  const actual = convertCertBufferToPEM(input);
+  const actual = convertX509BufferToPEM(input);
   const actualPemArr = actual.split('\n');
   assertEquals(
     actual,

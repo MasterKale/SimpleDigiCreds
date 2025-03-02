@@ -3,13 +3,7 @@ import { AsnParser } from '@peculiar/asn1-schema';
 import { Certificate } from '@peculiar/asn1-x509';
 
 import { COSEHEADER, COSEKEYS, isCOSEPublicKeyEC2 } from '../../cose.ts';
-import {
-  convertCertBufferToPEM,
-  convertX509PublicKeyToCOSE,
-  isX509Array,
-  SimpleDigiCredsError,
-  verifyEC2,
-} from '../../helpers/index.ts';
+import { SimpleDigiCredsError, verifyEC2, x509 } from '../../helpers/index.ts';
 import type {
   DecodedDocument,
   MdocCOSESign1SigStructure,
@@ -28,19 +22,19 @@ export async function verifyIssuerSigned(document: DecodedDocument) {
 
   const x5chain = issuerAuth[1].get(COSEHEADER.X5CHAIN);
   let leafCert: Uint8Array;
-  if (isX509Array(x5chain)) {
+  if (x509.isX509Array(x5chain)) {
     leafCert = x5chain[0];
   } else {
     leafCert = x5chain;
     // console.log('x5chain:', issuerAuth[1].get(COSEHEADER.X5CHAIN));
-    console.log('PEM:\n', convertCertBufferToPEM(x5chain));
+    console.log('PEM:\n', x509.convertX509BufferToPEM(x5chain));
     // const x509 = AsnParser.parse(x5chain, Certificate);
     // console.log(x509.tbsCertificate.issuer);
     // console.log(x509.tbsCertificate.subject);
     // console.log(x509.tbsCertificate.signature);
   }
 
-  const cosePublicKey = convertX509PublicKeyToCOSE(leafCert);
+  const cosePublicKey = x509.convertX509PublicKeyToCOSE(leafCert);
 
   if (!isCOSEPublicKeyEC2(cosePublicKey)) {
     throw new SimpleDigiCredsError({

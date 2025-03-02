@@ -1,11 +1,8 @@
 export * as base64url from './base64url.ts';
-export { convertCertBufferToPEM } from './convertCertBufferToPEM.ts';
-export { convertX509PublicKeyToCOSE } from './convertX509PublicKeyToCOSE.ts';
+export * as x509 from './x509/index.ts';
 export { generateNonce } from './generateNonce.ts';
 export { importKey } from './importKey.ts';
 export { isDCAPIResponse } from './isDCAPIResponse.ts';
-export { isX509Array } from './isX509Array.ts';
 export { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';
-export { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg.ts';
 export { SimpleDigiCredsError, type SimpleDigiCredsErrorCode } from './simpleDigiCredsError.ts';
 export { verifyEC2 } from './verifyEC2.ts';
