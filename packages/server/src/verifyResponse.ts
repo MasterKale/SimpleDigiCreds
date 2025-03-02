@@ -94,6 +94,7 @@ export async function verifyResponse({ response, options }: {
 export type VerifiedResponse = {
   [credID: string]: {
     verifiedClaims: VerifiedClaims;
+    // TODO: What other data should come out of this?
     meta: {
       issuerAuth?: unknown;
       walletAuth?: unknown;
