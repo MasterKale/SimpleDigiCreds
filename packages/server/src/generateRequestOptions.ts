@@ -3,7 +3,7 @@ import type {
   OID4VPCredentialQueryMdoc,
   OID4VPSupportedMdocClaimName,
 } from './protocols/oid4vp.ts';
-import type { DCAPIRequestOptions } from './dcapi.ts';
+import type { CredentialRequestOptions } from './dcapi.ts';
 
 /**
  * Generate credential presentation request options suitable for passing into
@@ -20,7 +20,7 @@ export function generateRequestOptions(
     desiredClaims: OID4VPSupportedMdocClaimName[];
     requestOrigin: string;
   },
-): DCAPIRequestOptions {
+): CredentialRequestOptions {
   const mdocCredentialRequest: OID4VPCredentialQueryMdoc = {
     id: 'cred1',
     format: 'mso_mdoc',
@@ -36,15 +36,18 @@ export function generateRequestOptions(
     digital: {
       requests: [
         {
-          response_type: 'vp_token',
-          response_mode: 'dc_api',
-          client_id: `web-origin:${requestOrigin}`,
-          nonce: generateNonce(),
-          // https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#dcql_query
-          dcql_query: {
-            credentials: [
-              mdocCredentialRequest,
-            ],
+          protocol: 'oid4vp',
+          data: {
+            response_type: 'vp_token',
+            response_mode: 'dc_api',
+            client_id: `web-origin:${requestOrigin}`,
+            nonce: generateNonce(),
+            // https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#dcql_query
+            dcql_query: {
+              credentials: [
+                mdocCredentialRequest,
+              ],
+            },
           },
         },
       ],
