@@ -25,7 +25,7 @@ app.get("/options", async (ctx) => {
     digital: {
       providers: [{
         protocol: "openid4vp",
-        request: options.digital.requests[0],
+        request: options.digital.requests[0].data,
       }],
     },
   };
