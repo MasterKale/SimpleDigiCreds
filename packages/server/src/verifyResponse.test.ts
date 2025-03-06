@@ -1,29 +1,32 @@
 import { assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
 
-import type { DCAPIRequestOptions, DCAPIResponse } from './dcapi.ts';
+import type { CredentialRequestOptions, DCAPIResponse } from './dcapi.ts';
 import { verifyResponse } from './verifyResponse.ts';
 import { base64url, SimpleDigiCredsError } from './helpers/index.ts';
 
-const options: DCAPIRequestOptions = {
+const options: CredentialRequestOptions = {
   digital: {
     requests: [
       {
-        response_type: 'vp_token',
-        response_mode: 'dc_api',
-        client_id: 'web-origin:http://localhost:8000',
-        nonce: '9M90LkDtCtucTZq8brlkpKHnGf1HpQKCpPKYTPk5MaA',
-        dcql_query: {
-          credentials: [
-            {
-              id: 'cred1',
-              format: 'mso_mdoc',
-              meta: { doctype_value: 'org.iso.18013.5.1.mDL' },
-              claims: [
-                { path: ['org.iso.18013.5.1', 'family_name'] },
-                { path: ['org.iso.18013.5.1', 'given_name'] },
-              ],
-            },
-          ],
+        protocol: 'openid4vp',
+        data: {
+          response_type: 'vp_token',
+          response_mode: 'dc_api',
+          client_id: 'web-origin:http://localhost:8000',
+          nonce: '9M90LkDtCtucTZq8brlkpKHnGf1HpQKCpPKYTPk5MaA',
+          dcql_query: {
+            credentials: [
+              {
+                id: 'cred1',
+                format: 'mso_mdoc',
+                meta: { doctype_value: 'org.iso.18013.5.1.mDL' },
+                claims: [
+                  { path: ['org.iso.18013.5.1', 'family_name'] },
+                  { path: ['org.iso.18013.5.1', 'given_name'] },
+                ],
+              },
+            ],
+          },
         },
       },
     ],
@@ -61,26 +64,29 @@ Deno.test('should error on bad `vp_token` entries', async () => {
 });
 
 Deno.test('should verify a well-formed presentation', async () => {
-  const options: DCAPIRequestOptions = {
+  const options: CredentialRequestOptions = {
     digital: {
       requests: [
         {
-          response_type: 'vp_token',
-          response_mode: 'dc_api',
-          client_id: 'web-origin:http://localhost:8000',
-          nonce: 'Glgd3WVI_6Uy8fjtI22ol0JGiJVq4GLuHGW6OCHV3_o',
-          dcql_query: {
-            credentials: [
-              {
-                id: 'cred1',
-                format: 'mso_mdoc',
-                meta: { doctype_value: 'org.iso.18013.5.1.mDL' },
-                claims: [
-                  { path: ['org.iso.18013.5.1', 'family_name'] },
-                  { path: ['org.iso.18013.5.1', 'given_name'] },
-                ],
-              },
-            ],
+          protocol: 'openid4vp',
+          data: {
+            response_type: 'vp_token',
+            response_mode: 'dc_api',
+            client_id: 'web-origin:http://localhost:8000',
+            nonce: 'Glgd3WVI_6Uy8fjtI22ol0JGiJVq4GLuHGW6OCHV3_o',
+            dcql_query: {
+              credentials: [
+                {
+                  id: 'cred1',
+                  format: 'mso_mdoc',
+                  meta: { doctype_value: 'org.iso.18013.5.1.mDL' },
+                  claims: [
+                    { path: ['org.iso.18013.5.1', 'family_name'] },
+                    { path: ['org.iso.18013.5.1', 'given_name'] },
+                  ],
+                },
+              ],
+            },
           },
         },
       ],

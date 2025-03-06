@@ -1,4 +1,4 @@
-import type { DCAPIRequestOptions } from './dcapi.ts';
+import type { CredentialRequestOptions } from './dcapi.ts';
 import type { OID4VPCredentialQuery, OID4VPCredentialQueryMdoc } from './protocols/oid4vp.ts';
 import { verifyMdocPresentation } from './formats/mdoc/index.ts';
 import { base64url, isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
@@ -8,7 +8,7 @@ import { base64url, isDCAPIResponse, SimpleDigiCredsError } from './helpers/inde
  */
 export async function verifyResponse({ response, options }: {
   response: unknown;
-  options: DCAPIRequestOptions;
+  options: CredentialRequestOptions;
 }): Promise<VerifiedResponse> {
   const verifiedValues: VerifiedResponse = {};
 
@@ -23,7 +23,7 @@ export async function verifyResponse({ response, options }: {
 
   // We've verified the shape of the response, now verify it
   for (const request of options.digital.requests) {
-    const { dcql_query } = request;
+    const { dcql_query } = request.data;
 
     for (const requestedCred of dcql_query.credentials) {
       const { id } = requestedCred;
@@ -39,7 +39,7 @@ export async function verifyResponse({ response, options }: {
       if (isMdocRequest(requestedCred)) {
         // Begin verifying the mdoc
         const responseBytes = base64url.base64URLToBuffer(matchingResponse);
-        const verifiedPresentation = await verifyMdocPresentation(responseBytes, request);
+        const verifiedPresentation = await verifyMdocPresentation(responseBytes, request.data);
 
         // Extract the verified data
         const verifiedClaims = Object.values(verifiedPresentation.verifiedClaims);
