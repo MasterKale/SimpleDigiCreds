@@ -70,8 +70,11 @@
             let response;
             try {
               response = await navigator.credentials.get(optionsJSON);
-              console.log("Raw response:", response);
-              printDebug("Response", response.data);
+              console.log("Raw presentation:", response);
+              printDebug(
+                "Raw Presentation",
+                JSON.stringify(response.data, null, 2)
+              );
             } catch (err) {
               elemError.innerText = `${err}`;
               console.error(err);
