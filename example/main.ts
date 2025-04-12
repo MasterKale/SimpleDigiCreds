@@ -37,7 +37,9 @@ app.post("/verify", async (ctx) => {
     options: currentOptions,
   });
 
-  return ctx.json(verified);
+  console.log("verified claims:\n", JSON.stringify(verified, null, 2));
+
+  return ctx.json({ verified });
 });
 
 Deno.serve({ hostname: "localhost" }, app.fetch);
