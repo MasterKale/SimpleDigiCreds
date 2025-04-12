@@ -16,21 +16,9 @@ app.get("/options", async (ctx) => {
 
   console.log(JSON.stringify(options, null, 2));
 
-  /**
-   * This is an older format of the DC API call. We have to call it this way for now till a
-   * future Chrome update (currently on Chrome Canary 134) adds support for the newer DC API
-   * call structure
-   */
-  const _options = {
-    digital: {
-      providers: [{
-        protocol: "openid4vp",
-        request: options.digital.requests[0].data,
-      }],
-    },
-  };
+  currentOptions = options;
 
-  return ctx.json(_options);
+  return ctx.json(options);
 });
 
 app.post("/verify", async (ctx) => {
