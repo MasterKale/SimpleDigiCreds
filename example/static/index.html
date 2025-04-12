@@ -83,7 +83,10 @@
 
             const verification = await fetch("/verify", {
               method: "post",
-              body: response.data,
+              body: JSON.stringify(response.data),
+              headers: {
+                "Content-Type": "application/json",
+              },
             });
             const verificationJSON = await verification.json();
 
