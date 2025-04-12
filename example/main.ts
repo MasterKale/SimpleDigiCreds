@@ -1,7 +1,13 @@
 import { Hono } from "hono";
 import { serveStatic } from "hono/deno";
 
-import { generateRequestOptions } from "../packages/server/src/index.ts";
+import {
+  CredentialRequestOptions,
+  generateRequestOptions,
+  verifyResponse,
+} from "../packages/server/src/index.ts";
+
+let currentOptions: CredentialRequestOptions;
 
 const app = new Hono();
 
@@ -26,9 +32,12 @@ app.post("/verify", async (ctx) => {
 
   console.log("verifying presentation", body);
 
-  return ctx.json({
-    verified: "TODO",
+  const verified = await verifyResponse({
+    response: body,
+    options: currentOptions,
   });
+
+  return ctx.json(verified);
 });
 
 Deno.serve({ hostname: "localhost" }, app.fetch);
