@@ -2,6 +2,7 @@ import { decodeCBOR, encodeCBOR } from '@levischuck/tiny-cbor';
 
 import { COSEHEADER, COSEKEYS, isCOSEPublicKeyEC2 } from '../../cose.ts';
 import { SimpleDigiCredsError, verifyEC2, x509 } from '../../helpers/index.ts';
+import type { Uint8Array_ } from '../../helpers/types.ts';
 import type {
   DecodedDocument,
   MdocCOSESign1SigStructure,
@@ -13,8 +14,8 @@ export async function verifyIssuerSigned(document: DecodedDocument): Promise<Ver
   const issuerAuth = issuerSigned.get('issuerAuth');
 
   const x5chain = issuerAuth[1].get(COSEHEADER.X5CHAIN);
-  let leafCert: Uint8Array<ArrayBuffer>;
-  let _normalizedX5C: Uint8Array<ArrayBuffer>[];
+  let leafCert: Uint8Array_;
+  let _normalizedX5C: Uint8Array_[];
   if (x509.isX509Array(x5chain)) {
     leafCert = x5chain[0];
     _normalizedX5C = x5chain;
@@ -44,7 +45,7 @@ export async function verifyIssuerSigned(document: DecodedDocument): Promise<Ver
 
   const verified = await verifyEC2({
     cosePublicKey,
-    data: encodeCBOR(issuerData) as Uint8Array<ArrayBuffer>,
+    data: encodeCBOR(issuerData) as Uint8Array_,
     signature: issuerAuth[3],
     shaHashOverride: hashAlg,
   });
@@ -54,5 +55,5 @@ export async function verifyIssuerSigned(document: DecodedDocument): Promise<Ver
 
 type VerifiedIssuerSigned = {
   verified: boolean;
-  x5chain: Uint8Array<ArrayBuffer>[];
+  x5chain: Uint8Array_[];
 };

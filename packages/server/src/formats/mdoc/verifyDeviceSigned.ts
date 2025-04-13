@@ -11,6 +11,7 @@ import type {
   MobileSecurityObject,
 } from './types.ts';
 import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
+import type { Uint8Array_ } from '../../helpers/types.ts';
 
 export async function verifyDeviceSigned(
   document: DecodedDocument,
@@ -23,7 +24,7 @@ export async function verifyDeviceSigned(
   // These bytes were provably signed above during IssuerAuth verification
   const decodedMSOBytes = decodeCBOR(issuerAuth[2]) as CBORTag;
   const decodedMSO = decodeCBOR(
-    decodedMSOBytes.value as Uint8Array<ArrayBuffer>,
+    decodedMSOBytes.value as Uint8Array_,
   ) as MobileSecurityObject;
 
   // Make sure the credential is chronologically valid
@@ -67,7 +68,7 @@ export async function verifyDeviceSigned(
   const deviceAuthenticationCBOR = encodeCBOR(deviceAuthentication);
   const deviceAuthenticationCBORBstr = encodeCBOR(
     new CBORTag(24, deviceAuthenticationCBOR),
-  ) as Uint8Array<ArrayBuffer>;
+  ) as Uint8Array_;
 
   const deviceAuth = deviceSigned.get('deviceAuth');
   const deviceSignature = deviceAuth.get('deviceSignature');
@@ -99,7 +100,7 @@ export async function verifyDeviceSigned(
 
   const verified = await verifyEC2({
     cosePublicKey: devicePublicKey,
-    data: encodeCBOR(deviceData) as Uint8Array<ArrayBuffer>,
+    data: encodeCBOR(deviceData) as Uint8Array_,
     signature: deviceSignature[3],
     shaHashOverride: hashAlg,
   });

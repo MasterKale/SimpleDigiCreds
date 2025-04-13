@@ -6,12 +6,13 @@ import { verifyIssuerSigned } from './verifyIssuerSigned.ts';
 import { verifyDeviceSigned } from './verifyDeviceSigned.ts';
 import { type VerifiedNamespace, verifyNameSpaces } from './verifyNameSpaces.ts';
 import { convertX509BufferToPEM } from '../../helpers/x509/index.ts';
+import type { Uint8Array_ } from '../../helpers/types.ts';
 
 /**
  * Verify an mdoc presentation as returned through the DC API
  */
 export async function verifyMdocPresentation(
-  responseBytes: Uint8Array<ArrayBuffer>,
+  responseBytes: Uint8Array_,
   request: DCAPIRequestOID4VP,
 ): Promise<VerifiedMdocPresentation> {
   const decodedResponse = decodeCBOR(responseBytes) as DecodedCredentialResponse;

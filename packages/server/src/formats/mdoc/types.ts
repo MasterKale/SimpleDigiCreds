@@ -7,6 +7,7 @@ import type {
   COSEPublicKeyEC2,
   COSEPublicKeyOKP,
 } from '../../cose.ts';
+import type { Uint8Array_ } from '../../helpers/types.ts';
 
 /**
  * 7.1 mDL document type and namespace
@@ -66,7 +67,7 @@ export type IssuerAuth = COSESign1<
   MobileSecurityObjectBytes
 >;
 
-export type MdocIssuerAuthProtectedBytes = Uint8Array<ArrayBuffer>;
+export type MdocIssuerAuthProtectedBytes = Uint8Array_;
 export type MdocIssuerAuthProtected = {
   /**
    * From mdoc 9.1.3.6:
@@ -79,7 +80,7 @@ export type MdocIssuerAuthProtected = {
   ): COSEALG.ES256 | COSEALG.ES384 | COSEALG.ES512 | COSEALG.EdDSA;
 };
 
-export type MdocDeviceAuthProtectedBytes = Uint8Array<ArrayBuffer>;
+export type MdocDeviceAuthProtectedBytes = Uint8Array_;
 export type MdocDeviceAuthProtected = {
   /**
    * From mdoc 9.1.3.6:
@@ -92,7 +93,7 @@ export type MdocDeviceAuthProtected = {
   ): COSEALG.ES256 | COSEALG.ES384 | COSEALG.ES512 | COSEALG.EdDSA;
 };
 
-export type MobileSecurityObjectBytes = Uint8Array<ArrayBuffer>;
+export type MobileSecurityObjectBytes = Uint8Array_;
 export type MobileSecurityObject = {
   get(key: 'version'): string; // Version of the MobileSecurityObject
   get(key: 'digestAlgorithm'): 'SHA-256' | 'SHA-384' | 'SHA-512'; // Message digest algorithm used
@@ -108,7 +109,7 @@ export type ValidityInfo = {
   get(key: 'validUntil'): CBORTag;
 };
 
-export type ValueDigests = Map<string, Map<number, Uint8Array<ArrayBuffer>>>;
+export type ValueDigests = Map<string, Map<number, Uint8Array_>>;
 
 /**  */
 export type DeviceKeyInfo = {
@@ -127,7 +128,7 @@ export type AuthorizedDataElements = unknown; // Spec type: `{+ NameSpace => Dat
 
 export type DecodedIssuerSignedItem = {
   get(key: 'digestID'): number;
-  get(key: 'random'): Uint8Array<ArrayBuffer>;
+  get(key: 'random'): Uint8Array_;
   get(key: 'elementIdentifier'): string;
   get(key: 'elementValue'): unknown; // Necessarily undefinable here
 };
@@ -175,8 +176,8 @@ export type COSESign1<
 ];
 export type COSESign1HeaderProtected = CBORType;
 export type COSESign1HeaderUnprotected = Map<string | number, CBORType>;
-export type COSESign1Payload = Uint8Array<ArrayBuffer> | undefined;
-export type COSESign1Signature = Uint8Array<ArrayBuffer>;
+export type COSESign1Payload = Uint8Array_ | undefined;
+export type COSESign1Signature = Uint8Array_;
 
 /**
  * Sig_structure
@@ -190,10 +191,10 @@ export type COSESign1Signature = Uint8Array<ArrayBuffer>;
  */
 export type COSESign1SigStructure = [
   context: 'Signature1',
-  body_protected: Uint8Array<ArrayBuffer>,
-  sign_protected: Uint8Array<ArrayBuffer>, // (should be empty)
-  external_aad: Uint8Array<ArrayBuffer>,
-  payload: Uint8Array<ArrayBuffer>,
+  body_protected: Uint8Array_,
+  sign_protected: Uint8Array_, // (should be empty)
+  external_aad: Uint8Array_,
+  payload: Uint8Array_,
 ];
 
 /**
@@ -203,9 +204,9 @@ export type COSESign1SigStructure = [
  */
 export type MdocCOSESign1SigStructure = [
   context: 'Signature1',
-  body_protected: Uint8Array<ArrayBuffer>,
-  sign_protected: Uint8Array<ArrayBuffer>, // (should be empty)
-  payload: Uint8Array<ArrayBuffer>,
+  body_protected: Uint8Array_,
+  sign_protected: Uint8Array_, // (should be empty)
+  payload: Uint8Array_,
 ];
 
 /**
@@ -214,5 +215,5 @@ export type MdocCOSESign1SigStructure = [
 export type DCAPIOID4VPSessionTranscript = [
   deviceEngagementBytes: null,
   eReaderKeyBytes: null,
-  handover: ['OpenID4VPDCAPIHandover', Uint8Array<ArrayBuffer>],
+  handover: ['OpenID4VPDCAPIHandover', Uint8Array_],
 ];

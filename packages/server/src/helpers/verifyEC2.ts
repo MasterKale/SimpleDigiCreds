@@ -1,15 +1,15 @@
 import { type COSEALG, COSECRV, COSEKEYS, type COSEPublicKeyEC2 } from '../cose.ts';
 import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';
 import { base64url, importKey } from './index.ts';
-import type { SubtleCryptoAlg, SubtleCryptoCrv } from './types.ts';
+import type { SubtleCryptoAlg, SubtleCryptoCrv, Uint8Array_ } from './types.ts';
 
 /**
  * Verify a signature using an EC2 public key
  */
 export async function verifyEC2(opts: {
   cosePublicKey: COSEPublicKeyEC2;
-  signature: Uint8Array<ArrayBuffer>;
-  data: Uint8Array<ArrayBuffer>;
+  signature: Uint8Array_;
+  data: Uint8Array_;
   shaHashOverride?: COSEALG;
 }): Promise<boolean> {
   const { cosePublicKey, signature, data, shaHashOverride } = opts;
