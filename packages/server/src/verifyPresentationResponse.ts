@@ -65,7 +65,8 @@ export async function verifyPresentationResponse({ response, options }: {
       } else if (isSDJWTPresentation(requestedCred)) {
       } else {
         throw new SimpleDigiCredsError({
-          message: `Unsupported request structure for cred id "${requestedCred.id}")`,
+          message:
+            `Unsupported credential format "${requestedCred.format}" for cred id "${requestedCred.id}")`,
           code: 'InvalidDCAPIResponse',
         });
       }
