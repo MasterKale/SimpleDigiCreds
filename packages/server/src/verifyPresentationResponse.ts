@@ -6,11 +6,11 @@ import { base64url, isDCAPIResponse, SimpleDigiCredsError } from './helpers/inde
 /**
  * Verify and return a credential presentation out of a call to the Digital Credentials API
  */
-export async function verifyResponse({ response, options }: {
+export async function verifyPresentationResponse({ response, options }: {
   response: unknown;
   options: CredentialRequestOptions;
-}): Promise<VerifiedResponse> {
-  const verifiedValues: VerifiedResponse = {};
+}): Promise<VerifiedPresentation> {
+  const verifiedValues: VerifiedPresentation = {};
 
   // console.log({ response, options });
 
@@ -91,11 +91,11 @@ export async function verifyResponse({ response, options }: {
  * }
  * ```
  */
-export type VerifiedResponse = {
+export type VerifiedPresentation = {
   /**
-   * TODO: Typing on this is kinda weird when working with output from `verifyResponse()`. For
-   * example, `verified.cred1.verifiedClaims` requires you to know that this library chose "cred1"
-   * as the name when it generated credential request options. Can we collapse this so that it's
+   * TODO: Typing on this is kinda weird when working with output from this method. For example,
+   * `verified.cred1.verifiedClaims` requires you to know that this library chose "cred1" as
+   * the name when it generated credential request options. Can we collapse this type so that it's
    * `verified.verifiedClaims` instead?
    */
   [credID: string]: {

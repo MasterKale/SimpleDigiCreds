@@ -1,7 +1,7 @@
 import { assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
 
 import type { CredentialRequestOptions, DCAPIResponse } from './dcapi.ts';
-import { verifyResponse } from './verifyResponse.ts';
+import { verifyPresentationResponse } from './verifyPresentationResponse.ts';
 import { base64url, SimpleDigiCredsError } from './helpers/index.ts';
 
 const options: CredentialRequestOptions = {
@@ -35,7 +35,7 @@ const options: CredentialRequestOptions = {
 
 Deno.test('should error on missing `vp_token`', async () => {
   const response = {};
-  const rejected = await assertRejects(() => verifyResponse({ response, options }));
+  const rejected = await assertRejects(() => verifyPresentationResponse({ response, options }));
 
   assertInstanceOf(rejected, SimpleDigiCredsError);
   assertEquals(rejected.code, 'InvalidDCAPIResponse');
@@ -44,7 +44,7 @@ Deno.test('should error on missing `vp_token`', async () => {
 
 Deno.test('should error on bad `vp_token`', async () => {
   const response = { vp_token: '' };
-  const rejected = await assertRejects(() => verifyResponse({ response, options }));
+  const rejected = await assertRejects(() => verifyPresentationResponse({ response, options }));
 
   assertInstanceOf(rejected, SimpleDigiCredsError);
   assertEquals(rejected.code, 'InvalidDCAPIResponse');
@@ -53,7 +53,7 @@ Deno.test('should error on bad `vp_token`', async () => {
 
 Deno.test('should error on bad `vp_token` entries', async () => {
   const response = { vp_token: { cred1: '@@@@@' } };
-  const rejected = await assertRejects(() => verifyResponse({ response, options }));
+  const rejected = await assertRejects(() => verifyPresentationResponse({ response, options }));
 
   assertInstanceOf(rejected, SimpleDigiCredsError);
   assertEquals(rejected.code, 'InvalidDCAPIResponse');
@@ -100,7 +100,7 @@ Deno.test('should verify a well-formed presentation', async () => {
     },
   };
 
-  const verified = await verifyResponse({ response, options });
+  const verified = await verifyPresentationResponse({ response, options });
 
   assertEquals(
     verified,

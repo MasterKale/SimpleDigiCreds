@@ -15,7 +15,7 @@ import type { CredentialRequestOptions } from './dcapi.ts';
  * Supported Document Formats:
  * - mdoc
  */
-export function generateRequestOptions(
+export function generatePresentationOptions(
   { desiredClaims, requestOrigin }: {
     desiredClaims: OID4VPSupportedMdocClaimName[];
     requestOrigin: string;
