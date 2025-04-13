@@ -1,5 +1,9 @@
 import type { CredentialRequestOptions } from './dcapi.ts';
-import type { OID4VPCredentialQuery, OID4VPCredentialQueryMdoc } from './protocols/oid4vp.ts';
+import type {
+  OID4VPCredentialQuery,
+  OID4VPCredentialQueryMdoc,
+  OID4VPCredentialQuerySDJWT,
+} from './protocols/oid4vp.ts';
 import { verifyMdocPresentation } from './formats/mdoc/index.ts';
 import { base64url, isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
 
@@ -58,6 +62,7 @@ export async function verifyPresentationResponse({ response, options }: {
         for (const [claimName, claimValue] of verifiedClaims[0]) {
           verifiedValues[id].verifiedClaims[claimName] = claimValue;
         }
+      } else if (isSDJWTPresentation(requestedCred)) {
       } else {
         throw new SimpleDigiCredsError({
           message: `Unsupported request structure for cred id "${requestedCred.id}")`,
@@ -113,10 +118,19 @@ export type VerifiedPresentation = {
 type VerifiedClaims = { [claimName: string]: unknown };
 
 /**
- * Determine the credential being requested
+ * Type guard to make sure a query is for an mdoc
  */
 function isMdocPresentation(
   query: OID4VPCredentialQuery | OID4VPCredentialQueryMdoc,
 ): query is OID4VPCredentialQueryMdoc {
   return (query as OID4VPCredentialQueryMdoc).format === 'mso_mdoc';
+}
+
+/**
+ * Type guard to make sure a query is for an SD-JWT
+ */
+function isSDJWTPresentation(
+  query: OID4VPCredentialQuery | OID4VPCredentialQuerySDJWT,
+): query is OID4VPCredentialQuerySDJWT {
+  return (query as OID4VPCredentialQuerySDJWT).format === 'dc+sd-jwt';
 }

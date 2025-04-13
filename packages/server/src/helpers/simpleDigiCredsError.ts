@@ -21,4 +21,5 @@ export class SimpleDigiCredsError extends Error {
 
 export type SimpleDigiCredsErrorCode =
   | 'InvalidDCAPIResponse'
-  | 'MdocVerificationError';
+  | 'MdocVerificationError'
+  | 'SDJWTVerificationError';
