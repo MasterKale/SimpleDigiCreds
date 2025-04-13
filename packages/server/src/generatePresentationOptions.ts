@@ -1,6 +1,7 @@
 import { generateNonce } from './helpers/index.ts';
 import type {
   OID4VPCredentialQueryMdoc,
+  OID4VPCredentialQuerySDJWT,
   OID4VPSupportedMdocClaimName,
 } from './protocols/oid4vp.ts';
 import type { CredentialRequestOptions } from './dcapi.ts';
@@ -30,6 +31,27 @@ export function generatePresentationOptions(
     claims: desiredClaims.map((claimName) => ({
       path: ['org.iso.18013.5.1', claimName],
     })),
+  };
+
+  const sdjwtCredentialRequest: OID4VPCredentialQuerySDJWT = {
+    id: 'cred1',
+    format: 'dc+sd-jwt',
+    meta: {
+      // TODO: This can't be hardcoded...how do we let users specify it?
+      // DEBUG: Just for CMWallet
+      vct_values: ['urn:eu.europa.ec.eudi:pid:1'],
+    },
+    claims: desiredClaims.map((claimName) => ({
+      path: [claimName],
+    })),
+    client_metadata: {
+      vp_formats: {
+        'dc+sd-jwt': {
+          'sd-jwt_alg_values': ['ES256'],
+          'kb-jwt_alg_values': ['ES256'],
+        },
+      },
+    },
   };
 
   return {
