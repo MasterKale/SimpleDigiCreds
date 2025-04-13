@@ -5,6 +5,7 @@ import type {
   OID4VPCredentialQuerySDJWT,
 } from './protocols/oid4vp.ts';
 import { verifyMdocPresentation } from './formats/mdoc/index.ts';
+import { verifySDJWTPresentation } from './formats/sd-jwt-vc/index.ts';
 import { base64url, isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
 
 /**
@@ -59,10 +60,28 @@ export async function verifyPresentationResponse({ response, options }: {
             issuerAuth: verifiedPresentation.issuerX5C,
           },
         };
+
         for (const [claimName, claimValue] of verifiedClaims[0]) {
           verifiedValues[id].verifiedClaims[claimName] = claimValue;
         }
       } else if (isSDJWTPresentation(requestedCred)) {
+        const { verifiedClaims } = await verifySDJWTPresentation();
+
+        if (verifiedClaims.length < 1) {
+          console.warn('document had no verifiable claims, skipping');
+          continue;
+        }
+
+        verifiedValues[id] = {
+          verifiedClaims: {},
+          meta: {
+            // issuerAuth: verifiedPresentation.issuerX5C,
+          },
+        };
+
+        for (const [claimName, claimValue] of verifiedClaims) {
+          verifiedValues[id].verifiedClaims[claimName] = claimValue;
+        }
       } else {
         throw new SimpleDigiCredsError({
           message:
