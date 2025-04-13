@@ -13,7 +13,9 @@ import { RSAPublicKey } from '@peculiar/asn1-rsa';
 
 import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg.ts';
 
-export function convertX509PublicKeyToCOSE(x509Certificate: Uint8Array): COSEPublicKey {
+export function convertX509PublicKeyToCOSE(
+  x509Certificate: Uint8Array<ArrayBuffer>,
+): COSEPublicKey {
   let cosePublicKey: COSEPublicKey = new Map();
 
   /**
@@ -57,8 +59,8 @@ export function convertX509PublicKeyToCOSE(x509Certificate: Uint8Array): COSEPub
       subjectPublicKeyInfo.subjectPublicKey,
     );
 
-    let x: Uint8Array;
-    let y: Uint8Array;
+    let x: Uint8Array<ArrayBuffer>;
+    let y: Uint8Array<ArrayBuffer>;
     if (subjectPublicKey[0] === 0x04) {
       // Public key is in "uncompressed form", so we can split the remaining bytes in half
       let pointer = 1;

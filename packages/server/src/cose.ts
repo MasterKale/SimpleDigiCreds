@@ -30,10 +30,10 @@ export type COSEPublicKey = {
 export type COSEPublicKeyOKP = COSEPublicKey & {
   // Getters
   get(key: COSEKEYS.crv): number | undefined;
-  get(key: COSEKEYS.x): Uint8Array | undefined;
+  get(key: COSEKEYS.x): Uint8Array<ArrayBuffer> | undefined;
   // Setters
   set(key: COSEKEYS.crv, value: number): void;
-  set(key: COSEKEYS.x, value: Uint8Array): void;
+  set(key: COSEKEYS.x, value: Uint8Array<ArrayBuffer>): void;
 };
 
 /**
@@ -42,12 +42,12 @@ export type COSEPublicKeyOKP = COSEPublicKey & {
 export type COSEPublicKeyEC2 = COSEPublicKey & {
   // Getters
   get(key: COSEKEYS.crv): number | undefined;
-  get(key: COSEKEYS.x): Uint8Array | undefined;
-  get(key: COSEKEYS.y): Uint8Array | undefined;
+  get(key: COSEKEYS.x): Uint8Array<ArrayBuffer> | undefined;
+  get(key: COSEKEYS.y): Uint8Array<ArrayBuffer> | undefined;
   // Setters
   set(key: COSEKEYS.crv, value: number): void;
-  set(key: COSEKEYS.x, value: Uint8Array): void;
-  set(key: COSEKEYS.y, value: Uint8Array): void;
+  set(key: COSEKEYS.x, value: Uint8Array<ArrayBuffer>): void;
+  set(key: COSEKEYS.y, value: Uint8Array<ArrayBuffer>): void;
 };
 
 /**
@@ -55,11 +55,11 @@ export type COSEPublicKeyEC2 = COSEPublicKey & {
  */
 export type COSEPublicKeyRSA = COSEPublicKey & {
   // Getters
-  get(key: COSEKEYS.n): Uint8Array | undefined;
-  get(key: COSEKEYS.e): Uint8Array | undefined;
+  get(key: COSEKEYS.n): Uint8Array<ArrayBuffer> | undefined;
+  get(key: COSEKEYS.e): Uint8Array<ArrayBuffer> | undefined;
   // Setters
-  set(key: COSEKEYS.n, value: Uint8Array): void;
-  set(key: COSEKEYS.e, value: Uint8Array): void;
+  set(key: COSEKEYS.n, value: Uint8Array<ArrayBuffer>): void;
+  set(key: COSEKEYS.e, value: Uint8Array<ArrayBuffer>): void;
 };
 
 /**
@@ -204,8 +204,8 @@ export type COSESign1<
 ];
 export type COSESign1HeaderProtected = CBORType;
 export type COSESign1HeaderUnprotected = Map<string | number, CBORType>;
-export type COSESign1Payload = Uint8Array | undefined;
-export type COSESign1Signature = Uint8Array;
+export type COSESign1Payload = Uint8Array<ArrayBuffer> | undefined;
+export type COSESign1Signature = Uint8Array<ArrayBuffer>;
 
 /**
  * COSE_X509
@@ -223,4 +223,4 @@ export type CBORX5Chain = {
  *
  * mdoc B.1.1 says X.509 chain certs are DER-encoded
  */
-export type COSEX509DERBytes = Uint8Array;
+export type COSEX509DERBytes = Uint8Array<ArrayBuffer>;

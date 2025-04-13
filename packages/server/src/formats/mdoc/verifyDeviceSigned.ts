@@ -22,7 +22,9 @@ export async function verifyDeviceSigned(
 
   // These bytes were provably signed above during IssuerAuth verification
   const decodedMSOBytes = decodeCBOR(issuerAuth[2]) as CBORTag;
-  const decodedMSO = decodeCBOR(decodedMSOBytes.value as Uint8Array) as MobileSecurityObject;
+  const decodedMSO = decodeCBOR(
+    decodedMSOBytes.value as Uint8Array<ArrayBuffer>,
+  ) as MobileSecurityObject;
 
   // Make sure the credential is chronologically valid
   const validityInfo = decodedMSO.get('validityInfo');
@@ -63,7 +65,9 @@ export async function verifyDeviceSigned(
     deviceSignedNameSpaces,
   ];
   const deviceAuthenticationCBOR = encodeCBOR(deviceAuthentication);
-  const deviceAuthenticationCBORBstr = encodeCBOR(new CBORTag(24, deviceAuthenticationCBOR));
+  const deviceAuthenticationCBORBstr = encodeCBOR(
+    new CBORTag(24, deviceAuthenticationCBOR),
+  ) as Uint8Array<ArrayBuffer>;
 
   const deviceAuth = deviceSigned.get('deviceAuth');
   const deviceSignature = deviceAuth.get('deviceSignature');
@@ -95,7 +99,7 @@ export async function verifyDeviceSigned(
 
   const verified = await verifyEC2({
     cosePublicKey: devicePublicKey,
-    data: encodeCBOR(deviceData),
+    data: encodeCBOR(deviceData) as Uint8Array<ArrayBuffer>,
     signature: deviceSignature[3],
     shaHashOverride: hashAlg,
   });

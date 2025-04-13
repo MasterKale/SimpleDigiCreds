@@ -40,7 +40,7 @@ const issuerSubjectIDKey: { [key: string]: 'C' | 'O' | 'OU' | 'CN' } = {
  * @param pemCertificate Result from call to `convertASN1toPEM(x5c[0])`
  */
 export function getX509CertificateInfo(
-  leafCertBuffer: Uint8Array,
+  leafCertBuffer: Uint8Array<ArrayBuffer>,
 ): CertificateInfo {
   const x509 = AsnParser.parse(leafCertBuffer, Certificate);
   const parsedCert = x509.tbsCertificate;

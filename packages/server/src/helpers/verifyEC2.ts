@@ -8,8 +8,8 @@ import type { SubtleCryptoAlg, SubtleCryptoCrv } from './types.ts';
  */
 export async function verifyEC2(opts: {
   cosePublicKey: COSEPublicKeyEC2;
-  signature: Uint8Array;
-  data: Uint8Array;
+  signature: Uint8Array<ArrayBuffer>;
+  data: Uint8Array<ArrayBuffer>;
   shaHashOverride?: COSEALG;
 }): Promise<boolean> {
   const { cosePublicKey, signature, data, shaHashOverride } = opts;

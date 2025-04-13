@@ -11,7 +11,7 @@ import { convertX509BufferToPEM } from '../../helpers/x509/index.ts';
  * Verify an mdoc presentation as returned through the DC API
  */
 export async function verifyMdocPresentation(
-  responseBytes: Uint8Array,
+  responseBytes: Uint8Array<ArrayBuffer>,
   request: DCAPIRequestOID4VP,
 ): Promise<VerifiedMdocPresentation> {
   const decodedResponse = decodeCBOR(responseBytes) as DecodedCredentialResponse;
