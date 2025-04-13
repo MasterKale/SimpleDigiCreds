@@ -1,7 +1,7 @@
 import { assertEquals } from '@std/assert';
 import { stub } from '@std/testing/mock';
 
-import { generateRequestOptions } from './index.ts';
+import { generatePresentationOptions } from './index.ts';
 import { _generateNonceInternals } from './helpers/generateNonce.ts';
 
 Deno.test('Should generate options', () => {
@@ -11,7 +11,7 @@ Deno.test('Should generate options', () => {
     () => '9kMlSgHQW8oBv_AdkSaZKM0ajrEUatzg2f24vV6AgnI',
   );
 
-  const options = generateRequestOptions({
+  const options = generatePresentationOptions({
     desiredClaims: ['family_name', 'given_name', 'age_over_21'],
     requestOrigin: 'https://digital-credentials.dev',
   });
