@@ -41,7 +41,7 @@ export function isDCAPIResponse(response: unknown): response is DCAPIResponse {
   if (!entriesValid) {
     throw new SimpleDigiCredsError({
       code: 'InvalidDCAPIResponse',
-      message: 'Object `response.tp_token` contained non-base64url-encoded entries',
+      message: 'Object `response.vp_token` contained non-base64url-encoded entries',
     });
   }
 
