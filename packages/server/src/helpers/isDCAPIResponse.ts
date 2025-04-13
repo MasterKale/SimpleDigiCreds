@@ -35,7 +35,7 @@ export function isDCAPIResponse(response: unknown): response is DCAPIResponse {
       break;
     }
 
-    entriesValid = typeof cred === 'string' && base64url.isBase64URLString(cred);
+    entriesValid = typeof cred === 'string';
   }
 
   if (!entriesValid) {

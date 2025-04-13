@@ -29,17 +29,18 @@ export async function verifyPresentationResponse({ response, options }: {
       const { id } = requestedCred;
       // console.log(requestedCred);
 
-      const matchingResponse = response.vp_token[id];
+      const matchingPresentation = response.vp_token[id];
 
-      if (!matchingResponse) {
+      if (!matchingPresentation) {
         console.warn(`could not find matching response for cred id "${id}", skipping`);
         continue;
       }
 
-      if (isMdocRequest(requestedCred)) {
-        // Begin verifying the mdoc
-        const responseBytes = base64url.base64URLToBuffer(matchingResponse);
-        const verifiedPresentation = await verifyMdocPresentation(responseBytes, request.data);
+      if (isMdocPresentation(requestedCred)) {
+        const verifiedPresentation = await verifyMdocPresentation(
+          matchingPresentation,
+          request.data,
+        );
 
         // Extract the verified data
         const verifiedClaims = Object.values(verifiedPresentation.verifiedClaims);
@@ -112,9 +113,9 @@ export type VerifiedPresentation = {
 type VerifiedClaims = { [claimName: string]: unknown };
 
 /**
- * Help clarify the format of the credential being requested
+ * Determine the credential being requested
  */
-function isMdocRequest(
+function isMdocPresentation(
   query: OID4VPCredentialQuery | OID4VPCredentialQueryMdoc,
 ): query is OID4VPCredentialQueryMdoc {
   return (query as OID4VPCredentialQueryMdoc).format === 'mso_mdoc';

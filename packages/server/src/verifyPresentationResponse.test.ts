@@ -52,7 +52,7 @@ Deno.test('should error on bad `vp_token`', async () => {
 });
 
 Deno.test('should error on bad `vp_token` entries', async () => {
-  const response = { vp_token: { cred1: '@@@@@' } };
+  const response = { vp_token: { cred1: 12345 } };
   const rejected = await assertRejects(() => verifyPresentationResponse({ response, options }));
 
   assertInstanceOf(rejected, SimpleDigiCredsError);

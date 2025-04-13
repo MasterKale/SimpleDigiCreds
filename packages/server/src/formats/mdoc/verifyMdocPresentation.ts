@@ -6,16 +6,25 @@ import { verifyIssuerSigned } from './verifyIssuerSigned.ts';
 import { verifyDeviceSigned } from './verifyDeviceSigned.ts';
 import { type VerifiedNamespace, verifyNameSpaces } from './verifyNameSpaces.ts';
 import { convertX509BufferToPEM } from '../../helpers/x509/index.ts';
-import type { Uint8Array_ } from '../../helpers/types.ts';
+import { base64url, SimpleDigiCredsError } from '../../helpers/index.ts';
 
 /**
  * Verify an mdoc presentation as returned through the DC API
  */
 export async function verifyMdocPresentation(
-  responseBytes: Uint8Array_,
+  presentation: string,
   request: DCAPIRequestOID4VP,
 ): Promise<VerifiedMdocPresentation> {
-  const decodedResponse = decodeCBOR(responseBytes) as DecodedCredentialResponse;
+  if (!base64url.isBase64URLString(presentation)) {
+    throw new SimpleDigiCredsError({
+      message: 'mdoc presentation was not a base64url string',
+      code: 'MdocVerificationError',
+    });
+  }
+
+  const presentationBytes = base64url.base64URLToBuffer(presentation);
+
+  const decodedResponse = decodeCBOR(presentationBytes) as DecodedCredentialResponse;
   const document = decodedResponse.get('documents')[0];
 
   // Verify the issuer-signed data
