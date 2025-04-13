@@ -31,7 +31,7 @@ The simplest way to get started is to import methods required for generating opt
 presentation:
 
 ```ts
-import { generateRequestOptions, verifyResponse } from '@simpledigicreds/server';
+import { generatePresentationOptions, verifyPresentationResponse } from '@simpledigicreds/server';
 
 /* server */
 const options = await generateRequestOptions({
@@ -45,11 +45,11 @@ if (typeof window.DigitalCredential === 'function') {
 }
 
 /* server */
-const verified = await verifyResponse({
+const verified = await verifyPresentationResponse({
   response: response.data,
   options,
 });
 ```
 
-The output of `verifyResponse()` will contain any verified claims contained in the presented
-credential.
+The output of `verifyPresentationResponse()` will contain any verified claims contained in the
+presented credential.

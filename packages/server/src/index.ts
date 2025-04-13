@@ -1,5 +1,8 @@
-export { generateRequestOptions } from './generateRequestOptions.ts';
-export { type VerifiedResponse, verifyResponse } from './verifyResponse.ts';
+export { generatePresentationOptions } from './generatePresentationOptions.ts';
+export {
+  type VerifiedPresentation,
+  verifyPresentationResponse,
+} from './verifyPresentationResponse.ts';
 
 export type {
   CredentialRequestOptions,

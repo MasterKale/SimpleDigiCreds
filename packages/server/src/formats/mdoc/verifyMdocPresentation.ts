@@ -46,7 +46,7 @@ export async function verifyMdocPresentation(
 
   /**
    * TODO: It's probably not important to return this, and instead verify the certificate chain
-   * as part of verification using trust anchors specified when calling `verifyResponse()`.
+   * as part of verification using trust anchors specified when calling the verification method.
    * If the chain can't be verified then reject the presentation.
    */
   const x5cPEM = issuerX5C.map(convertX509BufferToPEM);

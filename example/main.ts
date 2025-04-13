@@ -3,8 +3,8 @@ import { serveStatic } from "hono/deno";
 
 import {
   CredentialRequestOptions,
-  generateRequestOptions,
-  verifyResponse,
+  generatePresentationOptions,
+  verifyPresentationResponse,
 } from "../packages/server/src/index.ts";
 
 let currentOptions: CredentialRequestOptions;
@@ -15,7 +15,7 @@ app.use("/static/*", serveStatic({ root: "./" }));
 app.get("/", serveStatic({ path: "./static/index.html" }));
 
 app.get("/options", async (ctx) => {
-  const options = await generateRequestOptions({
+  const options = await generatePresentationOptions({
     desiredClaims: ["family_name", "given_name"],
     requestOrigin: "http://localhost:8000",
   });
@@ -32,7 +32,7 @@ app.post("/verify", async (ctx) => {
 
   console.log("verifying presentation", body);
 
-  const verified = await verifyResponse({
+  const verified = await verifyPresentationResponse({
     response: body,
     options: currentOptions,
   });
