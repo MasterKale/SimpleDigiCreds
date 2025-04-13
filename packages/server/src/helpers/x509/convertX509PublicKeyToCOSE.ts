@@ -1,6 +1,8 @@
 import { AsnParser } from '@peculiar/asn1-schema';
 import { Certificate } from '@peculiar/asn1-x509';
 import { ECParameters, id_ecPublicKey, id_secp256r1, id_secp384r1 } from '@peculiar/asn1-ecc';
+import { RSAPublicKey } from '@peculiar/asn1-rsa';
+
 import {
   COSECRV,
   COSEKEYS,
@@ -9,11 +11,12 @@ import {
   type COSEPublicKeyEC2,
   type COSEPublicKeyRSA,
 } from '../../cose.ts';
-import { RSAPublicKey } from '@peculiar/asn1-rsa';
-
 import { mapX509SignatureAlgToCOSEAlg } from './mapX509SignatureAlgToCOSEAlg.ts';
+import type { Uint8Array_ } from '../types.ts';
 
-export function convertX509PublicKeyToCOSE(x509Certificate: Uint8Array): COSEPublicKey {
+export function convertX509PublicKeyToCOSE(
+  x509Certificate: Uint8Array_,
+): COSEPublicKey {
   let cosePublicKey: COSEPublicKey = new Map();
 
   /**
@@ -57,8 +60,8 @@ export function convertX509PublicKeyToCOSE(x509Certificate: Uint8Array): COSEPub
       subjectPublicKeyInfo.subjectPublicKey,
     );
 
-    let x: Uint8Array;
-    let y: Uint8Array;
+    let x: Uint8Array_;
+    let y: Uint8Array_;
     if (subjectPublicKey[0] === 0x04) {
       // Public key is in "uncompressed form", so we can split the remaining bytes in half
       let pointer = 1;

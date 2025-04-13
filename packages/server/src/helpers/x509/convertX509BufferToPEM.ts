@@ -1,9 +1,10 @@
 import { base64url } from '../index.ts';
+import type { Uint8Array_ } from '../types.ts';
 
 /**
  * Convert buffer to an OpenSSL-compatible PEM text format.
  */
-export function convertX509BufferToPEM(certBuffer: Uint8Array): string {
+export function convertX509BufferToPEM(certBuffer: Uint8Array_): string {
   // We specifically do not want base64url used here, PEM is base64
   const b64cert = base64url.bufferToBase64(certBuffer);
 

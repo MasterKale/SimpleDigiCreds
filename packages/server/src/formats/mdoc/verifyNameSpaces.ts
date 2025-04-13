@@ -3,6 +3,7 @@ import { type CBORTag, decodeCBOR, encodeCBOR } from '@levischuck/tiny-cbor';
 import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
 import type { DecodedDocument, DecodedIssuerSignedItem, MobileSecurityObject } from './types.ts';
 import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
+import type { Uint8Array_ } from '../../helpers/types.ts';
 
 export async function verifyNameSpaces(
   document: DecodedDocument,
@@ -16,7 +17,7 @@ export async function verifyNameSpaces(
   const issuerAuth = issuerSigned.get('issuerAuth');
 
   const decodedMSOBytes = decodeCBOR(issuerAuth[2]) as CBORTag;
-  const decodedMSO = decodeCBOR(decodedMSOBytes.value as Uint8Array) as MobileSecurityObject;
+  const decodedMSO = decodeCBOR(decodedMSOBytes.value as Uint8Array_) as MobileSecurityObject;
 
   const msoDigestAlg = decodedMSO.get('digestAlgorithm');
 
@@ -30,7 +31,7 @@ export async function verifyNameSpaces(
   for (const [dataElemID, dataElemValues] of issuerSignedNameSpaces.entries()) {
     for (const issuerSignedItemBytes of dataElemValues) {
       const decodedItem = decodeCBOR(
-        issuerSignedItemBytes.value as Uint8Array,
+        issuerSignedItemBytes.value as Uint8Array_,
       ) as DecodedIssuerSignedItem;
 
       const digestID = decodedItem.get('digestID');
