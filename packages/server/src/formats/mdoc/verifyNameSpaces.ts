@@ -17,9 +17,7 @@ export async function verifyNameSpaces(
   const issuerAuth = issuerSigned.get('issuerAuth');
 
   const decodedMSOBytes = decodeCBOR(issuerAuth[2]) as CBORTag;
-  const decodedMSO = decodeCBOR(
-    decodedMSOBytes.value as Uint8Array_,
-  ) as MobileSecurityObject;
+  const decodedMSO = decodeCBOR(decodedMSOBytes.value as Uint8Array_) as MobileSecurityObject;
 
   const msoDigestAlg = decodedMSO.get('digestAlgorithm');
 

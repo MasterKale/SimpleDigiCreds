@@ -23,9 +23,7 @@ export async function verifyDeviceSigned(
 
   // These bytes were provably signed above during IssuerAuth verification
   const decodedMSOBytes = decodeCBOR(issuerAuth[2]) as CBORTag;
-  const decodedMSO = decodeCBOR(
-    decodedMSOBytes.value as Uint8Array_,
-  ) as MobileSecurityObject;
+  const decodedMSO = decodeCBOR(decodedMSOBytes.value as Uint8Array_) as MobileSecurityObject;
 
   // Make sure the credential is chronologically valid
   const validityInfo = decodedMSO.get('validityInfo');
