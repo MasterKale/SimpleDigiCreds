@@ -1,29 +1,32 @@
 import { assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
 
-import type { DCAPIRequestOptions, DCAPIResponse } from './dcapi.ts';
+import type { CredentialRequestOptions, DCAPIResponse } from './dcapi.ts';
 import { verifyResponse } from './verifyResponse.ts';
 import { base64url, SimpleDigiCredsError } from './helpers/index.ts';
 
-const options: DCAPIRequestOptions = {
+const options: CredentialRequestOptions = {
   digital: {
     requests: [
       {
-        response_type: 'vp_token',
-        response_mode: 'dc_api',
-        client_id: 'web-origin:http://localhost:8000',
-        nonce: '9M90LkDtCtucTZq8brlkpKHnGf1HpQKCpPKYTPk5MaA',
-        dcql_query: {
-          credentials: [
-            {
-              id: 'cred1',
-              format: 'mso_mdoc',
-              meta: { doctype_value: 'org.iso.18013.5.1.mDL' },
-              claims: [
-                { path: ['org.iso.18013.5.1', 'family_name'] },
-                { path: ['org.iso.18013.5.1', 'given_name'] },
-              ],
-            },
-          ],
+        protocol: 'openid4vp',
+        data: {
+          response_type: 'vp_token',
+          response_mode: 'dc_api',
+          client_id: 'web-origin:http://localhost:8000',
+          nonce: '9M90LkDtCtucTZq8brlkpKHnGf1HpQKCpPKYTPk5MaA',
+          dcql_query: {
+            credentials: [
+              {
+                id: 'cred1',
+                format: 'mso_mdoc',
+                meta: { doctype_value: 'org.iso.18013.5.1.mDL' },
+                claims: [
+                  { path: ['org.iso.18013.5.1', 'family_name'] },
+                  { path: ['org.iso.18013.5.1', 'given_name'] },
+                ],
+              },
+            ],
+          },
         },
       },
     ],
@@ -61,26 +64,29 @@ Deno.test('should error on bad `vp_token` entries', async () => {
 });
 
 Deno.test('should verify a well-formed presentation', async () => {
-  const options: DCAPIRequestOptions = {
+  const options: CredentialRequestOptions = {
     digital: {
       requests: [
         {
-          response_type: 'vp_token',
-          response_mode: 'dc_api',
-          client_id: 'web-origin:http://localhost:8000',
-          nonce: 'Glgd3WVI_6Uy8fjtI22ol0JGiJVq4GLuHGW6OCHV3_o',
-          dcql_query: {
-            credentials: [
-              {
-                id: 'cred1',
-                format: 'mso_mdoc',
-                meta: { doctype_value: 'org.iso.18013.5.1.mDL' },
-                claims: [
-                  { path: ['org.iso.18013.5.1', 'family_name'] },
-                  { path: ['org.iso.18013.5.1', 'given_name'] },
-                ],
-              },
-            ],
+          protocol: 'openid4vp',
+          data: {
+            response_type: 'vp_token',
+            response_mode: 'dc_api',
+            client_id: 'web-origin:http://localhost:8000',
+            nonce: 'Glgd3WVI_6Uy8fjtI22ol0JGiJVq4GLuHGW6OCHV3_o',
+            dcql_query: {
+              credentials: [
+                {
+                  id: 'cred1',
+                  format: 'mso_mdoc',
+                  meta: { doctype_value: 'org.iso.18013.5.1.mDL' },
+                  claims: [
+                    { path: ['org.iso.18013.5.1', 'family_name'] },
+                    { path: ['org.iso.18013.5.1', 'given_name'] },
+                  ],
+                },
+              ],
+            },
           },
         },
       ],
@@ -106,9 +112,7 @@ Deno.test('should verify a well-formed presentation', async () => {
         },
         meta: {
           issuerAuth: [
-            base64url.base64URLToBuffer(
-              'MIICwDCCAmegAwIBAgIUHn8bMq1PNO_ksMwHt7DjM6cLGE0wCgYIKoZIzj0EAwIweTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDU1vdW50YWluIFZpZXcxHDAaBgNVBAoME0RpZ2l0YWwgQ3JlZGVudGlhbHMxHzAdBgNVBAMMFmRpZ2l0YWxjcmVkZW50aWFscy5kZXYwHhcNMjUwMjE5MjMzMDE4WhcNMjYwMjE5MjMzMDE4WjB5MQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEWMBQGA1UEBwwNTW91bnRhaW4gVmlldzEcMBoGA1UECgwTRGlnaXRhbCBDcmVkZW50aWFsczEfMB0GA1UEAwwWZGlnaXRhbGNyZWRlbnRpYWxzLmRldjBZMBMGByqGSM49AgEGCCqGSM49AwEHA0IABOt5Nivi1_OXw1AEfYPh42Is41VrNg9qaMdYuw3cavhsCa-aXV0NmTl2EsNaJ5GWmMoAD8ikwAFszYhIeNgF42mjgcwwgckwHwYDVR0jBBgwFoAUok_0idl8Ruhuo4bZR0jOzL7cz_UwHQYDVR0OBBYEFN_-aloS6cBixLyYpyXS2XD3emAoMDQGA1UdHwQtMCswKaAnoCWGI2h0dHBzOi8vZGlnaXRhbC1jcmVkZW50aWFscy5kZXYvY3JsMCoGA1UdEgQjMCGGH2h0dHBzOi8vZGlnaXRhbC1jcmVkZW50aWFscy5kZXYwDgYDVR0PAQH_BAQDAgeAMBUGA1UdJQEB_wQLMAkGByiBjF0FAQIwCgYIKoZIzj0EAwIDRwAwRAIgYcXL9XzB43vy4LEz2h8gMQRdcJtaIRQOemgwm8sHQucCIHCvouHEm_unjBXMCeUZ7QR_ympjGyHITw25_B9H9QsC',
-            ),
+            '-----BEGIN CERTIFICATE-----\nMIICwDCCAmegAwIBAgIUHn8bMq1PNO/ksMwHt7DjM6cLGE0wCgYIKoZIzj0EAwIw\neTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDU1v\ndW50YWluIFZpZXcxHDAaBgNVBAoME0RpZ2l0YWwgQ3JlZGVudGlhbHMxHzAdBgNV\nBAMMFmRpZ2l0YWxjcmVkZW50aWFscy5kZXYwHhcNMjUwMjE5MjMzMDE4WhcNMjYw\nMjE5MjMzMDE4WjB5MQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEW\nMBQGA1UEBwwNTW91bnRhaW4gVmlldzEcMBoGA1UECgwTRGlnaXRhbCBDcmVkZW50\naWFsczEfMB0GA1UEAwwWZGlnaXRhbGNyZWRlbnRpYWxzLmRldjBZMBMGByqGSM49\nAgEGCCqGSM49AwEHA0IABOt5Nivi1/OXw1AEfYPh42Is41VrNg9qaMdYuw3cavhs\nCa+aXV0NmTl2EsNaJ5GWmMoAD8ikwAFszYhIeNgF42mjgcwwgckwHwYDVR0jBBgw\nFoAUok/0idl8Ruhuo4bZR0jOzL7cz/UwHQYDVR0OBBYEFN/+aloS6cBixLyYpyXS\n2XD3emAoMDQGA1UdHwQtMCswKaAnoCWGI2h0dHBzOi8vZGlnaXRhbC1jcmVkZW50\naWFscy5kZXYvY3JsMCoGA1UdEgQjMCGGH2h0dHBzOi8vZGlnaXRhbC1jcmVkZW50\naWFscy5kZXYwDgYDVR0PAQH/BAQDAgeAMBUGA1UdJQEB/wQLMAkGByiBjF0FAQIw\nCgYIKoZIzj0EAwIDRwAwRAIgYcXL9XzB43vy4LEz2h8gMQRdcJtaIRQOemgwm8sH\nQucCIHCvouHEm/unjBXMCeUZ7QR/ympjGyHITw25/B9H9QsC\n-----END CERTIFICATE-----\n',
           ],
         },
       },

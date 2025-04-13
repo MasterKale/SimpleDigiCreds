@@ -1,6 +1,12 @@
 export { generateRequestOptions } from './generateRequestOptions.ts';
+export { type VerifiedResponse, verifyResponse } from './verifyResponse.ts';
 
-export type { DCAPIRequestOID4VP, DCAPIRequestOptions } from './dcapi.ts';
+export type {
+  CredentialRequestOptions,
+  DCAPIRequestOID4VP,
+  DigitalCredentialRequest,
+  DigitalCredentialRequestOptions,
+} from './dcapi.ts';
 
 export type {
   OID4VPClaimQuery,

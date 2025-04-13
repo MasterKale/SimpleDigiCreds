@@ -1,4 +1,4 @@
-import type { DCAPIRequestOptions } from './dcapi.ts';
+import type { CredentialRequestOptions } from './dcapi.ts';
 import type { OID4VPCredentialQuery, OID4VPCredentialQueryMdoc } from './protocols/oid4vp.ts';
 import { verifyMdocPresentation } from './formats/mdoc/index.ts';
 import { base64url, isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
@@ -8,7 +8,7 @@ import { base64url, isDCAPIResponse, SimpleDigiCredsError } from './helpers/inde
  */
 export async function verifyResponse({ response, options }: {
   response: unknown;
-  options: DCAPIRequestOptions;
+  options: CredentialRequestOptions;
 }): Promise<VerifiedResponse> {
   const verifiedValues: VerifiedResponse = {};
 
@@ -23,7 +23,7 @@ export async function verifyResponse({ response, options }: {
 
   // We've verified the shape of the response, now verify it
   for (const request of options.digital.requests) {
-    const { dcql_query } = request;
+    const { dcql_query } = request.data;
 
     for (const requestedCred of dcql_query.credentials) {
       const { id } = requestedCred;
@@ -39,7 +39,7 @@ export async function verifyResponse({ response, options }: {
       if (isMdocRequest(requestedCred)) {
         // Begin verifying the mdoc
         const responseBytes = base64url.base64URLToBuffer(matchingResponse);
-        const verifiedPresentation = await verifyMdocPresentation(responseBytes, request);
+        const verifiedPresentation = await verifyMdocPresentation(responseBytes, request.data);
 
         // Extract the verified data
         const verifiedClaims = Object.values(verifiedPresentation.verifiedClaims);
@@ -92,9 +92,16 @@ export async function verifyResponse({ response, options }: {
  * ```
  */
 export type VerifiedResponse = {
+  /**
+   * TODO: Typing on this is kinda weird when working with output from `verifyResponse()`. For
+   * example, `verified.cred1.verifiedClaims` requires you to know that this library chose "cred1"
+   * as the name when it generated credential request options. Can we collapse this so that it's
+   * `verified.verifiedClaims` instead?
+   */
   [credID: string]: {
     verifiedClaims: VerifiedClaims;
-    // TODO: What other data should come out of this?
+    // TODO: What other data should come out of this? I heard it's okay to assume X.509 cert chains
+    // in wallet responses.
     meta: {
       issuerAuth?: unknown;
       walletAuth?: unknown;

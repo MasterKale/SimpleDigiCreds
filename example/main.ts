@@ -1,7 +1,13 @@
 import { Hono } from "hono";
 import { serveStatic } from "hono/deno";
 
-import { generateRequestOptions } from "../packages/server/src/index.ts";
+import {
+  CredentialRequestOptions,
+  generateRequestOptions,
+  verifyResponse,
+} from "../packages/server/src/index.ts";
+
+let currentOptions: CredentialRequestOptions;
 
 const app = new Hono();
 
@@ -16,21 +22,9 @@ app.get("/options", async (ctx) => {
 
   console.log(JSON.stringify(options, null, 2));
 
-  /**
-   * This is an older format of the DC API call. We have to call it this way for now till a
-   * future Chrome update (currently on Chrome Canary 134) adds support for the newer DC API
-   * call structure
-   */
-  const _options = {
-    digital: {
-      providers: [{
-        protocol: "openid4vp",
-        request: options.digital.requests[0],
-      }],
-    },
-  };
+  currentOptions = options;
 
-  return ctx.json(_options);
+  return ctx.json(options);
 });
 
 app.post("/verify", async (ctx) => {
@@ -38,9 +32,14 @@ app.post("/verify", async (ctx) => {
 
   console.log("verifying presentation", body);
 
-  return ctx.json({
-    verified: "TODO",
+  const verified = await verifyResponse({
+    response: body,
+    options: currentOptions,
   });
+
+  console.log("verified claims:\n", JSON.stringify(verified, null, 2));
+
+  return ctx.json({ verified });
 });
 
 Deno.serve({ hostname: "localhost" }, app.fetch);

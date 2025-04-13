@@ -5,6 +5,7 @@ import type { DecodedCredentialResponse } from './types.ts';
 import { verifyIssuerSigned } from './verifyIssuerSigned.ts';
 import { verifyDeviceSigned } from './verifyDeviceSigned.ts';
 import { type VerifiedNamespace, verifyNameSpaces } from './verifyNameSpaces.ts';
+import { convertX509BufferToPEM } from '../../helpers/x509/index.ts';
 
 /**
  * Verify an mdoc presentation as returned through the DC API
@@ -42,13 +43,20 @@ export async function verifyMdocPresentation(
   // TODO: In case it's a bad idea to flatten claims like we're doing above
   // verifiedValues[id] = verifiedItems;
 
+  /**
+   * TODO: It's probably not important to return this, and instead verify the certificate chain
+   * as part of verification using trust anchors specified when calling `verifyResponse()`.
+   * If the chain can't be verified then reject the presentation.
+   */
+  const x5cPEM = issuerX5C.map(convertX509BufferToPEM);
+
   return {
     verifiedClaims,
-    issuerX5C,
+    issuerX5C: x5cPEM,
   };
 }
 
 type VerifiedMdocPresentation = {
   verifiedClaims: VerifiedNamespace;
-  issuerX5C: Uint8Array[];
+  issuerX5C: string[];
 };

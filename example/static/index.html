@@ -70,8 +70,11 @@
             let response;
             try {
               response = await navigator.credentials.get(optionsJSON);
-              console.log("Raw response:", response);
-              printDebug("Response", response.data);
+              console.log("Raw presentation:", response);
+              printDebug(
+                "Raw Presentation",
+                JSON.stringify(response.data, null, 2)
+              );
             } catch (err) {
               elemError.innerText = `${err}`;
               console.error(err);
@@ -80,7 +83,10 @@
 
             const verification = await fetch("/verify", {
               method: "post",
-              body: response.data,
+              body: JSON.stringify(response.data),
+              headers: {
+                "Content-Type": "application/json",
+              },
             });
             const verificationJSON = await verification.json();
 
@@ -89,7 +95,7 @@
               JSON.stringify(verificationJSON, null, 2)
             );
 
-            if (verificationJSON && verificationJSON.verified === true) {
+            if (verificationJSON && verificationJSON.verified) {
               elemSuccess.innerHTML = "Successfully requested a credential!";
             } else {
               elemError.innerHTML = `Oh no, something went wrong! Response: <pre>${JSON.stringify(

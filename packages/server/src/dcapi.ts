@@ -1,6 +1,22 @@
 import type { OID4VPCredentialQuery, OID4VPCredentialQueryMdoc } from './protocols/oid4vp.ts';
 
 /**
+ * Options suitable for passing into `navigator.credentials.get({ digital: { ... } })` in the
+ * browser to request the presentation of a verifiable credential via the Digital Credentials API
+ */
+export type CredentialRequestOptions = {
+  digital: DigitalCredentialRequestOptions;
+};
+
+export type DigitalCredentialRequestOptions = {
+  requests: DigitalCredentialRequest[];
+};
+
+export type DigitalCredentialRequest = {
+  protocol: string;
+  data: DCAPIRequestOID4VP;
+};
+/**
  * OID4VP-specific request parameters
  *
  * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-A.2
@@ -17,16 +33,6 @@ export type DCAPIRequestOID4VP = {
   /** An array of credentials being requested */
   dcql_query: {
     credentials: (OID4VPCredentialQuery | OID4VPCredentialQueryMdoc)[];
-  };
-};
-
-/**
- * Options suitable for passing into `navigator.credentials.get({ digital: { ... } })` in the
- * browser to request the presentation of a verifiable credential via the Digital Credentials API
- */
-export type DCAPIRequestOptions = {
-  digital: {
-    requests: DCAPIRequestOID4VP[];
   };
 };
 
