@@ -6,7 +6,7 @@ import type {
 } from './protocols/oid4vp.ts';
 import { verifyMdocPresentation } from './formats/mdoc/index.ts';
 import { verifySDJWTPresentation } from './formats/sd-jwt-vc/index.ts';
-import { base64url, isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
+import { isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
 
 /**
  * Verify and return a credential presentation out of a call to the Digital Credentials API
@@ -65,7 +65,10 @@ export async function verifyPresentationResponse({ response, options }: {
           verifiedValues[id].verifiedClaims[claimName] = claimValue;
         }
       } else if (isSDJWTPresentation(requestedCred)) {
-        const { verifiedClaims } = await verifySDJWTPresentation();
+        const { verifiedClaims } = await verifySDJWTPresentation(
+          matchingPresentation,
+          request.data,
+        );
 
         if (verifiedClaims.length < 1) {
           console.warn('document had no verifiable claims, skipping');
