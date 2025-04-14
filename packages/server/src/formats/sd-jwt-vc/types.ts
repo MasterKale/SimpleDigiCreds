@@ -20,8 +20,16 @@ export type IssuerSignedJWTHeader = JWTHeader & {
  */
 export type IssuerSignedJWTPayload = {
   // https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html#section-4.2.4.1
-  _sd: string[];
+  _sd?: string[];
   _sd_alg?: SelectiveDisclosureAlgorithm;
+  iss?: string;
+  iat?: number;
+  exp?: number;
+  vct?: string;
+  // https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html#section-4.1.2
+  cnf?: {
+    jwk: JsonWebKey;
+  };
 };
 
 /** https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html#name-issuer-signed-jwt */
@@ -31,11 +39,8 @@ type IssuerSignedJWT = [
   IssuerSignedJWTSignature: string,
 ];
 
-// DEBUG: Just a reminder that types for "jwk" values can start by using the existing `JsonWebKey` type
-const foo: JsonWebKey = {};
-
 // One of https://www.iana.org/assignments/named-information/named-information.xhtml
-export type IANANamedInformationHashAlgorithm = 'sha-256' | 'sha-384' | 'sha-512';
+type IANANamedInformationHashAlgorithm = 'sha-256' | 'sha-384' | 'sha-512';
 export type SelectiveDisclosureAlgorithm = IANANamedInformationHashAlgorithm;
 
 /**

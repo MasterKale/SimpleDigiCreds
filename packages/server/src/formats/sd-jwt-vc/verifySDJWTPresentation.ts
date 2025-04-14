@@ -2,6 +2,12 @@ import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
 import { SimpleDigiCredsError } from '../../helpers/index.ts';
 
 import { parseJWTString } from './parseJWTString.ts';
+import { verifyJWTSignature } from './verifyJWTSignature.ts';
+import type {
+  IssuerSignedJWTHeader,
+  IssuerSignedJWTPayload,
+  SelectiveDisclosureAlgorithm,
+} from './types.ts';
 
 export async function verifySDJWTPresentation(
   presentation: string,
@@ -67,9 +73,53 @@ export async function verifySDJWTPresentation(
     disclosureStrings = vcParts.slice(1);
   }
 
-  const [header, payload, signature, rawSegments] = parseJWTString(issuerSignedJWTString);
+  const [header, payload, signature, rawParts] = parseJWTString<
+    IssuerSignedJWTHeader,
+    IssuerSignedJWTPayload
+  >(issuerSignedJWTString);
 
-  console.log(header);
+  /**
+   * Validate the signature over the Issuer-signed JWT
+   */
+  const verified = await verifyJWTSignature(header, rawParts);
+
+  if (!verified) {
+    throw new SimpleDigiCredsError({
+      message: 'JWT signature could not be verified',
+      code: 'SDJWTVerificationError',
+    });
+  }
+
+  /**
+   * TODO: Validate the Issuer and that the signing key belongs to this Issuer
+   */
+
+  /**
+   * Check that the _sd_alg claim value is understood and the hash algorithm is deemed secure
+   */
+  let selectiveDisclosureAlg: SelectiveDisclosureAlgorithm = 'sha-256';
+  if (payload._sd_alg) {
+    // Only supporting sha-256 for now - it should be pretty easy to add sha-384 and sha-512 later
+    const supportedSDAlgs: SelectiveDisclosureAlgorithm[] = ['sha-256'];
+
+    // Make sure the specified _sd_alg is one we support
+    if (supportedSDAlgs.indexOf(payload._sd_alg) < 0) {
+      throw new SimpleDigiCredsError({
+        message: `Unsuppored _sd_alg value of ${payload._sd_alg}`,
+        code: 'SDJWTVerificationError',
+      });
+    }
+
+    selectiveDisclosureAlg = payload._sd_alg;
+  }
+
+  /**
+   * Process the Disclosures and embedded digests in the Issuer-signed JWT
+   */
+  // if (!payload._sd)
+  // disclosureStrings
+  // selectiveDisclosureAlg
+
   console.log(payload);
   console.log(signature);
 
