@@ -4,9 +4,12 @@ type SDJWTHeader = {
   x5c?: string[];
 };
 
+/**
+ * https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html#section-4.1
+ */
 type SDJWTPayload = {
+  // https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html#section-4.2.4.1
   _sd: string[];
-  // https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html#hash_function_claim
   _sd_alg?: SelectiveDisclosureAlgorithm;
 };
 
