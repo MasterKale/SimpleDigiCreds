@@ -1,4 +1,5 @@
 import { base64url, SimpleDigiCredsError } from '../../helpers/index.ts';
+import { JWTParts } from './types.ts';
 
 /**
  * Take a JWT string and parse it into JSON data
@@ -9,7 +10,7 @@ export function parseJWTString<Header = unknown, Payload = unknown>(
   header: Header,
   payload: Payload,
   signature: string,
-  rawSegments: [headerBase64URL: string, payloadBase64URL: string, signatureBase64URL: string],
+  rawSegments: JWTParts,
 ] {
   if (typeof value !== 'string') {
     throw new SimpleDigiCredsError({
