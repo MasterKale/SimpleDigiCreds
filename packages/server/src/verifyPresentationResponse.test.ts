@@ -167,8 +167,8 @@ Deno.test('should verify a well-formed SD-JWT presentation', async () => {
   assertEquals(
     verified.cred1.verifiedClaims,
     {
-      given_name: 'Jon',
-      family_name: 'Smith',
+      given_name: 'Erika',
+      family_name: 'Mustermann',
     },
   );
 });
