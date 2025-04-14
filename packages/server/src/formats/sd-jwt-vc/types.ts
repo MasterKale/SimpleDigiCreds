@@ -61,21 +61,3 @@ export type DisclosureArrayElement = [
   salt: string,
   arrayElement: unknown,
 ];
-
-/**
- * Help understand when a parsed disclosure is an Object Property
- */
-export function isDisclosureObjectProperty(
-  disclosure: DisclosureObjectProperty | DisclosureArrayElement,
-): disclosure is DisclosureObjectProperty {
-  return Array.isArray(disclosure) && disclosure.length === 3;
-}
-
-/**
- * Help understand when a parsed disclosure is an Array Element
- */
-export function isDisclosureArrayElement(
-  disclosure: DisclosureObjectProperty | DisclosureArrayElement,
-): disclosure is DisclosureArrayElement {
-  return Array.isArray(disclosure) && disclosure.length === 2;
-}
