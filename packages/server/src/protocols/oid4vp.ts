@@ -78,9 +78,9 @@ export type OID4VPCredentialQuery = {
   /** A unique string comprised of alphanumeric, underscore (_) or hyphen (-) characters */
   id: string;
   /** The format of the requested Verifiable Credential */
-  format: string; // TODO: This can be constrained per query subtypes
+  format: string;
   /** Format-specific metadata */
-  meta?: unknown; // TODO: This can be defined per query subtype
+  meta?: unknown;
   claims?: OID4VPClaimQuery[];
 };
 
