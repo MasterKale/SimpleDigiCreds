@@ -32,7 +32,13 @@ export async function verifyPresentationResponse({ response, options }: {
 
     for (const requestedCred of dcql_query.credentials) {
       const { id } = requestedCred;
-      // console.log(requestedCred);
+
+      verifiedValues[id] = {
+        verifiedClaims: {},
+        meta: {
+          // issuerAuth: verifiedPresentation.issuerX5C,
+        },
+      };
 
       const matchingPresentation = response.vp_token[id];
 
@@ -74,13 +80,6 @@ export async function verifyPresentationResponse({ response, options }: {
           console.warn('document had no verifiable claims, skipping');
           continue;
         }
-
-        verifiedValues[id] = {
-          verifiedClaims: {},
-          meta: {
-            // issuerAuth: verifiedPresentation.issuerX5C,
-          },
-        };
 
         for (const [claimName, claimValue] of verifiedClaims) {
           verifiedValues[id].verifiedClaims[claimName] = claimValue;
