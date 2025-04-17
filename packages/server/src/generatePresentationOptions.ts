@@ -69,6 +69,7 @@ export function generatePresentationOptions(
             dcql_query: {
               credentials: [
                 mdocCredentialRequest,
+                // sdjwtCredentialRequest,
               ],
             },
           },

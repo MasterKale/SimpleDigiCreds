@@ -1,91 +1,63 @@
-import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
+import { type SDJWTVCConfig, SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
+import { type DecodedSDJwt, decodeSdJwt, getClaims } from '@sd-jwt/decode';
+
+import type { IssuerSignedJWTPayload, JWTHeader } from '../../formats/sd-jwt-vc/types.ts';
 import { SimpleDigiCredsError } from '../../helpers/index.ts';
+import { hashSDJWTVCData } from './hashSDJWTVCData.ts';
+import { getIssuerVerifier } from './getIssuerSignedVerifiers.ts';
+import { getKeyBindingVerifier } from './getKeyBindingVerifier.ts';
+import { assertIssuerSignedClaims } from './assertIssuerSignedClaims.ts';
+import type { OID4VPCredentialQuerySDJWT } from '../../protocols/oid4vp.ts';
 
-import { parseJWTString } from './parseJWTString.ts';
-import { verifyJWTSignature } from './verifyJWTSignature.ts';
-import type {
-  IssuerSignedJWTHeader,
-  IssuerSignedJWTPayload,
-  SelectiveDisclosureAlgorithm,
-} from './types.ts';
-import { hashDisclosure } from './hashDisclosure.ts';
-import { isDisclosureObjectProperty, parseDisclosure } from './parseDisclosure.ts';
-
+/**
+ * Verify an SD-JWT-VC presentation
+ */
 export async function verifySDJWTPresentation(
   presentation: string,
-  request: DCAPIRequestOID4VP,
+  credentialQuery: OID4VPCredentialQuerySDJWT,
 ): Promise<VerifiedSDJWTPresentation> {
-  // Treat the last item of the SD-JWT-VC differently if it's a key-binding JWT
-  const hasKBJWT = !presentation.endsWith('~');
-
-  console.log({ hasKBJWT });
-
-  const vcParts = presentation.split('~');
-
-  /**
-   * Bail out because no claims were disclosed:
-   *
-   * <Issuer-signed JWT>~
-   */
-  if (vcParts.length === 1) {
-    return {
-      verifiedClaims: [],
-    };
+  let decoded: DecodedSDJwt;
+  try {
+    decoded = await decodeSdJwt(presentation, hashSDJWTVCData);
+  } catch (err) {
+    const _err = err as Error;
+    throw new SimpleDigiCredsError({
+      message: 'Could not decode SD-JWT-VC',
+      code: 'SDJWTVerificationError',
+      cause: _err,
+    });
   }
 
-  if (hasKBJWT && vcParts.length === 2) {
-    /**
-     * Bail out because no claims were present between the issuer-signed JWT and key-binding JWT:
-     *
-     * <Issuer-signed JWT>~<KB-JWT>
-     */
-    return {
-      verifiedClaims: [],
-    };
-  }
+  const sdJWTVCInstanceConfig: SDJWTVCConfig = {
+    verifier: getIssuerVerifier(decoded.jwt.header as JWTHeader),
+    hasher: hashSDJWTVCData,
+  };
+  let verifyKeyBinding = false;
 
-  /**
-   * From this point on, it should be safe to assume we have the issuer-signed JWT, at least
-   * one claim, and an optional key-binding JWT
-   *
-   * <Issuer-signed JWT>~<Disclosure 1>~<Disclosure N>~
-   * <Issuer-signed JWT>~<Disclosure 1>~<Disclosure N>~<KB-JWT>
-   */
-  const issuerSignedJWTString = vcParts[0];
-  let disclosureStrings: string[] = [];
-  let kbJWTString: string = '';
+  if (decoded.kbJwt) {
+    sdJWTVCInstanceConfig.kbVerifier = await getKeyBindingVerifier(decoded.jwt.payload);
+    verifyKeyBinding = true;
 
-  if (hasKBJWT) {
-    /** <Issuer-signed JWT>~<Disclosure 1>~<Disclosure N>~<KB-JWT> */
-    disclosureStrings = vcParts.slice(1, -1);
-    [kbJWTString] = vcParts.slice(-1);
-
-    // Safety check
-    if (!kbJWTString) {
+    if (!sdJWTVCInstanceConfig.kbVerifier) {
       throw new SimpleDigiCredsError({
-        message: 'How was there no key-binding JWT after all the logic that ran before here?',
+        message: 'Issuer-signed JWT did not have enough information to verify Key Binding JWT',
         code: 'SDJWTVerificationError',
       });
     }
-  } else {
-    /** <Issuer-signed JWT>~<Disclosure 1>~<Disclosure N>~ */
-    disclosureStrings = vcParts.slice(1);
   }
 
-  const [header, payload, _, rawParts] = parseJWTString<
-    IssuerSignedJWTHeader,
-    IssuerSignedJWTPayload
-  >(issuerSignedJWTString);
+  const sdjwtVerifier = new SDJwtVcInstance(sdJWTVCInstanceConfig);
 
-  /**
-   * Validate the signature over the Issuer-signed JWT
-   */
-  const verified = await verifyJWTSignature(header, rawParts);
-
-  if (!verified) {
+  // @sd-jwt/sd-jwt-vc doesn't export `VerificationResult` so we have to do some TS trickery here
+  let verified: Awaited<ReturnType<SDJwtVcInstance['verify']>>;
+  try {
+    verified = await sdjwtVerifier.verify(presentation, [], verifyKeyBinding);
+  } catch (err) {
+    const _err = err as Error;
     throw new SimpleDigiCredsError({
-      message: 'JWT signature could not be verified',
+      message: 'Could not verify SD-JWT-VC, see cause',
       code: 'SDJWTVerificationError',
+      cause: _err,
     });
   }
 
@@ -94,121 +66,49 @@ export async function verifySDJWTPresentation(
    */
 
   /**
-   * Check that the _sd_alg claim value is understood and the hash algorithm is deemed secure
+   * Make sure claims like exp, iat, and others are otherwise valid
    */
-  let selectiveDisclosureAlg: SelectiveDisclosureAlgorithm = 'sha-256';
-  if (payload._sd_alg) {
-    // Only supporting sha-256 for now - it should be pretty easy to add sha-384 and sha-512 later
-    const supportedSDAlgs: SelectiveDisclosureAlgorithm[] = ['sha-256'];
+  const claims = await getClaims<IssuerSignedJWTPayload>(
+    decoded.jwt.payload,
+    decoded.disclosures,
+    hashSDJWTVCData,
+  );
+  assertIssuerSignedClaims(claims, credentialQuery);
 
-    // Make sure the specified _sd_alg is one we support
-    if (supportedSDAlgs.indexOf(payload._sd_alg) < 0) {
+  if (verifyKeyBinding) {
+    // This _shouldn't_ happen but just in case because the typing says `kb` can be undefined
+    if (!verified.kb) {
       throw new SimpleDigiCredsError({
-        message: `Unsuppored _sd_alg value of ${payload._sd_alg}`,
+        message:
+          'Key Binding JWT was supposedly verified but was not returned for some reason... (oops)',
         code: 'SDJWTVerificationError',
       });
     }
 
-    selectiveDisclosureAlg = payload._sd_alg;
+    /**
+     * TODO: Verify `aud` is the client ID in the request options
+     * TODO: Verify `nonce` is the nonce in the request options
+     * TODO: Verify `sd_hash` is a hash over the SD-JWT and Claims (using _sd_alg/'sha-256')
+     */
+    console.log('TODO: verify key binding JWT\n', verified.kb.payload);
   }
 
   /**
-   * Process the Disclosures and embedded digests in the Issuer-signed JWT
-   *
-   * TODO: This assumes _sd is in the root of the payload, but there can be nested disclosures too.
-   * Figure that out later.
+   * Everything's fine, collect the disclosures
    */
-  const selectiveDisclosureHashes = payload._sd;
-  if (!selectiveDisclosureHashes || !Array.isArray(selectiveDisclosureHashes)) {
-    throw new SimpleDigiCredsError({
-      message: 'JWT payload _sd was missing or not an array',
-      code: 'SDJWTVerificationError',
-    });
-  }
-
-  const selectiveDisclosureHashesMap = Object.fromEntries(
-    selectiveDisclosureHashes.map((value) => [value, true]),
-  );
-
   const verifiedClaims: VerifiedSDJWTPresentation['verifiedClaims'] = [];
-  const unmatchedDisclosures: string[] = [];
-
-  for (const disclosure of disclosureStrings) {
-    const disclosureHash = await hashDisclosure(disclosure, selectiveDisclosureAlg);
-    if (!selectiveDisclosureHashesMap[disclosureHash]) {
-      unmatchedDisclosures.push(disclosure);
-      continue;
+  decoded.disclosures.forEach((disclosure) => {
+    if (disclosure.key) {
+      verifiedClaims.push([disclosure.key, disclosure.value]);
     }
+  });
 
-    const parsedDisclosure = parseDisclosure(disclosure);
-
-    /**
-     * Validating as per https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html#section-7.1-4.3.2.3.2.2.1
-     */
-    if (!isDisclosureObjectProperty(parsedDisclosure)) {
-      throw new SimpleDigiCredsError({
-        message: `Disclosure ${
-          JSON.stringify(parsedDisclosure)
-        } did not have three elements as expected`,
-        code: 'SDJWTVerificationError',
-      });
-    }
-
-    const [_, claimName, claimValue] = parsedDisclosure;
-
-    if (claimName === '_sd' || claimName === '...') {
-      throw new SimpleDigiCredsError({
-        message: `Disclosure claim name "${claimName}" was disallowed value "_sd" or "..."`,
-        code: 'SDJWTVerificationError',
-      });
-    }
-
-    // @ts-ignore: I don't want to muddy up the definition of the payload's type
-    if (payload[claimName] !== undefined) {
-      throw new SimpleDigiCredsError({
-        message: `Disclosure claim name "${claimName}" was found at same level of payload as "_sd"`,
-        code: 'SDJWTVerificationError',
-      });
-    }
-
-    // @ts-ignore: SD-JWT spec wants this assignment (to catch duplicates it seems)
-    payload[claimName] = claimValue;
-    verifiedClaims.push([claimName, claimValue]);
-
-    /**
-     * "If any Disclosure was not referenced by digest value in the Issuer-signed JWT (directly
-     * or recursively via other Disclosures), the SD-JWT MUST be rejected."
-     *
-     * https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html#section-7.1-4.5
-     */
-    if (unmatchedDisclosures.length > 0) {
-      throw new SimpleDigiCredsError({
-        message: `The following disclosures did not have a matching digest: ${
-          JSON.stringify(unmatchedDisclosures)
-        }`,
-        code: 'SDJWTVerificationError',
-      });
-    }
-
-    /**
-     * "Check that the SD-JWT is valid using claims such as nbf, iat, and exp in the processed
-     * payload. If a required validity-controlling claim is missing (see Section 9.7), the SD-JWT
-     * MUST be rejected."
-     *
-     * https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html#section-7.1-4.6
-     *
-     * iss (Issuer)
-     * aud (Audience), although issuers MAY allow individual entries in the array to be selectively disclosable
-     * exp (Expiration Time)
-     * nbf (Not Before)
-     * cnf (Confirmation Key)
-     */
-    // TODO
-
-    // TODO: Need to verify kbJWTString
-  }
-
-  console.log(payload);
+  /**
+   * Return some more claims the Verifier might find useful
+   */
+  claims.iss && verifiedClaims.push(['issuer', claims.iss]);
+  claims.iat && verifiedClaims.push(['issued_at', new Date(claims.iat * 1000)]);
+  claims.exp && verifiedClaims.push(['expires_on', new Date(claims.exp * 1000)]);
 
   return { verifiedClaims };
 }

@@ -73,7 +73,7 @@ export async function verifyPresentationResponse({ response, options }: {
       } else if (isSDJWTPresentation(requestedCred)) {
         const { verifiedClaims } = await verifySDJWTPresentation(
           matchingPresentation,
-          request.data,
+          requestedCred,
         );
 
         if (verifiedClaims.length < 1) {
