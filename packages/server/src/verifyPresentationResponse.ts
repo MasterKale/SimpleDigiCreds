@@ -71,10 +71,11 @@ export async function verifyPresentationResponse({ response, options }: {
           verifiedValues[id].verifiedClaims[claimName] = claimValue;
         }
       } else if (isSDJWTPresentation(requestedCred)) {
-        const { verifiedClaims } = await verifySDJWTPresentation(
-          matchingPresentation,
-          requestedCred,
-        );
+        const { verifiedClaims } = await verifySDJWTPresentation({
+          presentation: matchingPresentation,
+          matchingCredentialQuery: requestedCred,
+          dcapiRequestData: request.data,
+        });
 
         if (verifiedClaims.length < 1) {
           console.warn('document had no verifiable claims, skipping');

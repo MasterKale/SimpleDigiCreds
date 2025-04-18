@@ -3,6 +3,8 @@ import { type DecodedSDJwt, decodeSdJwt, getClaims } from '@sd-jwt/decode';
 
 import type { IssuerSignedJWTPayload, JWTHeader } from '../../formats/sd-jwt-vc/types.ts';
 import { SimpleDigiCredsError } from '../../helpers/index.ts';
+import type { OID4VPCredentialQuerySDJWT } from '../../protocols/oid4vp.ts';
+import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
 import { hashSDJWTVCData } from './hashSDJWTVCData.ts';
 import { getIssuerVerifier } from './getIssuerSignedVerifiers.ts';
 import { getKeyBindingVerifier } from './getKeyBindingVerifier.ts';
@@ -12,10 +14,15 @@ import { assertKeyBindingJWTClaims } from './assertKeyBindingJWTClaims.ts';
 /**
  * Verify an SD-JWT-VC presentation
  */
-export async function verifySDJWTPresentation(
-  presentation: string,
-  credentialQuery: OID4VPCredentialQuerySDJWT,
-): Promise<VerifiedSDJWTPresentation> {
+export async function verifySDJWTPresentation({
+  presentation,
+  matchingCredentialQuery,
+  dcapiRequestData,
+}: {
+  presentation: string;
+  matchingCredentialQuery: OID4VPCredentialQuerySDJWT;
+  dcapiRequestData: DCAPIRequestOID4VP;
+}): Promise<VerifiedSDJWTPresentation> {
   let decoded: DecodedSDJwt;
   try {
     decoded = await decodeSdJwt(presentation, hashSDJWTVCData);
@@ -51,6 +58,12 @@ export async function verifySDJWTPresentation(
   // @sd-jwt/sd-jwt-vc doesn't export `VerificationResult` so we have to do some TS trickery here
   let verified: Awaited<ReturnType<SDJwtVcInstance['verify']>>;
   try {
+    /**
+     * If `verifyKeyBinding` is true then `sdjwtVerifier.verify()` will also take care of verifying
+     * `sd_hash` in the Key Binding JWT
+     *
+     * https://github.com/openwallet-foundation/sd-jwt-js/blob/d2f2cb5a4d9f40e5d90209f572665a9bf1f0844b/packages/core/src/index.ts#L255-L257
+     */
     verified = await sdjwtVerifier.verify(presentation, [], verifyKeyBinding);
   } catch (err) {
     const _err = err as Error;
@@ -87,12 +100,12 @@ export async function verifySDJWTPresentation(
       });
     }
 
-    /**
-     * TODO: Verify `aud` is the client ID in the request options
-     * TODO: Verify `nonce` is the nonce in the request options
-     * TODO: Verify `sd_hash` is a hash over the SD-JWT and Claims (using _sd_alg/'sha-256')
-     */
-    console.log('TODO: verify key binding JWT\n', verified.kb.payload);
+    // Verify the claims in the Key Binding JWT
+    assertKeyBindingJWTClaims({
+      payload: verified.kb.payload,
+      clientID: dcapiRequestData.client_id,
+      nonce: dcapiRequestData.nonce,
+    });
   }
 
   /**
@@ -110,9 +123,10 @@ export async function verifySDJWTPresentation(
   /**
    * Return some more claims the Verifier might find useful
    */
-  claims.iss && verifiedClaims.push(['issuer', claims.iss]);
-  claims.iat && verifiedClaims.push(['issued_at', new Date(claims.iat * 1000)]);
-  claims.exp && verifiedClaims.push(['expires_on', new Date(claims.exp * 1000)]);
+  // TODO: These should probably be returned as "meta" values instead of with the requested claims
+  // claims.iss && verifiedClaims.push(['issuer', claims.iss]);
+  // claims.iat && verifiedClaims.push(['issued_at', new Date(claims.iat * 1000)]);
+  // claims.exp && verifiedClaims.push(['expires_on', new Date(claims.exp * 1000)]);
 
   return { verifiedClaims };
 }
