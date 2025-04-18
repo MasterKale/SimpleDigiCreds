@@ -2,7 +2,11 @@ import type { kbPayload } from '@sd-jwt/types';
 
 import { SimpleDigiCredsError } from '../../helpers/index.ts';
 
-/** */
+/**
+ * Check Key Binding JWT claims for correctness
+ *
+ * @raises `SimpleDigiCredsError` with whatever claim was invalid
+ */
 export function assertKeyBindingJWTClaims({
   payload,
   clientID,
