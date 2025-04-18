@@ -13,6 +13,18 @@ export function assertIssuerSignedJWTClaims({
   claims: IssuerSignedJWTPayload;
   allowedCredentialTypes?: string[];
 }): void {
+  // Ensure that the `nbf` claim is some time before Now
+  if (claims.nbf) {
+    const notBeforeDate = new Date(claims.nbf * 1000);
+    const currentDate = new Date();
+    if (notBeforeDate >= currentDate) {
+      throw new SimpleDigiCredsError({
+        message: 'Issuer-signed JWT is not yet valid',
+        code: 'SDJWTVerificationError',
+      });
+    }
+  }
+
   // Ensure that the `exp` claim is some time after Now
   if (claims.exp) {
     const expirationDate = new Date(claims.exp * 1000);
