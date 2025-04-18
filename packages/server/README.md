@@ -34,7 +34,8 @@ presentation:
 import { generatePresentationOptions, verifyPresentationResponse } from '@simpledigicreds/server';
 
 /* server */
-const options = await generateRequestOptions({
+const options = await generatePresentationOptions({
+  credentialFormat: 'mdl';
   desiredClaims: ['family_name', 'given_name'],
   requestOrigin: 'http://localhost:8000',
 });
@@ -51,5 +52,4 @@ const verified = await verifyPresentationResponse({
 });
 ```
 
-The output of `verifyPresentationResponse()` will contain any verified claims contained in the
-presented credential.
+`verified.cred1.claims` will contain any verified claims contained in the presented credential.
