@@ -21,3 +21,44 @@ export type SubtleCryptoKeyAlgName =
  * https://github.com/denoland/std/blob/b5a5fe4f96b91c1fe8dba5cc0270092dd11d3287/bytes/_types.ts#L11
  */
 export type Uint8Array_ = ReturnType<Uint8Array['slice']>;
+
+export type VerifiedClaims = [elemID: string, elemValue: unknown][];
+export type VerifiedMeta = {
+  issuedAt?: Date;
+  validFrom?: Date;
+  expiresOn?: Date;
+};
+
+/**
+ * Verified credentials and any present claims, mapped by requested credential ID. Also includes
+ * various "`...meta`" values that can be used by the Verifier afterwards (e.g. policy-related
+ * checks, etc...)
+ */
+export type VerifiedPresentation = {
+  /**
+   * TODO: Typing on this is kinda weird when working with output from this method. For example,
+   * `verified.cred1.verifiedClaims` requires you to know that this library chose "cred1" as
+   * the name when it generated credential request options. Can we collapse this type so that it's
+   * `verified.verifiedClaims` instead?
+   */
+  [credID: string]: VerifiedCredential;
+};
+
+export type VerifiedCredential = {
+  claims: VerifiedClaimsMap;
+  issuerMeta: VerifiedCredentialIssuerMeta;
+};
+
+/**
+ * Document claim values mapped by their claim name
+ */
+export type VerifiedClaimsMap = { [elemID: string]: unknown };
+
+/**
+ * Issuer-centric information about the digital credential from which
+ */
+export type VerifiedCredentialIssuerMeta = {
+  validFrom?: Date;
+  expiresOn?: Date;
+  issuedAt?: Date;
+};

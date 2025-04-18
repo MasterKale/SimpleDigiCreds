@@ -7,6 +7,7 @@ import type {
 import { verifyMdocPresentation } from './formats/mdoc/index.ts';
 import { verifySDJWTPresentation } from './formats/sd-jwt-vc/index.ts';
 import { isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
+import { VerifiedPresentation } from './helpers/types.ts';
 
 /**
  * Verify and return a credential presentation out of a call to the Digital Credentials API
@@ -97,48 +98,6 @@ export async function verifyPresentationResponse({ response, options }: {
 
   return verifiedValues;
 }
-
-/**
- * Claims that could be successfully verified, mapped by requested credential ID. Also includes
- * values that can be used to verify the issuer and wallet when available.
- *
- * Example:
- *
- * ```
- * {
- *   cred1: {
- *     verifiedClaims: {
- *       given_name: 'Jon',
- *       family_name: 'Smith',
- *       age_over_21: true,
- *     },
- *     meta: {
- *       issuerAuth: [...],
- *       walletAuth: [...],
- *     },
- *   }
- * }
- * ```
- */
-export type VerifiedPresentation = {
-  /**
-   * TODO: Typing on this is kinda weird when working with output from this method. For example,
-   * `verified.cred1.verifiedClaims` requires you to know that this library chose "cred1" as
-   * the name when it generated credential request options. Can we collapse this type so that it's
-   * `verified.verifiedClaims` instead?
-   */
-  [credID: string]: {
-    verifiedClaims: VerifiedClaims;
-    // TODO: What other data should come out of this? I heard it's okay to assume X.509 cert chains
-    // in wallet responses.
-    meta: {
-      issuerAuth?: unknown;
-      walletAuth?: unknown;
-    };
-  };
-};
-
-type VerifiedClaims = { [claimName: string]: unknown };
 
 /**
  * Type guard to make sure a query is for an mdoc
