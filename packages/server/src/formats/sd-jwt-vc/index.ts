@@ -1,4 +1,1 @@
-export {
-  type VerifiedSDJWTPresentation,
-  verifySDJWTPresentation,
-} from './verifySDJWTPresentation.ts';
+export { verifySDJWTPresentation } from './verifySDJWTPresentation.ts';

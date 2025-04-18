@@ -54,15 +54,13 @@ export async function verifyPresentationResponse({ response, options }: {
 
         verifiedValues[id] = verifiedCredential;
       } else if (isSDJWTPresentation(requestedCred)) {
-        const { verifiedClaims } = await verifySDJWTPresentation({
+        const verifiedCredential = await verifySDJWTPresentation({
           presentation: matchingPresentation,
           matchingCredentialQuery: requestedCred,
-          dcapiRequestData: request.data,
+          request: request.data,
         });
 
-        for (const [claimName, claimValue] of verifiedClaims) {
-          verifiedValues[id].claims[claimName] = claimValue;
-        }
+        verifiedValues[id] = verifiedCredential;
       } else {
         throw new SimpleDigiCredsError({
           message:

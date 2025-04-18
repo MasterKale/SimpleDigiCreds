@@ -24,6 +24,7 @@ export type IssuerSignedJWTPayload = {
   _sd_alg?: SelectiveDisclosureAlgorithm;
   iss?: string;
   iat?: number;
+  nbf?: number;
   exp?: number;
   vct?: string;
   // https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html#section-4.1.2

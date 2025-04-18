@@ -175,6 +175,7 @@ Deno.test('should verify a well-formed SD-JWT presentation', async () => {
         issuerMeta: {
           expiresOn: new Date('2029-09-01T23:33:20.000Z'),
           issuedAt: new Date('2023-05-02T04:00:00.000Z'),
+          validFrom: undefined,
         },
       },
     },

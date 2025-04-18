@@ -3,6 +3,7 @@ import { type DecodedSDJwt, decodeSdJwt, getClaims } from '@sd-jwt/decode';
 
 import type { IssuerSignedJWTPayload, JWTHeader } from '../../formats/sd-jwt-vc/types.ts';
 import { SimpleDigiCredsError } from '../../helpers/index.ts';
+import type { VerifiedClaimsMap, VerifiedCredential } from '../../helpers/types.ts';
 import type { OID4VPCredentialQuerySDJWT } from '../../protocols/oid4vp.ts';
 import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
 import { hashSDJWTVCData } from './hashSDJWTVCData.ts';
@@ -17,12 +18,12 @@ import { assertKeyBindingJWTClaims } from './assertKeyBindingJWTClaims.ts';
 export async function verifySDJWTPresentation({
   presentation,
   matchingCredentialQuery,
-  dcapiRequestData,
+  request: dcapiRequestData,
 }: {
   presentation: string;
   matchingCredentialQuery: OID4VPCredentialQuerySDJWT;
-  dcapiRequestData: DCAPIRequestOID4VP;
-}): Promise<VerifiedSDJWTPresentation> {
+  request: DCAPIRequestOID4VP;
+}): Promise<VerifiedCredential> {
   let decoded: DecodedSDJwt;
   try {
     decoded = await decodeSdJwt(presentation, hashSDJWTVCData);
@@ -81,14 +82,14 @@ export async function verifySDJWTPresentation({
   /**
    * Make sure claims like exp, iat, and others are otherwise valid
    */
-  const claims = await getClaims<IssuerSignedJWTPayload>(
+  const issuerClaims = await getClaims<IssuerSignedJWTPayload>(
     decoded.jwt.payload,
     decoded.disclosures,
     hashSDJWTVCData,
   );
 
   const { vct_values: allowedCredentialTypes } = matchingCredentialQuery.meta || {};
-  assertIssuerSignedJWTClaims({ claims, allowedCredentialTypes });
+  assertIssuerSignedJWTClaims({ claims: issuerClaims, allowedCredentialTypes });
 
   if (verifyKeyBinding) {
     // This _shouldn't_ happen but just in case because the typing says `kb` can be undefined
@@ -111,26 +112,21 @@ export async function verifySDJWTPresentation({
   /**
    * Everything's fine, collect the disclosures
    */
-  const verifiedClaims: VerifiedSDJWTPresentation['verifiedClaims'] = [];
+  const claims: VerifiedClaimsMap = {};
   decoded.disclosures.forEach((disclosure) => {
     // This might drop ArrayElement disclosures, depending on how @sd-jwt/sd-jwt-vc handles them
     // https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html#section-4.2.2
     if (disclosure.key) {
-      verifiedClaims.push([disclosure.key, disclosure.value]);
+      claims[disclosure.key] = disclosure.value;
     }
   });
 
-  /**
-   * Return some more claims the Verifier might find useful
-   */
-  // TODO: These should probably be returned as "meta" values instead of with the requested claims
-  // claims.iss && verifiedClaims.push(['issuer', claims.iss]);
-  // claims.iat && verifiedClaims.push(['issued_at', new Date(claims.iat * 1000)]);
-  // claims.exp && verifiedClaims.push(['expires_on', new Date(claims.exp * 1000)]);
-
-  return { verifiedClaims };
+  return {
+    claims,
+    issuerMeta: {
+      expiresOn: issuerClaims.exp ? new Date(issuerClaims.exp * 1000) : undefined,
+      issuedAt: issuerClaims.iat ? new Date(issuerClaims.iat * 1000) : undefined,
+      validFrom: issuerClaims.nbf ? new Date(issuerClaims.nbf * 1000) : undefined,
+    },
+  };
 }
-
-export type VerifiedSDJWTPresentation = {
-  verifiedClaims: [elemID: string, elemValue: unknown][];
-};
