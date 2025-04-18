@@ -122,7 +122,7 @@ export enum COSEKTY {
 }
 
 export function isCOSEKty(kty: number | undefined): kty is COSEKTY {
-  return Object.values(COSEKTY).indexOf(kty as COSEKTY) >= 0;
+  return Object.values(COSEKTY).includes(kty as COSEKTY);
 }
 
 /**
@@ -139,7 +139,7 @@ export enum COSECRV {
 }
 
 export function isCOSECrv(crv: number | undefined): crv is COSECRV {
-  return Object.values(COSECRV).indexOf(crv as COSECRV) >= 0;
+  return Object.values(COSECRV).includes(crv as COSECRV);
 }
 
 /**
@@ -173,7 +173,7 @@ export enum COSEALG {
 }
 
 export function isCOSEAlg(alg: number | undefined): alg is COSEALG {
-  return Object.values(COSEALG).indexOf(alg as COSEALG) >= 0;
+  return Object.values(COSEALG).includes(alg as COSEALG);
 }
 
 /**

@@ -20,5 +20,7 @@ export class SimpleDigiCredsError extends Error {
 }
 
 export type SimpleDigiCredsErrorCode =
+  | 'InvalidPresentationOptions'
   | 'InvalidDCAPIResponse'
-  | 'MdocVerificationError';
+  | 'MdocVerificationError'
+  | 'SDJWTVerificationError';

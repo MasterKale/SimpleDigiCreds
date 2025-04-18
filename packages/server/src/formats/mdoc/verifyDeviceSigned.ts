@@ -16,7 +16,7 @@ import type { Uint8Array_ } from '../../helpers/types.ts';
 export async function verifyDeviceSigned(
   document: DecodedDocument,
   request: DCAPIRequestOID4VP,
-) {
+): Promise<VerifiedDeviceSigned> {
   const issuerSigned = document.get('issuerSigned');
   const deviceSigned = document.get('deviceSigned');
   const issuerAuth = issuerSigned.get('issuerAuth');
@@ -29,6 +29,7 @@ export async function verifyDeviceSigned(
   const validityInfo = decodedMSO.get('validityInfo');
   const validFrom = validityInfo.get('validFrom').value as string;
   const validUntil = validityInfo.get('validUntil').value as string;
+  const signed = validityInfo.get('signed').value as string;
 
   const dateValidFrom = new Date(Date.parse(validFrom));
   const dateValidUntil = new Date(Date.parse(validUntil));
@@ -103,5 +104,17 @@ export async function verifyDeviceSigned(
     shaHashOverride: hashAlg,
   });
 
-  return { verified };
+  return {
+    verified,
+    issuedAt: new Date(Date.parse(signed)),
+    validFrom: dateValidFrom,
+    expiresOn: dateValidUntil,
+  };
 }
+
+type VerifiedDeviceSigned = {
+  verified: boolean;
+  issuedAt: Date;
+  validFrom: Date;
+  expiresOn: Date;
+};

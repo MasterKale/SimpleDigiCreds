@@ -1,5 +1,5 @@
 import type { DCAPIResponse } from '../dcapi.ts';
-import { base64url, SimpleDigiCredsError } from './index.ts';
+import { SimpleDigiCredsError } from './index.ts';
 
 /**
  * Take a response from the Digital Credential API and make sure it's the expected shape
@@ -35,13 +35,13 @@ export function isDCAPIResponse(response: unknown): response is DCAPIResponse {
       break;
     }
 
-    entriesValid = typeof cred === 'string' && base64url.isBase64URLString(cred);
+    entriesValid = typeof cred === 'string';
   }
 
   if (!entriesValid) {
     throw new SimpleDigiCredsError({
       code: 'InvalidDCAPIResponse',
-      message: 'Object `response.tp_token` contained non-base64url-encoded entries',
+      message: 'Object `response.vp_token` contained non-base64url-encoded entries',
     });
   }
 

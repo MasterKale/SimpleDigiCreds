@@ -1,4 +1,8 @@
-import type { OID4VPCredentialQuery, OID4VPCredentialQueryMdoc } from './protocols/oid4vp.ts';
+import type {
+  OID4VPCredentialQuery,
+  OID4VPCredentialQueryMdoc,
+  OID4VPCredentialQuerySDJWT,
+} from './protocols/oid4vp.ts';
 
 /**
  * Options suitable for passing into `navigator.credentials.get({ digital: { ... } })` in the
@@ -32,7 +36,7 @@ export type DCAPIRequestOID4VP = {
   nonce: string;
   /** An array of credentials being requested */
   dcql_query: {
-    credentials: (OID4VPCredentialQuery | OID4VPCredentialQueryMdoc)[];
+    credentials: (OID4VPCredentialQuery | OID4VPCredentialQueryMdoc | OID4VPCredentialQuerySDJWT)[];
   };
 };
 

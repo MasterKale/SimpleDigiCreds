@@ -78,12 +78,13 @@ export type OID4VPCredentialQuery = {
   /** A unique string comprised of alphanumeric, underscore (_) or hyphen (-) characters */
   id: string;
   /** The format of the requested Verifiable Credential */
-  format: string; // TODO: This can be constrained per query subtypes
+  format: string;
   /** Format-specific metadata */
-  meta?: unknown; // TODO: This can be defined per query subtype
+  meta?: unknown;
   claims?: OID4VPClaimQuery[];
 };
 
+/** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#name-mobile-documents-or-mdocs-i */
 export type OID4VPCredentialQueryMdoc = {
   /** A unique string comprised of alphanumeric, underscore (_) or hyphen (-) characters */
   id: string;
@@ -92,6 +93,28 @@ export type OID4VPCredentialQueryMdoc = {
   /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3.1.1-2.2 */
   meta: { doctype_value: 'org.iso.18013.5.1.mDL' };
   claims: OID4VPClaimQueryMdoc[];
+};
+
+/** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.4 */
+export type OID4VPCredentialQuerySDJWT = {
+  /** A unique string comprised of alphanumeric, underscore (_) or hyphen (-) characters */
+  id: string;
+  format: 'dc+sd-jwt';
+  meta?: {
+    /** An array of strings that specifies allowed values for the type of the requested Verifiable Credential. */
+    vct_values?: string[];
+  };
+  claims: OID4VPClaimQuery[];
+  client_metadata: {
+    vp_formats: {
+      'dc+sd-jwt': {
+        // TODO: Just picking "ES256" for now.
+        // See https://www.rfc-editor.org/rfc/rfc7518.html#section-3.1 for possible values
+        'sd-jwt_alg_values'?: ['ES256'];
+        'kb-jwt_alg_values'?: ['ES256'];
+      };
+    };
+  };
 };
 
 /**
