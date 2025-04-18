@@ -37,15 +37,15 @@ export function assertIssuerSignedJWTClaims({
     }
   }
 
-  // Check if `vct` claim is one of the requested types, if any were specified
-  if (!claims.vct) {
-    throw new SimpleDigiCredsError({
-      message: 'Issuer-signed JWT was missing vct claim',
-      code: 'SDJWTVerificationError',
-    });
-  }
-
   if (allowedCredentialTypes) {
+    // Check if `vct` claim is one of the requested types, if any were specified
+    if (!claims.vct) {
+      throw new SimpleDigiCredsError({
+        message: 'Issuer-signed JWT was missing vct claim',
+        code: 'SDJWTVerificationError',
+      });
+    }
+
     // A credential type was specified in the request, but what we got back was not one of those
     // types
     if (!allowedCredentialTypes.includes(claims.vct)) {
