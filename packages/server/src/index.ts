@@ -1,4 +1,8 @@
-export { generatePresentationOptions } from './generatePresentationOptions.ts';
+export {
+  generatePresentationOptions,
+  type MDLRequestOptions,
+  type SDJWTRequestOptions,
+} from './generatePresentationOptions.ts';
 export { verifyPresentationResponse } from './verifyPresentationResponse.ts';
 
 export type {
