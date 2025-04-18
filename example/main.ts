@@ -23,12 +23,14 @@ app.get("/options", async (ctx) => {
 
   const sdjwtOptions = await generatePresentationOptions({
     credentialFormat: "sd-jwt",
-    // Just for CMWallet
     acceptedVCTValues: ["urn:eu.europa.ec.eudi:pid:1"],
     desiredClaims: ["family_name", "given_name"],
     requestOrigin: "http://localhost:8000",
   });
 
+  /**
+   * Toggle between these to test either format (until both can be included in one DC API call)
+   */
   // const options = mdlOptions;
   const options = sdjwtOptions;
 
