@@ -104,8 +104,8 @@ export async function verifySDJWTPresentation({
     // Verify the claims in the Key Binding JWT
     assertKeyBindingJWTClaims({
       payload: verified.kb.payload,
-      clientID: dcapiRequestData.client_id,
-      nonce: dcapiRequestData.nonce,
+      expectedClientID: dcapiRequestData.client_id,
+      expectedNonce: dcapiRequestData.nonce,
     });
   }
 

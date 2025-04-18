@@ -9,12 +9,12 @@ import { SimpleDigiCredsError } from '../../helpers/index.ts';
  */
 export function assertKeyBindingJWTClaims({
   payload,
-  clientID,
-  nonce,
+  expectedClientID,
+  expectedNonce,
 }: {
   payload: kbPayload;
-  clientID: string;
-  nonce: string;
+  expectedClientID: string;
+  expectedNonce: string;
 }): void {
   // Verify `iat`
   const issuedAtDate = new Date(payload.iat * 1000);
@@ -28,17 +28,19 @@ export function assertKeyBindingJWTClaims({
   }
 
   // Verify `aud`
-  if (payload.aud !== clientID) {
+  if (payload.aud !== expectedClientID) {
     throw new SimpleDigiCredsError({
-      message: `Key Binding JWT audience "${payload.aud}" did not match client_id "${clientID}"`,
+      message:
+        `Key Binding JWT audience "${payload.aud}" did not match expected client_id "${expectedClientID}"`,
       code: 'SDJWTVerificationError',
     });
   }
 
   // Verify `nonce`
-  if (payload.nonce !== nonce) {
+  if (payload.nonce !== expectedNonce) {
     throw new SimpleDigiCredsError({
-      message: `Key Binding JWT nonce "${payload.nonce}" did not match nonce "${nonce}"`,
+      message:
+        `Key Binding JWT expectedNonce "${payload.nonce}" did not match expected nonce "${expectedNonce}"`,
       code: 'SDJWTVerificationError',
     });
   }
