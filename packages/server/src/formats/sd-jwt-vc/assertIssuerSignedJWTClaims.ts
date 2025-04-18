@@ -17,7 +17,7 @@ export function assertIssuerSignedJWTClaims({
   if (claims.nbf) {
     const notBeforeDate = new Date(claims.nbf * 1000);
     const currentDate = new Date();
-    if (notBeforeDate >= currentDate) {
+    if (currentDate < notBeforeDate) {
       throw new SimpleDigiCredsError({
         message: 'Issuer-signed JWT is not yet valid',
         code: 'SDJWTVerificationError',
