@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.2.1
+
+- **[server]** Change CBOR library source from JSR to NPM
+
 ## v0.2.0
 
 - **[server]** Supports end-to-end OID4VP + SD-JWT-VC presentation request (unsigned) and
