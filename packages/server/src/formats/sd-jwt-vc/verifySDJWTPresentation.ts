@@ -98,6 +98,8 @@ export async function verifySDJWTPresentation(
    */
   const verifiedClaims: VerifiedSDJWTPresentation['verifiedClaims'] = [];
   decoded.disclosures.forEach((disclosure) => {
+    // This might drop ArrayElement disclosures, depending on how @sd-jwt/sd-jwt-vc handles them
+    // https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html#section-4.2.2
     if (disclosure.key) {
       verifiedClaims.push([disclosure.key, disclosure.value]);
     }
