@@ -7,7 +7,7 @@ import { hashSDJWTVCData } from './hashSDJWTVCData.ts';
 import { getIssuerVerifier } from './getIssuerSignedVerifiers.ts';
 import { getKeyBindingVerifier } from './getKeyBindingVerifier.ts';
 import { assertIssuerSignedJWTClaims } from './assertIssuerSignedJWTClaims.ts';
-import type { OID4VPCredentialQuerySDJWT } from '../../protocols/oid4vp.ts';
+import { assertKeyBindingJWTClaims } from './assertKeyBindingJWTClaims.ts';
 
 /**
  * Verify an SD-JWT-VC presentation
@@ -73,7 +73,9 @@ export async function verifySDJWTPresentation(
     decoded.disclosures,
     hashSDJWTVCData,
   );
-  assertIssuerSignedJWTClaims(claims, credentialQuery);
+
+  const { vct_values: allowedCredentialTypes } = matchingCredentialQuery.meta || {};
+  assertIssuerSignedJWTClaims({ claims, allowedCredentialTypes });
 
   if (verifyKeyBinding) {
     // This _shouldn't_ happen but just in case because the typing says `kb` can be undefined

@@ -1,5 +1,4 @@
 import { SimpleDigiCredsError } from '../../helpers/index.ts';
-import type { OID4VPCredentialQuerySDJWT } from '../../protocols/oid4vp.ts';
 import type { IssuerSignedJWTPayload } from './types.ts';
 
 /**
@@ -7,10 +6,13 @@ import type { IssuerSignedJWTPayload } from './types.ts';
  *
  * @raises `SimpleDigiCredsError` with whatever claim was invalid
  */
-export function assertIssuerSignedJWTClaims(
-  claims: IssuerSignedJWTPayload,
-  credentialQuery: OID4VPCredentialQuerySDJWT,
-): void {
+export function assertIssuerSignedJWTClaims({
+  claims,
+  allowedCredentialTypes,
+}: {
+  claims: IssuerSignedJWTPayload;
+  allowedCredentialTypes?: string[];
+}): void {
   // Ensure that the `exp` claim is some time after Now
   if (claims.exp) {
     const expirationDate = new Date(claims.exp * 1000);
@@ -31,14 +33,13 @@ export function assertIssuerSignedJWTClaims(
     });
   }
 
-  const { vct_values } = credentialQuery.meta || {};
-  if (vct_values) {
+  if (allowedCredentialTypes) {
     // A credential type was specified in the request, but what we got back was not one of those
     // types
-    if (!vct_values.includes(claims.vct)) {
+    if (!allowedCredentialTypes.includes(claims.vct)) {
       throw new SimpleDigiCredsError({
         message: `Issuer-signed JWT vct claim "${claims.vct}" was not one of ${
-          JSON.stringify(vct_values)
+          JSON.stringify(allowedCredentialTypes)
         }`,
         code: 'SDJWTVerificationError',
       });
