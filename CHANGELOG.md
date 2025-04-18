@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.2.0
+
+- **[server]** Supports end-to-end OID4VP + SD-JWT-VC presentation request (unsigned) and
+  verification (unencrypted) ([#10](https://github.com/MasterKale/SimpleDigiCreds/pull/10))
+- **[server]** `generateRequestOptions()` has been renamted to `generatePresentationOptions()`, and
+  `verifyResponse()` is now `verifyPresentationResponse()`
+  ([#9](https://github.com/MasterKale/SimpleDigiCreds/pull/9))
+
 ## v0.1.0
 
 - An example site can be started via `deno task example:start` to test out this project locally

@@ -1,6 +1,6 @@
 {
   "name": "@simpledigicreds/server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "exports": "./src/index.ts",
   "imports": {
     "@hexagon/base64": "npm:@hexagon/base64@^2.0.4",
