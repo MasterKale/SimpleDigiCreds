@@ -106,14 +106,14 @@ Deno.test('should verify a well-formed mdoc presentation', async () => {
     verified,
     {
       cred1: {
-        verifiedClaims: {
+        claims: {
           given_name: 'Jon',
           family_name: 'Smith',
         },
-        meta: {
-          issuerAuth: [
-            '-----BEGIN CERTIFICATE-----\nMIICwDCCAmegAwIBAgIUHn8bMq1PNO/ksMwHt7DjM6cLGE0wCgYIKoZIzj0EAwIw\neTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDU1v\ndW50YWluIFZpZXcxHDAaBgNVBAoME0RpZ2l0YWwgQ3JlZGVudGlhbHMxHzAdBgNV\nBAMMFmRpZ2l0YWxjcmVkZW50aWFscy5kZXYwHhcNMjUwMjE5MjMzMDE4WhcNMjYw\nMjE5MjMzMDE4WjB5MQswCQYDVQQGEwJVUzETMBEGA1UECAwKQ2FsaWZvcm5pYTEW\nMBQGA1UEBwwNTW91bnRhaW4gVmlldzEcMBoGA1UECgwTRGlnaXRhbCBDcmVkZW50\naWFsczEfMB0GA1UEAwwWZGlnaXRhbGNyZWRlbnRpYWxzLmRldjBZMBMGByqGSM49\nAgEGCCqGSM49AwEHA0IABOt5Nivi1/OXw1AEfYPh42Is41VrNg9qaMdYuw3cavhs\nCa+aXV0NmTl2EsNaJ5GWmMoAD8ikwAFszYhIeNgF42mjgcwwgckwHwYDVR0jBBgw\nFoAUok/0idl8Ruhuo4bZR0jOzL7cz/UwHQYDVR0OBBYEFN/+aloS6cBixLyYpyXS\n2XD3emAoMDQGA1UdHwQtMCswKaAnoCWGI2h0dHBzOi8vZGlnaXRhbC1jcmVkZW50\naWFscy5kZXYvY3JsMCoGA1UdEgQjMCGGH2h0dHBzOi8vZGlnaXRhbC1jcmVkZW50\naWFscy5kZXYwDgYDVR0PAQH/BAQDAgeAMBUGA1UdJQEB/wQLMAkGByiBjF0FAQIw\nCgYIKoZIzj0EAwIDRwAwRAIgYcXL9XzB43vy4LEz2h8gMQRdcJtaIRQOemgwm8sH\nQucCIHCvouHEm/unjBXMCeUZ7QR/ympjGyHITw25/B9H9QsC\n-----END CERTIFICATE-----\n',
-          ],
+        issuerMeta: {
+          expiresOn: new Date('2035-02-07T23:36:58.210Z'),
+          issuedAt: new Date('2025-02-19T23:36:58.210Z'),
+          validFrom: new Date('2025-02-19T23:36:58.210Z'),
         },
       },
     },
@@ -165,10 +165,18 @@ Deno.test('should verify a well-formed SD-JWT presentation', async () => {
   const verified = await verifyPresentationResponse({ response, options });
 
   assertEquals(
-    verified.cred1.verifiedClaims,
+    verified,
     {
-      given_name: 'Erika',
-      family_name: 'Mustermann',
+      cred1: {
+        claims: {
+          given_name: 'Erika',
+          family_name: 'Mustermann',
+        },
+        issuerMeta: {
+          expiresOn: new Date('2029-09-01T23:33:20.000Z'),
+          issuedAt: new Date('2023-05-02T04:00:00.000Z'),
+        },
+      },
     },
   );
 });

@@ -35,10 +35,8 @@ export async function verifyPresentationResponse({ response, options }: {
       const { id } = requestedCred;
 
       verifiedValues[id] = {
-        verifiedClaims: {},
-        meta: {
-          // issuerAuth: verifiedPresentation.issuerX5C,
-        },
+        claims: {},
+        issuerMeta: {},
       };
 
       const matchingPresentation = response.vp_token[id];
@@ -49,28 +47,12 @@ export async function verifyPresentationResponse({ response, options }: {
       }
 
       if (isMdocPresentation(requestedCred)) {
-        const verifiedPresentation = await verifyMdocPresentation(
+        const verifiedCredential = await verifyMdocPresentation(
           matchingPresentation,
           request.data,
         );
 
-        // Extract the verified data
-        const verifiedClaims = Object.values(verifiedPresentation.verifiedClaims);
-        if (verifiedClaims.length < 1) {
-          console.warn('document had no verifiable claims, skipping');
-          continue;
-        }
-
-        verifiedValues[id] = {
-          verifiedClaims: {},
-          meta: {
-            issuerAuth: verifiedPresentation.issuerX5C,
-          },
-        };
-
-        for (const [claimName, claimValue] of verifiedClaims[0]) {
-          verifiedValues[id].verifiedClaims[claimName] = claimValue;
-        }
+        verifiedValues[id] = verifiedCredential;
       } else if (isSDJWTPresentation(requestedCred)) {
         const { verifiedClaims } = await verifySDJWTPresentation({
           presentation: matchingPresentation,
@@ -78,13 +60,8 @@ export async function verifyPresentationResponse({ response, options }: {
           dcapiRequestData: request.data,
         });
 
-        if (verifiedClaims.length < 1) {
-          console.warn('document had no verifiable claims, skipping');
-          continue;
-        }
-
         for (const [claimName, claimValue] of verifiedClaims) {
-          verifiedValues[id].verifiedClaims[claimName] = claimValue;
+          verifiedValues[id].claims[claimName] = claimValue;
         }
       } else {
         throw new SimpleDigiCredsError({
