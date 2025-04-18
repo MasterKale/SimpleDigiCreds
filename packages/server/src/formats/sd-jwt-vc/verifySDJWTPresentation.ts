@@ -1,7 +1,7 @@
 import { type SDJWTVCConfig, SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
 import { type DecodedSDJwt, decodeSdJwt, getClaims } from '@sd-jwt/decode';
 
-import type { IssuerSignedJWTPayload, JWTHeader } from '../../formats/sd-jwt-vc/types.ts';
+import type { IssuerSignedJWTPayload, SDJWTHeader } from '../../formats/sd-jwt-vc/types.ts';
 import { SimpleDigiCredsError } from '../../helpers/index.ts';
 import type { VerifiedClaimsMap, VerifiedCredential } from '../../helpers/types.ts';
 import type { OID4VPCredentialQuerySDJWT } from '../../protocols/oid4vp.ts';
@@ -37,7 +37,7 @@ export async function verifySDJWTPresentation({
   }
 
   const sdJWTVCInstanceConfig: SDJWTVCConfig = {
-    verifier: getIssuerVerifier(decoded.jwt.header as JWTHeader),
+    verifier: getIssuerVerifier(decoded.jwt.header as SDJWTHeader),
     hasher: hashSDJWTVCData,
   };
   let verifyKeyBinding = false;

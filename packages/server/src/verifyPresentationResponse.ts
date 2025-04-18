@@ -7,7 +7,7 @@ import type {
 import { verifyMdocPresentation } from './formats/mdoc/index.ts';
 import { verifySDJWTPresentation } from './formats/sd-jwt-vc/index.ts';
 import { isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
-import { VerifiedPresentation } from './helpers/types.ts';
+import type { VerifiedPresentation } from './helpers/types.ts';
 
 /**
  * Verify and return a credential presentation out of a call to the Digital Credentials API
@@ -17,8 +17,6 @@ export async function verifyPresentationResponse({ response, options }: {
   options: CredentialRequestOptions;
 }): Promise<VerifiedPresentation> {
   const verifiedValues: VerifiedPresentation = {};
-
-  // console.log({ response, options });
 
   if (!isDCAPIResponse(response)) {
     throw new SimpleDigiCredsError({

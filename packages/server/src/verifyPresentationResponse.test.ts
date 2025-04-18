@@ -2,7 +2,7 @@ import { assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
 
 import type { CredentialRequestOptions, DCAPIResponse } from './dcapi.ts';
 import { verifyPresentationResponse } from './verifyPresentationResponse.ts';
-import { base64url, SimpleDigiCredsError } from './helpers/index.ts';
+import { SimpleDigiCredsError } from './helpers/index.ts';
 
 const options: CredentialRequestOptions = {
   digital: {

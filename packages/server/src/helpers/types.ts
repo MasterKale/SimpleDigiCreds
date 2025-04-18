@@ -22,13 +22,6 @@ export type SubtleCryptoKeyAlgName =
  */
 export type Uint8Array_ = ReturnType<Uint8Array['slice']>;
 
-export type VerifiedClaims = [elemID: string, elemValue: unknown][];
-export type VerifiedMeta = {
-  issuedAt?: Date;
-  validFrom?: Date;
-  expiresOn?: Date;
-};
-
 /**
  * Verified credentials and any present claims, mapped by requested credential ID. Also includes
  * various "`...meta`" values that can be used by the Verifier afterwards (e.g. policy-related
@@ -55,7 +48,7 @@ export type VerifiedCredential = {
 export type VerifiedClaimsMap = { [elemID: string]: unknown };
 
 /**
- * Issuer-centric information about the digital credential from which
+ * Issuer-centric information pulled from the digital credential
  */
 export type VerifiedCredentialIssuerMeta = {
   validFrom?: Date;

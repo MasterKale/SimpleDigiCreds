@@ -1,18 +1,7 @@
-export type JWTParts = [
-  headerBase64URL: string,
-  payloadBase64URL: string,
-  signatureBase64URL: string,
-];
-
-export type JWTHeader = {
+export type SDJWTHeader = {
   alg: string;
   typ: string;
   x5c?: string[];
-};
-
-export type IssuerSignedJWTHeader = JWTHeader & {
-  alg: 'ES256';
-  typ: 'dc+sd-jwt';
 };
 
 /**

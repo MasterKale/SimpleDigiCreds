@@ -1,18 +1,12 @@
 import { type CBORTag, decodeCBOR, encodeCBOR } from '@levischuck/tiny-cbor';
 
-import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
 import type { DecodedDocument, DecodedIssuerSignedItem, MobileSecurityObject } from './types.ts';
 import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
 import type { Uint8Array_ } from '../../helpers/types.ts';
 
 export async function verifyNameSpaces(
   document: DecodedDocument,
-  options: DCAPIRequestOID4VP,
 ): Promise<VerifiedNamespace> {
-  // TODO: Figure out if we should constrain returned values to whatever was explicitly requested,
-  // or if we simply return everything that came back in the doc.
-  // console.log(options);
-
   const issuerSigned = document.get('issuerSigned');
   const issuerAuth = issuerSigned.get('issuerAuth');
 

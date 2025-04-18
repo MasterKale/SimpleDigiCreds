@@ -1,5 +1,5 @@
 import type { DCAPIResponse } from '../dcapi.ts';
-import { base64url, SimpleDigiCredsError } from './index.ts';
+import { SimpleDigiCredsError } from './index.ts';
 
 /**
  * Take a response from the Digital Credential API and make sure it's the expected shape

@@ -1,8 +1,5 @@
 export { generatePresentationOptions } from './generatePresentationOptions.ts';
-export {
-  type VerifiedPresentation,
-  verifyPresentationResponse,
-} from './verifyPresentationResponse.ts';
+export { verifyPresentationResponse } from './verifyPresentationResponse.ts';
 
 export type {
   CredentialRequestOptions,
@@ -21,3 +18,14 @@ export type {
 } from './protocols/oid4vp.ts';
 
 export type { DocumentTypeMDLv1, Identifier, NamespaceMDLv1 } from './formats/mdoc/types.ts';
+export type {
+  IssuerSignedJWTPayload,
+  SDJWTHeader,
+  SelectiveDisclosureAlgorithm,
+} from './formats/sd-jwt-vc/types.ts';
+
+export type {
+  VerifiedClaimsMap,
+  VerifiedCredential,
+  VerifiedCredentialIssuerMeta,
+} from './helpers/types.ts';
