@@ -361,9 +361,6 @@
       "jsr:@deno/dnt@~0.41.3",
       "jsr:@std/assert@^1.0.9",
       "jsr:@std/testing@^1.0.6",
-      "npm:@sd-jwt/decode@0.10",
-      "npm:@sd-jwt/sd-jwt-vc@0.10",
-      "npm:@sd-jwt/types@0.10",
       "npm:hono@^4.7.2"
     ],
     "members": {
@@ -374,7 +371,10 @@
           "npm:@peculiar/asn1-ecc@^2.3.15",
           "npm:@peculiar/asn1-rsa@^2.3.15",
           "npm:@peculiar/asn1-schema@^2.3.15",
-          "npm:@peculiar/asn1-x509@^2.3.15"
+          "npm:@peculiar/asn1-x509@^2.3.15",
+          "npm:@sd-jwt/decode@0.10",
+          "npm:@sd-jwt/sd-jwt-vc@0.10",
+          "npm:@sd-jwt/types@0.10"
         ]
       }
     }
