@@ -6,7 +6,7 @@ import { SimpleDigiCredsError } from '../../helpers/index.ts';
 import { hashSDJWTVCData } from './hashSDJWTVCData.ts';
 import { getIssuerVerifier } from './getIssuerSignedVerifiers.ts';
 import { getKeyBindingVerifier } from './getKeyBindingVerifier.ts';
-import { assertIssuerSignedClaims } from './assertIssuerSignedClaims.ts';
+import { assertIssuerSignedJWTClaims } from './assertIssuerSignedJWTClaims.ts';
 import type { OID4VPCredentialQuerySDJWT } from '../../protocols/oid4vp.ts';
 
 /**
@@ -73,7 +73,7 @@ export async function verifySDJWTPresentation(
     decoded.disclosures,
     hashSDJWTVCData,
   );
-  assertIssuerSignedClaims(claims, credentialQuery);
+  assertIssuerSignedJWTClaims(claims, credentialQuery);
 
   if (verifyKeyBinding) {
     // This _shouldn't_ happen but just in case because the typing says `kb` can be undefined

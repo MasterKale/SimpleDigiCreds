@@ -7,7 +7,7 @@ import type { IssuerSignedJWTPayload } from './types.ts';
  *
  * @raises `SimpleDigiCredsError` with whatever claim was invalid
  */
-export function assertIssuerSignedClaims(
+export function assertIssuerSignedJWTClaims(
   claims: IssuerSignedJWTPayload,
   credentialQuery: OID4VPCredentialQuerySDJWT,
 ): void {
