@@ -3,7 +3,7 @@ import type {
   OID4VPCredentialQueryMdoc,
   OID4VPCredentialQuerySDJWT,
   OID4VPSupportedMdocClaimName,
-} from './protocols/oid4vp.ts';
+} from './protocols/oid4vp/types.ts';
 import type { CredentialRequestOptions } from './dcapi.ts';
 import { SimpleDigiCredsError } from './helpers/index.ts';
 import { generateMDLRequestOptions } from './formats/mdoc/generateMDLRequestOptions.ts';

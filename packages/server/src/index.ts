@@ -19,7 +19,7 @@ export type {
   OID4VPCredentialQueryMdoc,
   OID4VPSupportedMdocClaimName,
   PathPointer,
-} from './protocols/oid4vp.ts';
+} from './protocols/oid4vp/types.ts';
 
 export type { DocumentTypeMDLv1, Identifier, NamespaceMDLv1 } from './formats/mdoc/types.ts';
 export type {

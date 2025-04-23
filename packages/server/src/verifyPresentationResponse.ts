@@ -3,7 +3,7 @@ import type {
   OID4VPCredentialQuery,
   OID4VPCredentialQueryMdoc,
   OID4VPCredentialQuerySDJWT,
-} from './protocols/oid4vp.ts';
+} from './protocols/oid4vp/oid4vp.ts';
 import { verifyMdocPresentation } from './formats/mdoc/index.ts';
 import { verifySDJWTPresentation } from './formats/sd-jwt-vc/index.ts';
 import { isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
