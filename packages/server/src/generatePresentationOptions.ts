@@ -1,14 +1,7 @@
-import { generateNonce } from './helpers/index.ts';
-import type {
-  OID4VPCredentialQueryMdoc,
-  OID4VPCredentialQuerySDJWT,
-  OID4VPSupportedMdocClaimName,
-} from './protocols/oid4vp/types.ts';
-import type { CredentialRequestOptions } from './dcapi.ts';
+import type { CredentialRequestOptions, DigitalCredentialRequest } from './dcapi.ts';
 import { SimpleDigiCredsError } from './helpers/index.ts';
-import { generateMDLRequestOptions } from './formats/mdoc/generateMDLRequestOptions.ts';
-import { generateSDJWTRequestOptions } from './formats/sd-jwt-vc/generateSDJWTRequestOptions.ts';
 import {
+  generateOID4VPRequest,
   type OID4VPMDLRequestOptions,
   type OID4VPSDJWTRequestOptions,
 } from './protocols/oid4vp/generateOID4VPRequest.ts';
@@ -26,42 +19,24 @@ import {
 export function generatePresentationOptions(
   options: OID4VPMDLRequestOptions | OID4VPSDJWTRequestOptions,
 ): CredentialRequestOptions {
-  const { credentialFormat, desiredClaims, requestOrigin } = options;
-
-  let request: OID4VPCredentialQueryMdoc | OID4VPCredentialQuerySDJWT;
+  let request: DigitalCredentialRequest;
 
   /**
-   * I'd love to be able to include multiple requests in different doc formats, but alas, the
+   * I'd love to be able to include multiple requests in different protocols, but alas, the
    * DC API does not yet support this.
    */
-  if (credentialFormat === 'mdl') {
-    request = generateMDLRequestOptions({ id: 'cred1', desiredClaims });
-  } else if (credentialFormat === 'sd-jwt') {
-    const { acceptedVCTValues } = options;
-    request = generateSDJWTRequestOptions({ id: 'cred1', desiredClaims, acceptedVCTValues });
+  if (options.protocol === 'oid4vp') {
+    request = generateOID4VPRequest(options);
   } else {
     throw new SimpleDigiCredsError({
-      message: `Unsupported credential format: ${credentialFormat}`,
+      message: `Unsupported presentation protocol "${options.protocol}"`,
       code: 'InvalidPresentationOptions',
     });
   }
 
   return {
     digital: {
-      requests: [
-        {
-          // https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#name-protocol
-          protocol: 'openid4vp',
-          data: {
-            response_type: 'vp_token',
-            response_mode: 'dc_api',
-            client_id: `web-origin:${requestOrigin}`,
-            nonce: generateNonce(),
-            // https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#dcql_query
-            dcql_query: { credentials: [request] },
-          },
-        },
-      ],
+      requests: [request],
     },
   };
 }
