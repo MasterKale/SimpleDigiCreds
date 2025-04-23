@@ -8,6 +8,10 @@ import type { CredentialRequestOptions } from './dcapi.ts';
 import { SimpleDigiCredsError } from './helpers/index.ts';
 import { generateMDLRequestOptions } from './formats/mdoc/generateMDLRequestOptions.ts';
 import { generateSDJWTRequestOptions } from './formats/sd-jwt-vc/generateSDJWTRequestOptions.ts';
+import {
+  type OID4VPMDLRequestOptions,
+  type OID4VPSDJWTRequestOptions,
+} from './protocols/oid4vp/generateOID4VPRequest.ts';
 
 /**
  * Generate credential presentation request options suitable for passing into
@@ -20,7 +24,7 @@ import { generateSDJWTRequestOptions } from './formats/sd-jwt-vc/generateSDJWTRe
  * - mdoc
  */
 export function generatePresentationOptions(
-  options: MDLRequestOptions | SDJWTRequestOptions,
+  options: OID4VPMDLRequestOptions | OID4VPSDJWTRequestOptions,
 ): CredentialRequestOptions {
   const { credentialFormat, desiredClaims, requestOrigin } = options;
 
@@ -61,16 +65,3 @@ export function generatePresentationOptions(
     },
   };
 }
-
-export type MDLRequestOptions = {
-  credentialFormat: 'mdl';
-  desiredClaims: OID4VPSupportedMdocClaimName[];
-  requestOrigin: string;
-};
-
-export type SDJWTRequestOptions = {
-  credentialFormat: 'sd-jwt';
-  desiredClaims: string[];
-  requestOrigin: string;
-  acceptedVCTValues?: string[];
-};

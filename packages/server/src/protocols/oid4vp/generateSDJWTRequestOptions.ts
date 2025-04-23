@@ -1,4 +1,4 @@
-import type { OID4VPCredentialQuerySDJWT } from '../../protocols/oid4vp/types.ts';
+import type { OID4VPCredentialQuerySDJWT } from './types.ts';
 
 /**
  * Generate an SD-JWT-VC-specific set of request options for the Digital Credentials API

@@ -1,7 +1,7 @@
 export {
   generatePresentationOptions,
-  type MDLRequestOptions,
-  type SDJWTRequestOptions,
+  type OID4VPMDLRequestOptions as MDLRequestOptions,
+  type OID4VPSDJWTRequestOptions as SDJWTRequestOptions,
 } from './generatePresentationOptions.ts';
 export { verifyPresentationResponse } from './verifyPresentationResponse.ts';
 
