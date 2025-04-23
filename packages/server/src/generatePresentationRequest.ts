@@ -14,12 +14,14 @@ import {
  * - OID4VP
  *
  * Supported Document Formats:
- * - mdoc
+ * - ISO 18013-5 mdoc (mDL)
+ * - SD-JWT-VC
  */
-export function generatePresentationRequest(
-  options: PresentationOptions,
-): CredentialRequestOptions {
-  const { protocol = 'openid4vp' } = options;
+export function generatePresentationRequest({
+  credentialOptions,
+  protocol = 'openid4vp',
+  signRequest = false,
+}: PresentationOptions): CredentialRequestOptions {
   let request: DigitalCredentialRequest;
 
   /**
@@ -27,7 +29,7 @@ export function generatePresentationRequest(
    * DC API does not yet support this.
    */
   if (protocol === 'openid4vp') {
-    request = generateOID4VPRequest(options.credentialOptions);
+    request = generateOID4VPRequest(credentialOptions, signRequest);
   } else {
     throw new SimpleDigiCredsError({
       message: `Unsupported presentation protocol "${protocol}"`,
@@ -45,4 +47,5 @@ export function generatePresentationRequest(
 export type PresentationOptions = {
   credentialOptions: OID4VPMDLCredentialOptions | OID4VPSDJWTCredentialOptions;
   protocol?: 'openid4vp';
+  signRequest?: boolean;
 };

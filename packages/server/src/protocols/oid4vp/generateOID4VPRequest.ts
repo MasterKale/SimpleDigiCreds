@@ -14,6 +14,7 @@ import type {
  */
 export function generateOID4VPRequest(
   credentialOptions: OID4VPMDLCredentialOptions | OID4VPSDJWTCredentialOptions,
+  signRequest: boolean,
 ): DigitalCredentialRequest {
   const { format, desiredClaims, requestOrigin } = credentialOptions;
 
