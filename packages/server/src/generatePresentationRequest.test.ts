@@ -1,7 +1,7 @@
 import { assertEquals } from '@std/assert';
 import { stub } from '@std/testing/mock';
 
-import { generatePresentationOptions } from './index.ts';
+import { generatePresentationRequest } from './generatePresentationRequest.ts';
 import { _generateNonceInternals } from './helpers/generateNonce.ts';
 
 Deno.test('Should generate mDL options', () => {
@@ -11,10 +11,12 @@ Deno.test('Should generate mDL options', () => {
     () => '9kMlSgHQW8oBv_AdkSaZKM0ajrEUatzg2f24vV6AgnI',
   );
 
-  const options = generatePresentationOptions({
-    credentialFormat: 'mdl',
-    desiredClaims: ['family_name', 'given_name', 'age_over_21'],
-    requestOrigin: 'https://digital-credentials.dev',
+  const options = generatePresentationRequest({
+    credentialOptions: {
+      format: 'mdl',
+      desiredClaims: ['family_name', 'given_name', 'age_over_21'],
+      requestOrigin: 'https://digital-credentials.dev',
+    },
   });
 
   assertEquals(
@@ -62,11 +64,13 @@ Deno.test('Should generate SD-JWT-VC options', () => {
     () => '9kMlSgHQW8oBv_AdkSaZKM0ajrEUatzg2f24vV6AgnI',
   );
 
-  const options = generatePresentationOptions({
-    credentialFormat: 'sd-jwt',
-    desiredClaims: ['family_name', 'given_name', 'age_over_21'],
-    requestOrigin: 'https://digital-credentials.dev',
-    acceptedVCTValues: ['urn:eu.europa.ec.eudi:pid:1'],
+  const options = generatePresentationRequest({
+    credentialOptions: {
+      format: 'sd-jwt',
+      desiredClaims: ['family_name', 'given_name', 'age_over_21'],
+      requestOrigin: 'https://digital-credentials.dev',
+      acceptedVCTValues: ['urn:eu.europa.ec.eudi:pid:1'],
+    },
   });
 
   assertEquals(

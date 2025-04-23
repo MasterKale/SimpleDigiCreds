@@ -2,8 +2,8 @@ import type { CredentialRequestOptions, DigitalCredentialRequest } from './dcapi
 import { SimpleDigiCredsError } from './helpers/index.ts';
 import {
   generateOID4VPRequest,
-  type OID4VPMDLRequestOptions,
-  type OID4VPSDJWTRequestOptions,
+  type OID4VPMDLCredentialOptions,
+  type OID4VPSDJWTCredentialOptions,
 } from './protocols/oid4vp/generateOID4VPRequest.ts';
 
 /**
@@ -16,20 +16,21 @@ import {
  * Supported Document Formats:
  * - mdoc
  */
-export function generatePresentationOptions(
-  options: OID4VPMDLRequestOptions | OID4VPSDJWTRequestOptions,
+export function generatePresentationRequest(
+  options: PresentationOptions,
 ): CredentialRequestOptions {
+  const { protocol = 'openid4vp' } = options;
   let request: DigitalCredentialRequest;
 
   /**
    * I'd love to be able to include multiple requests in different protocols, but alas, the
    * DC API does not yet support this.
    */
-  if (options.protocol === 'oid4vp') {
-    request = generateOID4VPRequest(options);
+  if (protocol === 'openid4vp') {
+    request = generateOID4VPRequest(options.credentialOptions);
   } else {
     throw new SimpleDigiCredsError({
-      message: `Unsupported presentation protocol "${options.protocol}"`,
+      message: `Unsupported presentation protocol "${protocol}"`,
       code: 'InvalidPresentationOptions',
     });
   }
@@ -40,3 +41,8 @@ export function generatePresentationOptions(
     },
   };
 }
+
+export type PresentationOptions = {
+  credentialOptions: OID4VPMDLCredentialOptions | OID4VPSDJWTCredentialOptions;
+  protocol?: 'openid4vp';
+};

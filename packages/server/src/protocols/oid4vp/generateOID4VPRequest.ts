@@ -13,20 +13,20 @@ import type {
  * Generate an OID4VP credential presentation request usable with the Digital Credentials API
  */
 export function generateOID4VPRequest(
-  options: OID4VPMDLRequestOptions | OID4VPSDJWTRequestOptions,
+  credentialOptions: OID4VPMDLCredentialOptions | OID4VPSDJWTCredentialOptions,
 ): DigitalCredentialRequest {
-  const { credentialFormat, desiredClaims, requestOrigin } = options;
+  const { format, desiredClaims, requestOrigin } = credentialOptions;
 
   let request: OID4VPCredentialQueryMdoc | OID4VPCredentialQuerySDJWT;
 
-  if (credentialFormat === 'mdl') {
+  if (format === 'mdl') {
     request = generateMDLRequestOptions({ id: 'cred1', desiredClaims });
-  } else if (credentialFormat === 'sd-jwt') {
-    const { acceptedVCTValues } = options;
+  } else if (format === 'sd-jwt') {
+    const { acceptedVCTValues } = credentialOptions;
     request = generateSDJWTRequestOptions({ id: 'cred1', desiredClaims, acceptedVCTValues });
   } else {
     throw new SimpleDigiCredsError({
-      message: `Unsupported credential format: ${credentialFormat}`,
+      message: `Unsupported credential format: ${format}`,
       code: 'InvalidPresentationOptions',
     });
   }
@@ -45,16 +45,14 @@ export function generateOID4VPRequest(
   };
 }
 
-export type OID4VPMDLRequestOptions = {
-  protocol: 'oid4vp';
-  credentialFormat: 'mdl';
+export type OID4VPMDLCredentialOptions = {
+  format: 'mdl';
   desiredClaims: OID4VPSupportedMdocClaimName[];
   requestOrigin: string;
 };
 
-export type OID4VPSDJWTRequestOptions = {
-  protocol: 'oid4vp';
-  credentialFormat: 'sd-jwt';
+export type OID4VPSDJWTCredentialOptions = {
+  format: 'sd-jwt';
   desiredClaims: string[];
   requestOrigin: string;
   acceptedVCTValues?: string[];
