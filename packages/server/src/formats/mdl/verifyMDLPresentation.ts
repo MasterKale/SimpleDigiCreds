@@ -12,7 +12,7 @@ import type { VerifiedClaimsMap, VerifiedCredential } from '../../helpers/types.
 /**
  * Verify an mdoc presentation as returned through the DC API
  */
-export async function verifyMdocPresentation(
+export async function verifyMDLPresentation(
   presentation: string,
   request: DCAPIRequestOID4VP,
 ): Promise<VerifiedCredential> {

@@ -4,7 +4,7 @@ import type {
   OID4VPCredentialQueryMdoc,
   OID4VPCredentialQuerySDJWT,
 } from './protocols/oid4vp/types.ts';
-import { verifyMdocPresentation } from './formats/mdoc/index.ts';
+import { verifyMDLPresentation } from './formats/mdl/index.ts';
 import { verifySDJWTPresentation } from './formats/sd-jwt-vc/index.ts';
 import { isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
 import type { VerifiedPresentation } from './helpers/types.ts';
@@ -45,7 +45,7 @@ export async function verifyPresentationResponse({ response, options }: {
       }
 
       if (isMdocPresentation(requestedCred)) {
-        const verifiedCredential = await verifyMdocPresentation(
+        const verifiedCredential = await verifyMDLPresentation(
           matchingPresentation,
           request.data,
         );

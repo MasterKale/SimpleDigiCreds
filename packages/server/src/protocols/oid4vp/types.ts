@@ -1,4 +1,4 @@
-import type { Identifier } from '../../formats/mdoc/types.ts';
+import type { Identifier } from '../../formats/mdl/types.ts';
 
 /**
  * OID4VP: Protocol for requesting documents
