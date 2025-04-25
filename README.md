@@ -9,7 +9,7 @@
 ## Overview
 
 This project makes it easier to combine **OID4VP (draft 24) + mdoc** for meaningful identity
-proofing via the [Digital Credentials API](https://wicg.github.io/digital-credentials/). The
+proofing via the [Digital Credentials API](https://w3c-fedid.github.io/digital-credentials/). The
 following packages are maintained here to achieve this:
 
 - [@simpledigicreds/browser](https://github.com/MasterKale/SimpleDigiCreds/tree/main/packages/browser)
