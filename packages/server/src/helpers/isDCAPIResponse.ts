@@ -15,7 +15,7 @@ export function isDCAPIResponse(response: unknown): response is DCAPIResponse {
   if (typeof response !== 'object') {
     throw new SimpleDigiCredsError({
       code: 'InvalidDCAPIResponse',
-      message: 'Response was not an object',
+      message: `Response was type ${typeof response}, not an object`,
     });
   }
 
