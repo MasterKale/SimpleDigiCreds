@@ -3,7 +3,7 @@ import { serveStatic } from "hono/deno";
 
 import {
   CredentialRequestOptions,
-  generatePresentationOptions,
+  generatePresentationRequest,
   verifyPresentationResponse,
 } from "../packages/server/src/index.ts";
 
@@ -15,17 +15,21 @@ app.use("/static/*", serveStatic({ root: "./" }));
 app.get("/", serveStatic({ path: "./static/index.html" }));
 
 app.get("/options", async (ctx) => {
-  const mdlOptions = await generatePresentationOptions({
-    credentialFormat: "mdl",
-    desiredClaims: ["family_name", "given_name"],
-    requestOrigin: "http://localhost:8000",
+  const mdlOptions = await generatePresentationRequest({
+    credentialOptions: {
+      format: "mdl",
+      desiredClaims: ["family_name", "given_name"],
+      requestOrigin: "http://localhost:8000",
+    },
   });
 
-  const sdjwtOptions = await generatePresentationOptions({
-    credentialFormat: "sd-jwt",
-    acceptedVCTValues: ["urn:eu.europa.ec.eudi:pid:1"],
-    desiredClaims: ["family_name", "given_name"],
-    requestOrigin: "http://localhost:8000",
+  const sdjwtOptions = await generatePresentationRequest({
+    credentialOptions: {
+      format: "sd-jwt",
+      acceptedVCTValues: ["urn:eu.europa.ec.eudi:pid:1"],
+      desiredClaims: ["family_name", "given_name"],
+      requestOrigin: "http://localhost:8000",
+    },
   });
 
   /**
@@ -45,9 +49,10 @@ app.post("/verify", async (ctx) => {
   const body = await ctx.req.json();
 
   console.log("verifying presentation", body);
+  console.log(typeof body);
 
   const verified = await verifyPresentationResponse({
-    response: body,
+    response: JSON.parse(body),
     options: currentOptions,
   });
 
