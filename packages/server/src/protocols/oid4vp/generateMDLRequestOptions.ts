@@ -13,15 +13,19 @@ export function generateMDLRequestOptions({
 }: {
   id: string;
   desiredClaims: string[];
-}): OID4VPCredentialQueryMdoc {
+}): {
+  credentialQuery: OID4VPCredentialQueryMdoc;
+} {
   return {
-    id,
-    format: 'mso_mdoc',
-    meta: {
-      doctype_value: 'org.iso.18013.5.1.mDL',
+    credentialQuery: {
+      id,
+      format: 'mso_mdoc',
+      meta: {
+        doctype_value: 'org.iso.18013.5.1.mDL',
+      },
+      claims: desiredClaims.map((claimName) => ({
+        path: ['org.iso.18013.5.1', claimName],
+      })),
     },
-    claims: desiredClaims.map((claimName) => ({
-      path: ['org.iso.18013.5.1', claimName],
-    })),
   };
 }

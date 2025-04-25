@@ -98,16 +98,16 @@ Deno.test('Should generate SD-JWT-VC options', () => {
                       { path: ['given_name'] },
                       { path: ['age_over_21'] },
                     ],
-                    client_metadata: {
-                      vp_formats: {
-                        'dc+sd-jwt': {
-                          'sd-jwt_alg_values': ['ES256'],
-                          'kb-jwt_alg_values': ['ES256'],
-                        },
-                      },
-                    },
                   },
                 ],
+              },
+              client_metadata: {
+                vp_formats: {
+                  'dc+sd-jwt': {
+                    'sd-jwt_alg_values': ['ES256'],
+                    'kb-jwt_alg_values': ['ES256'],
+                  },
+                },
               },
             },
           },

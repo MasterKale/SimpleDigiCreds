@@ -138,16 +138,16 @@ Deno.test('should verify a well-formed SD-JWT presentation', async () => {
                   format: 'dc+sd-jwt',
                   meta: { vct_values: ['urn:eu.europa.ec.eudi:pid:1'] },
                   claims: [{ path: ['family_name'] }, { path: ['given_name'] }],
-                  client_metadata: {
-                    vp_formats: {
-                      'dc+sd-jwt': {
-                        'sd-jwt_alg_values': ['ES256'],
-                        'kb-jwt_alg_values': ['ES256'],
-                      },
-                    },
-                  },
                 },
               ],
+            },
+            client_metadata: {
+              vp_formats: {
+                'dc+sd-jwt': {
+                  'sd-jwt_alg_values': ['ES256'],
+                  'kb-jwt_alg_values': ['ES256'],
+                },
+              },
             },
           },
         },

@@ -1,4 +1,6 @@
 import type {
+  OID4VPClientMetadata,
+  OID4VPClientMetadataSDJWTVC,
   OID4VPCredentialQuery,
   OID4VPCredentialQueryMdoc,
   OID4VPCredentialQuerySDJWT,
@@ -21,7 +23,7 @@ export type DigitalCredentialRequest = {
   data: DCAPIRequestOID4VP;
 };
 /**
- * OID4VP-specific request parameters
+ * Credential-agnostic OID4VP-specific request parameters
  *
  * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-A.2
  */
@@ -36,8 +38,29 @@ export type DCAPIRequestOID4VP = {
   nonce: string;
   /** An array of credentials being requested */
   dcql_query: {
-    credentials: (OID4VPCredentialQuery | OID4VPCredentialQueryMdoc | OID4VPCredentialQuerySDJWT)[];
+    credentials: OID4VPCredentialQuery[];
   };
+  client_metadata?: OID4VPClientMetadata;
+};
+
+/**
+ * OID4VP request parameters specific to requesting an mDL
+ */
+export type DCAPIRequestOID4VPMDL = DCAPIRequestOID4VP & {
+  dcql_query: {
+    credentials: OID4VPCredentialQueryMdoc[];
+  };
+  client_metadata?: never;
+};
+
+/**
+ * OID4VP request parameters specific to requesting an SD-JWT-VC
+ */
+export type DCAPIRequestOID4VPSDJWTVC = DCAPIRequestOID4VP & {
+  dcql_query: {
+    credentials: OID4VPCredentialQuerySDJWT[];
+  };
+  client_metadata: OID4VPClientMetadataSDJWTVC;
 };
 
 /**

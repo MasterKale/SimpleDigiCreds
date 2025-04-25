@@ -4,6 +4,7 @@ import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
 import { generateMDLRequestOptions } from './generateMDLRequestOptions.ts';
 import { generateSDJWTRequestOptions } from './generateSDJWTRequestOptions.ts';
 import type {
+  OID4VPClientMetadataSDJWTVC,
   OID4VPCredentialQueryMdoc,
   OID4VPCredentialQuerySDJWT,
   OID4VPSupportedMdocClaimName,
@@ -18,13 +19,18 @@ export function generateOID4VPRequest(
 ): DigitalCredentialRequest {
   const { format, desiredClaims, requestOrigin } = credentialOptions;
 
-  let request: OID4VPCredentialQueryMdoc | OID4VPCredentialQuerySDJWT;
+  let credentialQuery: OID4VPCredentialQueryMdoc | OID4VPCredentialQuerySDJWT;
+  let clientMetadata: OID4VPClientMetadataSDJWTVC | undefined = undefined;
 
   if (format === 'mdl') {
-    request = generateMDLRequestOptions({ id: 'cred1', desiredClaims });
+    ({ credentialQuery } = generateMDLRequestOptions({ id: 'cred1', desiredClaims }));
   } else if (format === 'sd-jwt') {
     const { acceptedVCTValues } = credentialOptions;
-    request = generateSDJWTRequestOptions({ id: 'cred1', desiredClaims, acceptedVCTValues });
+    ({ credentialQuery, clientMetadata } = generateSDJWTRequestOptions({
+      id: 'cred1',
+      desiredClaims,
+      acceptedVCTValues,
+    }));
   } else {
     throw new SimpleDigiCredsError({
       message: `Unsupported credential format: ${format}`,
@@ -32,7 +38,7 @@ export function generateOID4VPRequest(
     });
   }
 
-  return {
+  const toReturn: DigitalCredentialRequest = {
     // https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#name-protocol
     protocol: 'openid4vp',
     data: {
@@ -41,9 +47,15 @@ export function generateOID4VPRequest(
       client_id: `web-origin:${requestOrigin}`,
       nonce: generateNonce(),
       // https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#dcql_query
-      dcql_query: { credentials: [request] },
+      dcql_query: { credentials: [credentialQuery] },
     },
   };
+
+  if (clientMetadata) {
+    toReturn.data.client_metadata = clientMetadata;
+  }
+
+  return toReturn;
 }
 
 export type OID4VPMDLCredentialOptions = {
