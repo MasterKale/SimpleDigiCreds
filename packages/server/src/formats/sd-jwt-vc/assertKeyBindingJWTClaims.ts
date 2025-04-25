@@ -19,8 +19,10 @@ export function assertKeyBindingJWTClaims({
   // Verify `iat`
   const issuedAtDate = new Date(payload.iat * 1000);
   const currentDate = new Date();
+  // Add 1 second to the current date to account for clock skew
+  const currentDatePlus1Second = new Date(currentDate.getTime() + 1000);
 
-  if (issuedAtDate > currentDate) {
+  if (issuedAtDate > currentDatePlus1Second) {
     throw new SimpleDigiCredsError({
       message: 'Key Binding JWT was issued in the future',
       code: 'SDJWTVerificationError',
