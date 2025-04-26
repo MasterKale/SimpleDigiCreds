@@ -166,11 +166,8 @@ export type OID4VPClientMetadata = {
    * > specified, the response will be signed using JWS and the configured algorithm. If
    * > unspecified, the default algorithm to use for signing authorization responses is `RS256`.
    * > The algorithm `none` is not allowed._
-   *
-   * Just Recommended+ values for now. See
-   * https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-algorithms
    */
-  authorization_signed_response_alg?: 'ECDH-ES' | 'RSA-OAEP' | 'ES256';
+  authorization_signed_response_alg?: JWSALG;
   /**
    * From https://openid.net/specs/oauth-v2-jarm-final.html#section-3-3.4.1:
    *
@@ -178,28 +175,46 @@ export type OID4VPClientMetadata = {
    * > signing and encryption are requested, the response will be signed then encrypted, with the
    * > result being a Nested JWT, as defined in JWT [RFC7519]. The default, if omitted, is that no
    * > encryption is performed._
-   *
-   * Required and Recommended+ values. See
-   * https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-algorithms
    */
-  authorization_encrypted_response_alg?: 'HS256' | 'ECDH-ES' | 'RSA-OAEP' | 'ES256';
+  authorization_encrypted_response_alg?: JWEALG_HAIP;
   /**
    * From https://openid.net/specs/oauth-v2-jarm-final.html#section-3-3.6.1:
    *
-   * > The JWE [RFC7516] `enc` algorithm REQUIRED for encrypting authorization responses. If
+   * > _The JWE [RFC7516] `enc` algorithm REQUIRED for encrypting authorization responses. If
    * > `authorization_encrypted_response_alg` is specified, the default for this value is
    * > `A128CBC-HS256`. When `authorization_encrypted_response_enc` is included,
-   * > `authorization_encrypted_response_alg` MUST also be provided.
-   *
-   * Required and Recommended values. See
-   * https://www.rfc-editor.org/rfc/rfc7518.html#section-5.1
+   * > `authorization_encrypted_response_alg` MUST also be provided._
    */
-  authorization_encrypted_response_enc?:
-    | 'A128CBC-HS256'
-    | 'A256CBC-HS512'
-    | 'A128GCM'
-    | 'A256GCM';
+  authorization_encrypted_response_enc?: JWEENC_HAIP;
 };
+
+/**
+ * JWS [RFC7515] `alg` algorithms. Recommended+ values. See
+ * https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-algorithms
+ */
+type JWSALG = 'ECDH-ES' | 'RSA-OAEP' | 'ES256';
+
+/**
+ * JWE [RFC7516] `alg` algorithms. Required and Recommended+ values. See
+ * https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-algorithms
+ */
+type JWEALG = 'HS256' | 'ECDH-ES' | 'RSA-OAEP' | 'ES256';
+/**
+ * JWE [RFC7516] `alg` algorithms required by OID4VC HAIP. See
+ * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-6
+ */
+type JWEALG_HAIP = Extract<JWEALG, 'ECDH-ES'>;
+
+/**
+ * JWE [RFC7516] `enc` algorithms. Required and Recommended values. See
+ * https://www.rfc-editor.org/rfc/rfc7518.html#section-5.1
+ */
+type JWEENC = 'A128CBC-HS256' | 'A256CBC-HS512' | 'A128GCM' | 'A256GCM';
+/**
+ * JWE [RFC7516] `enc` algorithms required by OID4VC HAIP. See
+ * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-6
+ */
+type JWEENC_HAIP = Extract<JWEENC, 'A128GCM'>;
 
 /**
  * The shape of `client_metadata` when requesting an SD-JWT-VC. See
