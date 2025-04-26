@@ -15,7 +15,7 @@ app.use("/static/*", serveStatic({ root: "./" }));
 app.get("/", serveStatic({ path: "./static/index.html" }));
 
 app.get("/options", async (ctx) => {
-  const mdlOptions = await generatePresentationRequest({
+  const mdlRequest = await generatePresentationRequest({
     credentialOptions: {
       format: "mdl",
       desiredClaims: ["family_name", "given_name"],
@@ -24,7 +24,7 @@ app.get("/options", async (ctx) => {
     encryptResponse: false,
   });
 
-  const sdjwtOptions = await generatePresentationRequest({
+  const sdjwtRequest = await generatePresentationRequest({
     credentialOptions: {
       format: "sd-jwt-vc",
       desiredClaims: ["family_name", "given_name"],
@@ -36,13 +36,13 @@ app.get("/options", async (ctx) => {
   /**
    * Toggle between these to test either format (until both can be included in one DC API call)
    */
-  // const _options = mdlOptions;
-  const _options = sdjwtOptions;
-  const { dcapiOptions, requestMetadata } = _options;
+  // const _request = mdlRequest;
+  const _request = sdjwtRequest;
+  const { dcapiOptions } = _request;
 
-  console.log(JSON.stringify(_options, null, 2));
+  console.log(JSON.stringify(_request, null, 2));
 
-  currentRequest = _options;
+  currentRequest = _request;
 
   return ctx.json(dcapiOptions);
 });
