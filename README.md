@@ -6,8 +6,8 @@
 - [Supported Features](#supported-features)
   - [OID4VP - All doc formats](#oid4vp---all-doc-formats)
   - [OID4VP - SD-JWT-VC](#oid4vp---sd-jwt-vc)
-- [Contributions](#contributions)
 - [Example Site](#example-site)
+- [Contributions](#contributions)
 - [Development](#development)
 
 ## Disclaimer
@@ -45,17 +45,6 @@ See the packages' READMEs for more specific installation information.
 
 - Key binding verification
 
-## Contributions
-
-The SimpleDigiCreds project is not currently open to external contributions.
-
-Please [submit an Issue](https://github.com/MasterKale/SimpleDigiCreds/issues/new/choose) and fill
-out the provided template with as much information as possible if you have found a bug in need of
-fixing.
-
-You can also [submit an Issue](https://github.com/MasterKale/SimpleDigiCreds/issues/new/choose) to
-request new features, or to suggest changes to existing features.
-
 ## Example Site
 
 An example site is included to help test credential presentation locally. Run the following command
@@ -68,6 +57,17 @@ $> deno task example:start
 
 The site will be available at http://localhost:4000 to test out SimpleDigiCreds and the Digital
 Credentials API.
+
+## Contributions
+
+The SimpleDigiCreds project is not currently open to external contributions.
+
+Please [submit an Issue](https://github.com/MasterKale/SimpleDigiCreds/issues/new/choose) and fill
+out the provided template with as much information as possible if you have found a bug in need of
+fixing.
+
+You can also [submit an Issue](https://github.com/MasterKale/SimpleDigiCreds/issues/new/choose) to
+request new features, or to suggest changes to existing features.
 
 ## Development
 
