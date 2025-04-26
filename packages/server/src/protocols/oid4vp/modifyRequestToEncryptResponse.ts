@@ -2,7 +2,7 @@ import type { DigitalCredentialRequest } from '../../dcapi/types.ts';
 import { generateEncryptionKeypair } from '../../helpers/generateEncryptionKeypair.ts';
 
 /**
- * Modify the request to ensure that the response is encrypted.
+ * Modify the DC API request to ensure that the response is encrypted.
  */
 export async function modifyRequestToEncryptResponse(
   request: DigitalCredentialRequest,
@@ -26,7 +26,9 @@ export async function modifyRequestToEncryptResponse(
   };
 
   /**
-   * Add `authorization_encrypted_response_alg` and `authorization_encrypted_response_enc`
+   * Add `authorization_encrypted_response_alg` and `authorization_encrypted_response_enc` as per
+   * OID4VC HAIP
+   * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-6
    */
   clientMetadata.authorization_encrypted_response_alg = 'ECDH-ES';
   clientMetadata.authorization_encrypted_response_enc = 'A128GCM';
