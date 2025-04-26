@@ -1,4 +1,4 @@
-import type { OID4VPClientMetadataSDJWTVC, OID4VPCredentialQuerySDJWT } from './types.ts';
+import type { OID4VPClientMetadataSDJWTVC, OID4VPCredentialQuerySDJWTVC } from './types.ts';
 
 /**
  * Generate an SD-JWT-VC-specific set of request options for the Digital Credentials API
@@ -17,7 +17,7 @@ export function generateSDJWTRequestOptions({
   desiredClaims: string[];
   acceptedVCTValues?: string[];
 }): {
-  credentialQuery: OID4VPCredentialQuerySDJWT;
+  credentialQuery: OID4VPCredentialQuerySDJWTVC;
   clientMetadata: OID4VPClientMetadataSDJWTVC;
 } {
   return {

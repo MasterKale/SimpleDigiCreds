@@ -4,7 +4,7 @@ import { type DecodedSDJwt, decodeSdJwt, getClaims } from '@sd-jwt/decode';
 import type { IssuerSignedJWTPayload, SDJWTHeader } from '../../formats/sd-jwt-vc/types.ts';
 import { SimpleDigiCredsError } from '../../helpers/index.ts';
 import type { VerifiedClaimsMap, VerifiedCredential } from '../../helpers/types.ts';
-import type { OID4VPCredentialQuerySDJWT } from '../../protocols/oid4vp/types.ts';
+import type { OID4VPCredentialQuerySDJWTVC } from '../../protocols/oid4vp/types.ts';
 import type { DCAPIRequestOID4VP } from '../../dcapi/types.ts';
 import type { GeneratedPresentationRequestMetadata } from '../../generatePresentationRequest.ts';
 import { hashSDJWTVCData } from './hashSDJWTVCData.ts';
@@ -23,7 +23,7 @@ export async function verifySDJWTPresentation({
   requestMetadata,
 }: {
   presentation: string;
-  matchingCredentialQuery: OID4VPCredentialQuerySDJWT;
+  matchingCredentialQuery: OID4VPCredentialQuerySDJWTVC;
   request: DCAPIRequestOID4VP;
   requestMetadata: GeneratedPresentationRequestMetadata;
 }): Promise<VerifiedCredential> {

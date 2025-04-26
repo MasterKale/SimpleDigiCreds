@@ -1,7 +1,7 @@
 import type {
   OID4VPCredentialQuery,
   OID4VPCredentialQueryMdoc,
-  OID4VPCredentialQuerySDJWT,
+  OID4VPCredentialQuerySDJWTVC,
 } from './protocols/oid4vp/types.ts';
 import { verifyMDLPresentation } from './formats/mdl/index.ts';
 import { verifySDJWTPresentation } from './formats/sd-jwt-vc/index.ts';
@@ -116,7 +116,7 @@ function isMdocPresentation(
  * Type guard to make sure a query is for an SD-JWT
  */
 function isSDJWTPresentation(
-  query: OID4VPCredentialQuery | OID4VPCredentialQuerySDJWT,
-): query is OID4VPCredentialQuerySDJWT {
-  return (query as OID4VPCredentialQuerySDJWT).format === 'dc+sd-jwt';
+  query: OID4VPCredentialQuery | OID4VPCredentialQuerySDJWTVC,
+): query is OID4VPCredentialQuerySDJWTVC {
+  return (query as OID4VPCredentialQuerySDJWTVC).format === 'dc+sd-jwt';
 }

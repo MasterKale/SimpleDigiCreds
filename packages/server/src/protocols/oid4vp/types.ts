@@ -94,7 +94,7 @@ export type OID4VPCredentialQueryMdoc = OID4VPCredentialQuery & {
 };
 
 /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.4 */
-export type OID4VPCredentialQuerySDJWT = OID4VPCredentialQuery & {
+export type OID4VPCredentialQuerySDJWTVC = OID4VPCredentialQuery & {
   format: 'dc+sd-jwt';
   meta?: {
     /** An array of strings that specifies allowed values for the type of the requested Verifiable Credential. */
