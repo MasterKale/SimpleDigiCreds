@@ -3,6 +3,7 @@ import { generateNonce } from '../../helpers/generateNonce.ts';
 import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
 import { generateMDLRequestOptions } from './generateMDLRequestOptions.ts';
 import { generateSDJWTRequestOptions } from './generateSDJWTRequestOptions.ts';
+import { modifyRequestToEncryptResponse } from './modifyRequestToEncryptResponse.ts';
 import type {
   OID4VPClientMetadataSDJWTVC,
   OID4VPCredentialQueryMdoc,
@@ -15,7 +16,7 @@ import type {
  */
 export function generateOID4VPRequest(
   credentialOptions: OID4VPMDLCredentialOptions | OID4VPSDJWTCredentialOptions,
-  signRequest: boolean,
+  encryptResponse: boolean,
 ): DigitalCredentialRequest {
   const { format, desiredClaims, requestOrigin } = credentialOptions;
 
@@ -38,7 +39,7 @@ export function generateOID4VPRequest(
     });
   }
 
-  const toReturn: DigitalCredentialRequest = {
+  let toReturn: DigitalCredentialRequest = {
     // https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#name-protocol
     protocol: 'openid4vp',
     data: {
@@ -53,6 +54,10 @@ export function generateOID4VPRequest(
 
   if (clientMetadata) {
     toReturn.data.client_metadata = clientMetadata;
+  }
+
+  if (encryptResponse) {
+    toReturn = modifyRequestToEncryptResponse(toReturn);
   }
 
   return toReturn;

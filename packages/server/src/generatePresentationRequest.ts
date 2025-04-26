@@ -20,7 +20,7 @@ import {
 export function generatePresentationRequest({
   credentialOptions,
   protocol = 'openid4vp',
-  signRequest = false,
+  encryptResponse = false,
 }: PresentationOptions): CredentialRequestOptions {
   let request: DigitalCredentialRequest;
 
@@ -29,7 +29,7 @@ export function generatePresentationRequest({
    * DC API does not yet support this.
    */
   if (protocol === 'openid4vp') {
-    request = generateOID4VPRequest(credentialOptions, signRequest);
+    request = generateOID4VPRequest(credentialOptions, encryptResponse);
   } else {
     throw new SimpleDigiCredsError({
       message: `Unsupported presentation protocol "${protocol}"`,
@@ -47,5 +47,5 @@ export function generatePresentationRequest({
 export type PresentationOptions = {
   credentialOptions: OID4VPMDLCredentialOptions | OID4VPSDJWTCredentialOptions;
   protocol?: 'openid4vp';
-  signRequest?: boolean;
+  encryptResponse?: boolean;
 };
