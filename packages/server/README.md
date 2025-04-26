@@ -34,21 +34,24 @@ presentation:
 import { generatePresentationOptions, verifyPresentationResponse } from '@simpledigicreds/server';
 
 /* server */
-const options = await generatePresentationOptions({
-  credentialFormat: 'mdl';
-  desiredClaims: ['family_name', 'given_name'],
+const presentationRequest = await generatePresentationRequest({
+  credentialOptions: {
+    format: 'mdl',
+    desiredClaims: ['family_name', 'given_name'],
+  },
   requestOrigin: 'http://localhost:8000',
 });
+const { dcapiOptions } = presentationRequest;
 
 /* browser */
 if (typeof window.DigitalCredential === 'function') {
-  const response = await navigator.credentials.get(options);
+  const presentation = await navigator.credentials.get(dcapiOptions);
 }
 
 /* server */
 const verified = await verifyPresentationResponse({
-  response: response.data,
-  options,
+  data: presentation.data,
+  request: presentationRequest,
 });
 ```
 
