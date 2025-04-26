@@ -24,7 +24,7 @@ app.get("/options", async (ctx) => {
     encryptResponse: false,
   });
 
-  const sdjwtRequest = await generatePresentationRequest({
+  const sdjwtvcRequest = await generatePresentationRequest({
     credentialOptions: {
       format: "sd-jwt-vc",
       desiredClaims: ["family_name", "given_name"],
@@ -37,7 +37,7 @@ app.get("/options", async (ctx) => {
    * Toggle between these to test either format (until both can be included in one DC API call)
    */
   // const _request = mdlRequest;
-  const _request = sdjwtRequest;
+  const _request = sdjwtvcRequest;
   const { dcapiOptions } = _request;
 
   console.log(JSON.stringify(_request, null, 2));
