@@ -6,7 +6,7 @@ import { generateSDJWTRequestOptions } from './generateSDJWTRequestOptions.ts';
 import { modifyRequestToEncryptResponse } from './modifyRequestToEncryptResponse.ts';
 import type {
   OID4VPClientMetadataSDJWTVC,
-  OID4VPCredentialQueryMdoc,
+  OID4VPCredentialQueryMDL,
   OID4VPCredentialQuerySDJWTVC,
   OID4VPSupportedMdocClaimName,
 } from './types.ts';
@@ -23,7 +23,7 @@ export async function generateOID4VPRequest(
 }> {
   const { format, desiredClaims } = credentialOptions;
 
-  let credentialQuery: OID4VPCredentialQueryMdoc | OID4VPCredentialQuerySDJWTVC;
+  let credentialQuery: OID4VPCredentialQueryMDL | OID4VPCredentialQuerySDJWTVC;
   let clientMetadata: OID4VPClientMetadataSDJWTVC | undefined = undefined;
 
   if (format === 'mdl') {

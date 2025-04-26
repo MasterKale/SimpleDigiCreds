@@ -85,7 +85,7 @@ export type OID4VPCredentialQuery = {
 };
 
 /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#name-mobile-documents-or-mdocs-i */
-export type OID4VPCredentialQueryMdoc = OID4VPCredentialQuery & {
+export type OID4VPCredentialQueryMDL = OID4VPCredentialQuery & {
   /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3-2 */
   format: 'mso_mdoc';
   /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3.1.1-2.2 */

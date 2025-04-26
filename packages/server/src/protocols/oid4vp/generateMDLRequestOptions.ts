@@ -1,4 +1,4 @@
-import type { OID4VPCredentialQueryMdoc } from './types.ts';
+import type { OID4VPCredentialQueryMDL } from './types.ts';
 
 /**
  * Generate an mDL-specific set of request options for the Digital Credentials API
@@ -14,7 +14,7 @@ export function generateMDLRequestOptions({
   id: string;
   desiredClaims: string[];
 }): {
-  credentialQuery: OID4VPCredentialQueryMdoc;
+  credentialQuery: OID4VPCredentialQueryMDL;
 } {
   return {
     credentialQuery: {

@@ -1,6 +1,6 @@
 import type {
   OID4VPCredentialQuery,
-  OID4VPCredentialQueryMdoc,
+  OID4VPCredentialQueryMDL,
   OID4VPCredentialQuerySDJWTVC,
 } from './protocols/oid4vp/types.ts';
 import { verifyMDLPresentation } from './formats/mdl/index.ts';
@@ -73,7 +73,7 @@ export async function verifyPresentationResponse({ data, request }: {
         continue;
       }
 
-      if (isMdocPresentation(requestedCred)) {
+      if (isMDLPresentation(requestedCred)) {
         const verifiedCredential = await verifyMDLPresentation({
           presentation: matchingPresentation,
           request: request.data,
@@ -104,12 +104,13 @@ export async function verifyPresentationResponse({ data, request }: {
 }
 
 /**
- * Type guard to make sure a query is for an mdoc
+ * Type guard to make sure a query is for an mDL
  */
-function isMdocPresentation(
-  query: OID4VPCredentialQuery | OID4VPCredentialQueryMdoc,
-): query is OID4VPCredentialQueryMdoc {
-  return (query as OID4VPCredentialQueryMdoc).format === 'mso_mdoc';
+function isMDLPresentation(
+  query: OID4VPCredentialQuery | OID4VPCredentialQueryMDL,
+): query is OID4VPCredentialQueryMDL {
+  const _query = query as OID4VPCredentialQueryMDL;
+  return _query.format === 'mso_mdoc' && _query.meta.doctype_value === 'org.iso.18013.5.1.mDL';
 }
 
 /**

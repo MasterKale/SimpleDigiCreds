@@ -2,7 +2,7 @@ import type {
   OID4VPClientMetadata,
   OID4VPClientMetadataSDJWTVC,
   OID4VPCredentialQuery,
-  OID4VPCredentialQueryMdoc,
+  OID4VPCredentialQueryMDL,
   OID4VPCredentialQuerySDJWTVC,
 } from '../protocols/oid4vp/types.ts';
 
@@ -48,7 +48,7 @@ export type DCAPIRequestOID4VP = {
  */
 export type DCAPIRequestOID4VPMDL = DCAPIRequestOID4VP & {
   dcql_query: {
-    credentials: OID4VPCredentialQueryMdoc[];
+    credentials: OID4VPCredentialQueryMDL[];
   };
   client_metadata?: never;
 };

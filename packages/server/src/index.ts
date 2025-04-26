@@ -16,7 +16,7 @@ export type {
   OID4VPClaimQuery,
   OID4VPClaimQueryMdoc,
   OID4VPCredentialQuery,
-  OID4VPCredentialQueryMdoc,
+  OID4VPCredentialQueryMDL,
   OID4VPSupportedMdocClaimName,
   PathPointer,
 } from './protocols/oid4vp/types.ts';
