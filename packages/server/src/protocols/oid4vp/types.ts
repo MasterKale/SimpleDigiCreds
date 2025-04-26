@@ -1,4 +1,4 @@
-import type { Identifier } from '../formats/mdoc/types.ts';
+import type { Identifier } from '../../formats/mdl/types.ts';
 
 /**
  * OID4VP: Protocol for requesting documents
@@ -85,9 +85,7 @@ export type OID4VPCredentialQuery = {
 };
 
 /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#name-mobile-documents-or-mdocs-i */
-export type OID4VPCredentialQueryMdoc = {
-  /** A unique string comprised of alphanumeric, underscore (_) or hyphen (-) characters */
-  id: string;
+export type OID4VPCredentialQueryMdoc = OID4VPCredentialQuery & {
   /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3-2 */
   format: 'mso_mdoc';
   /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3.1.1-2.2 */
@@ -96,25 +94,13 @@ export type OID4VPCredentialQueryMdoc = {
 };
 
 /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.4 */
-export type OID4VPCredentialQuerySDJWT = {
-  /** A unique string comprised of alphanumeric, underscore (_) or hyphen (-) characters */
-  id: string;
+export type OID4VPCredentialQuerySDJWTVC = OID4VPCredentialQuery & {
   format: 'dc+sd-jwt';
   meta?: {
     /** An array of strings that specifies allowed values for the type of the requested Verifiable Credential. */
     vct_values?: string[];
   };
   claims: OID4VPClaimQuery[];
-  client_metadata: {
-    vp_formats: {
-      'dc+sd-jwt': {
-        // TODO: Just picking "ES256" for now.
-        // See https://www.rfc-editor.org/rfc/rfc7518.html#section-3.1 for possible values
-        'sd-jwt_alg_values'?: ['ES256'];
-        'kb-jwt_alg_values'?: ['ES256'];
-      };
-    };
-  };
 };
 
 /**
@@ -162,3 +148,87 @@ export type PathPointer = string[];
  * Valid mdoc identifiers that can be used in an OID4VP request as a value for `claim_name`
  */
 export type OID4VPSupportedMdocClaimName = Exclude<Identifier, 'age_over_NN'> | 'age_over_21';
+
+/**
+ * Verifier metadata values. See
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#section-5.1-4.2.1
+ */
+export type OID4VPClientMetadata = {
+  jwks?: {
+    keys: JsonWebKey[];
+  };
+  /**
+   * The shape of this depends on the type of credential being requested
+   */
+  vp_formats?: unknown;
+  /**
+   * From https://openid.net/specs/oauth-v2-jarm-final.html#section-3-3.2.1:
+   *
+   * > _The JWS [RFC7515] `alg` algorithm REQUIRED for signing authorization responses. If this is
+   * > specified, the response will be signed using JWS and the configured algorithm. If
+   * > unspecified, the default algorithm to use for signing authorization responses is `RS256`.
+   * > The algorithm `none` is not allowed._
+   */
+  // TODO: Uncomment when we support request signing
+  // authorization_signed_response_alg?: JWSALG;
+  /**
+   * From https://openid.net/specs/oauth-v2-jarm-final.html#section-3-3.4.1:
+   *
+   * > _The JWE [RFC7516] `alg` algorithm REQUIRED for encrypting authorization responses. If both
+   * > signing and encryption are requested, the response will be signed then encrypted, with the
+   * > result being a Nested JWT, as defined in JWT [RFC7519]. The default, if omitted, is that no
+   * > encryption is performed._
+   */
+  authorization_encrypted_response_alg?: JWEALG_HAIP;
+  /**
+   * From https://openid.net/specs/oauth-v2-jarm-final.html#section-3-3.6.1:
+   *
+   * > _The JWE [RFC7516] `enc` algorithm REQUIRED for encrypting authorization responses. If
+   * > `authorization_encrypted_response_alg` is specified, the default for this value is
+   * > `A128CBC-HS256`. When `authorization_encrypted_response_enc` is included,
+   * > `authorization_encrypted_response_alg` MUST also be provided._
+   */
+  authorization_encrypted_response_enc?: JWEENC_HAIP;
+};
+
+/**
+ * JWS [RFC7515] `alg` algorithms. Recommended+ values. See
+ * https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-algorithms
+ */
+// Uncomment when we support request signing
+// type JWSALG = 'ECDH-ES' | 'RSA-OAEP' | 'ES256';
+
+/**
+ * JWE [RFC7516] `alg` algorithms. Required and Recommended+ values. See
+ * https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-algorithms
+ */
+type JWEALG = 'HS256' | 'ECDH-ES' | 'RSA-OAEP' | 'ES256';
+/**
+ * JWE [RFC7516] `alg` algorithms required by OID4VC HAIP. See
+ * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-6
+ */
+type JWEALG_HAIP = Extract<JWEALG, 'ECDH-ES'>;
+
+/**
+ * JWE [RFC7516] `enc` algorithms. Required and Recommended values. See
+ * https://www.rfc-editor.org/rfc/rfc7518.html#section-5.1
+ */
+type JWEENC = 'A128CBC-HS256' | 'A256CBC-HS512' | 'A128GCM' | 'A256GCM';
+/**
+ * JWE [RFC7516] `enc` algorithms required by OID4VC HAIP. See
+ * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-6
+ */
+type JWEENC_HAIP = Extract<JWEENC, 'A128GCM'>;
+
+/**
+ * The shape of `client_metadata` when requesting an SD-JWT-VC. See
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.4.2
+ */
+export type OID4VPClientMetadataSDJWTVC = OID4VPClientMetadata & {
+  vp_formats: {
+    'dc+sd-jwt': {
+      'sd-jwt_alg_values': ['ES256'];
+      'kb-jwt_alg_values': ['ES256'];
+    };
+  };
+};

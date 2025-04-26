@@ -1,6 +1,6 @@
 import { assertEquals } from '@std/assert';
 
-import type { CredentialRequestOptions } from '../../dcapi.ts';
+import type { CredentialRequestOptions } from '../../dcapi/types.ts';
 import { generateSessionTranscript } from './generateSessionTranscript.ts';
 import { base64url } from '../../helpers/index.ts';
 
@@ -34,7 +34,13 @@ Deno.test('should generate OID4VP-specific session transcript', async () => {
     },
   };
 
-  const sessionTranscript = await generateSessionTranscript(options.digital.requests[0].data);
+  const sessionTranscript = await generateSessionTranscript(
+    options.digital.requests[0].data,
+    {
+      requestOrigin: 'http://localhost:8000',
+      clientID: 'web-origin:http://localhost:8000',
+    },
+  );
 
   assertEquals(
     sessionTranscript,

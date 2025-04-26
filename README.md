@@ -1,16 +1,25 @@
 # SimpleDigiCreds <!-- omit in toc -->
 
+- [Disclaimer](#disclaimer)
 - [Overview](#overview)
 - [Installation](#installation)
-- [Contributions](#contributions)
+- [Supported Features](#supported-features)
+  - [OID4VP - All doc formats](#oid4vp---all-doc-formats)
+  - [OID4VP - SD-JWT-VC](#oid4vp---sd-jwt-vc)
 - [Example Site](#example-site)
+- [Contributions](#contributions)
 - [Development](#development)
+
+## Disclaimer
+
+**THIS PROJECT IS A WIP RIGHT NOW! THE CORE API MAY CHANGE MORE QUICKLY THAN YOU LIKE!**
 
 ## Overview
 
-This project makes it easier to combine **OID4VP (draft 24) + mdoc** for meaningful identity
-proofing via the [Digital Credentials API](https://wicg.github.io/digital-credentials/). The
-following packages are maintained here to achieve this:
+This project makes it easier to request presentations of **ISO 18013-5 mDL** and **IETF SD-JWT-VC**
+digital credentials using **OID4VP (draft 24)** via the
+[Digital Credentials API](https://w3c-fedid.github.io/digital-credentials/). The following packages
+are maintained here to achieve this:
 
 - [@simpledigicreds/browser](https://github.com/MasterKale/SimpleDigiCreds/tree/main/packages/browser)
 - [@simpledigicreds/server](https://github.com/MasterKale/SimpleDigiCreds/tree/main/packages/server)
@@ -23,16 +32,18 @@ higher** projects, and other compatible runtimes (Cloudflare Workers, Bun, etc..
 
 See the packages' READMEs for more specific installation information.
 
-## Contributions
+## Supported Features
 
-The SimpleDigiCreds project is not currently open to external contributions.
+### OID4VP - All doc formats
 
-Please [submit an Issue](https://github.com/MasterKale/SimpleDigiCreds/issues/new/choose) and fill
-out the provided template with as much information as possible if you have found a bug in need of
-fixing.
+- Unencrypted requests
+- Unencrypted responses
+- Encrypted responses (following
+  [OID4VC HAIP](https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0-03.html#section-6))
 
-You can also [submit an Issue](https://github.com/MasterKale/SimpleDigiCreds/issues/new/choose) to
-request new features, or to suggest changes to existing features.
+### OID4VP - SD-JWT-VC
+
+- Key binding verification
 
 ## Example Site
 
@@ -46,6 +57,17 @@ $> deno task example:start
 
 The site will be available at http://localhost:4000 to test out SimpleDigiCreds and the Digital
 Credentials API.
+
+## Contributions
+
+The SimpleDigiCreds project is not currently open to external contributions.
+
+Please [submit an Issue](https://github.com/MasterKale/SimpleDigiCreds/issues/new/choose) and fill
+out the provided template with as much information as possible if you have found a bug in need of
+fixing.
+
+You can also [submit an Issue](https://github.com/MasterKale/SimpleDigiCreds/issues/new/choose) to
+request new features, or to suggest changes to existing features.
 
 ## Development
 

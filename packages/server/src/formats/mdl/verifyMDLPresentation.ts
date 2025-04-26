@@ -1,6 +1,6 @@
 import { decodeCBOR } from '@levischuck/tiny-cbor';
 
-import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
+import type { DCAPIRequestOID4VP } from '../../dcapi/types.ts';
 import type { DecodedCredentialResponse } from './types.ts';
 import { verifyIssuerSigned } from './verifyIssuerSigned.ts';
 import { verifyDeviceSigned } from './verifyDeviceSigned.ts';
@@ -8,14 +8,20 @@ import { verifyNameSpaces } from './verifyNameSpaces.ts';
 // import { convertX509BufferToPEM } from '../../helpers/x509/index.ts';
 import { base64url, SimpleDigiCredsError } from '../../helpers/index.ts';
 import type { VerifiedClaimsMap, VerifiedCredential } from '../../helpers/types.ts';
+import type { GeneratedPresentationRequestMetadata } from '../../generatePresentationRequest.ts';
 
 /**
  * Verify an mdoc presentation as returned through the DC API
  */
-export async function verifyMdocPresentation(
-  presentation: string,
-  request: DCAPIRequestOID4VP,
-): Promise<VerifiedCredential> {
+export async function verifyMDLPresentation({
+  presentation,
+  request,
+  requestMetadata,
+}: {
+  presentation: string;
+  request: DCAPIRequestOID4VP;
+  requestMetadata: GeneratedPresentationRequestMetadata;
+}): Promise<VerifiedCredential> {
   if (!base64url.isBase64URLString(presentation)) {
     throw new SimpleDigiCredsError({
       message: 'mdoc presentation was not a base64url string',
@@ -47,7 +53,7 @@ export async function verifyMdocPresentation(
     expiresOn,
     issuedAt,
     validFrom,
-  } = await verifyDeviceSigned(document, request);
+  } = await verifyDeviceSigned(document, request, requestMetadata);
   if (!deviceSignedVerified) {
     console.error('could not verify DeviceSigned (mdoc)');
     return {

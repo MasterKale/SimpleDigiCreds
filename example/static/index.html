@@ -63,13 +63,16 @@
             elemDebug.innerHTML = "";
 
             const options = await fetch("/options");
-            const optionsJSON = await options.json();
+            const dcapiOptions = await options.json();
 
-            printDebug("Request Options", JSON.stringify(optionsJSON, null, 2));
+            printDebug(
+              "Request Options",
+              JSON.stringify(dcapiOptions, null, 2)
+            );
 
             let response;
             try {
-              response = await navigator.credentials.get(optionsJSON);
+              response = await navigator.credentials.get(dcapiOptions);
               console.log("Raw presentation:", response);
               printDebug(
                 "Raw Presentation",
@@ -83,7 +86,7 @@
 
             const verification = await fetch("/verify", {
               method: "post",
-              body: JSON.stringify(response.data),
+              body: response.data,
               headers: {
                 "Content-Type": "application/json",
               },
