@@ -21,7 +21,7 @@ export async function generateOID4VPRequest(
   request: DigitalCredentialRequest;
   privateKeyJWK?: JsonWebKey;
 }> {
-  const { format, desiredClaims, requestOrigin } = credentialOptions;
+  const { format, desiredClaims } = credentialOptions;
 
   let credentialQuery: OID4VPCredentialQueryMdoc | OID4VPCredentialQuerySDJWT;
   let clientMetadata: OID4VPClientMetadataSDJWTVC | undefined = undefined;
@@ -48,7 +48,8 @@ export async function generateOID4VPRequest(
     data: {
       response_type: 'vp_token',
       response_mode: 'dc_api',
-      client_id: `web-origin:${requestOrigin}`,
+      // Omitting this for now, to come back later and set if/when we add request signing
+      // client_id: `web-origin:${requestOrigin}`,
       nonce: generateNonce(),
       // https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#dcql_query
       dcql_query: { credentials: [credentialQuery] },
@@ -70,12 +71,10 @@ export async function generateOID4VPRequest(
 export type OID4VPMDLCredentialOptions = {
   format: 'mdl';
   desiredClaims: OID4VPSupportedMdocClaimName[];
-  requestOrigin: string;
 };
 
 export type OID4VPSDJWTCredentialOptions = {
   format: 'sd-jwt';
   desiredClaims: string[];
-  requestOrigin: string;
   acceptedVCTValues?: string[];
 };

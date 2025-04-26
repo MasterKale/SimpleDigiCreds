@@ -15,8 +15,8 @@ Deno.test('Should generate mDL options', async () => {
     credentialOptions: {
       format: 'mdl',
       desiredClaims: ['family_name', 'given_name', 'age_over_21'],
-      requestOrigin: 'https://digital-credentials.dev',
     },
+    requestOrigin: 'https://digital-credentials.dev',
   });
 
   assertEquals(
@@ -29,7 +29,6 @@ Deno.test('Should generate mDL options', async () => {
             data: {
               response_type: 'vp_token',
               response_mode: 'dc_api',
-              client_id: 'web-origin:https://digital-credentials.dev',
               nonce: '9kMlSgHQW8oBv_AdkSaZKM0ajrEUatzg2f24vV6AgnI',
               dcql_query: {
                 credentials: [
@@ -68,9 +67,9 @@ Deno.test('Should generate SD-JWT-VC options', async () => {
     credentialOptions: {
       format: 'sd-jwt',
       desiredClaims: ['family_name', 'given_name', 'age_over_21'],
-      requestOrigin: 'https://digital-credentials.dev',
       acceptedVCTValues: ['urn:eu.europa.ec.eudi:pid:1'],
     },
+    requestOrigin: 'https://digital-credentials.dev',
   });
 
   assertEquals(
@@ -83,7 +82,6 @@ Deno.test('Should generate SD-JWT-VC options', async () => {
             data: {
               response_type: 'vp_token',
               response_mode: 'dc_api',
-              client_id: 'web-origin:https://digital-credentials.dev',
               nonce: '9kMlSgHQW8oBv_AdkSaZKM0ajrEUatzg2f24vV6AgnI',
               dcql_query: {
                 credentials: [
@@ -124,8 +122,8 @@ Deno.test('Should generate options set up to encrypt response', async () => {
     credentialOptions: {
       format: 'sd-jwt',
       desiredClaims: ['family_name', 'given_name', 'age_over_21'],
-      requestOrigin: 'https://digital-credentials.dev',
     },
+    requestOrigin: 'https://digital-credentials.dev',
     encryptResponse: true,
   });
 

@@ -7,8 +7,8 @@ import type {
 } from './protocols/oid4vp/types.ts';
 
 /**
- * Options suitable for passing into `navigator.credentials.get({ digital: { ... } })` in the
- * browser to request the presentation of a verifiable credential via the Digital Credentials API
+ * Options suitable for passing directly into `navigator.credentials.get()` in the browser to
+ * request the presentation of a verifiable credential via the Digital Credentials API
  */
 export type CredentialRequestOptions = {
   digital: DigitalCredentialRequestOptions;
@@ -33,7 +33,7 @@ export type DCAPIRequestOID4VP = {
   /** The value `"dc_api"` (when unsigned and unencrypted) or `"dc_api.jwt"` (when signed or encrypted) */
   response_mode: 'dc_api' | 'dc_api.jwt';
   /** Ex: `"web-origin:https://example.com"` */
-  client_id: string;
+  client_id?: string;
   /** Base64URL-encoded random bytes to ensure uniqueness of the presentation */
   nonce: string;
   /** An array of credentials being requested */

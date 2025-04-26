@@ -19,6 +19,7 @@ import {
  */
 export async function generatePresentationRequest({
   credentialOptions,
+  requestOrigin,
   protocol = 'openid4vp',
   encryptResponse = false,
 }: PresentationRequestOptions): Promise<GeneratedPresentationRequest> {
@@ -44,19 +45,36 @@ export async function generatePresentationRequest({
         requests: [request],
       },
     },
-    requestMetadata: { privateKeyJWK },
+    requestMetadata: {
+      requestOrigin,
+      privateKeyJWK,
+      // TODO: SD-JWT-VC and mDL use this `web-origin:...` client ID as of Draft 24, but I can't
+      // find where it's defined for use after Draft 24...I guess it's going away?
+      clientID: `web-origin:${requestOrigin}`,
+    },
   };
 }
 
 export type PresentationRequestOptions = {
   credentialOptions: OID4VPMDLCredentialOptions | OID4VPSDJWTCredentialOptions;
+  requestOrigin: string;
   protocol?: 'openid4vp';
   encryptResponse?: boolean;
 };
 
+/**
+ * The output from `generatePresentationRequest()`
+ */
 export type GeneratedPresentationRequest = {
   dcapiOptions: CredentialRequestOptions;
-  requestMetadata: {
-    privateKeyJWK?: JsonWebKey;
-  };
+  requestMetadata: GeneratedPresentationRequestMetadata;
+};
+
+/**
+ * Various values necessary to verify the presentation request's response
+ */
+export type GeneratedPresentationRequestMetadata = {
+  requestOrigin: string;
+  clientID: string;
+  privateKeyJWK?: JsonWebKey;
 };
