@@ -2,25 +2,11 @@ import type { DCAPIResponse } from './types.ts';
 import { SimpleDigiCredsError } from '../helpers/index.ts';
 
 /**
- * Take a response from the Digital Credential API and make sure it's the expected shape
+ * Take `response.data` from the Digital Credential API and make sure it's the expected shape
  */
-export function isDCAPIResponse(response: unknown): response is DCAPIResponse {
-  if (!response) {
-    throw new SimpleDigiCredsError({
-      code: 'InvalidDCAPIResponse',
-      message: 'Response was missing',
-    });
-  }
-
-  if (typeof response !== 'object') {
-    throw new SimpleDigiCredsError({
-      code: 'InvalidDCAPIResponse',
-      message: `Response was type ${typeof response}, not an object`,
-    });
-  }
-
+export function isDCAPIResponse(data: object): data is DCAPIResponse {
   // @ts-ignore: We know response is an object
-  if (typeof response.vp_token !== 'object') {
+  if (typeof data.vp_token !== 'object') {
     throw new SimpleDigiCredsError({
       code: 'InvalidDCAPIResponse',
       message: 'Required object `response.vp_token` was missing',
@@ -28,7 +14,7 @@ export function isDCAPIResponse(response: unknown): response is DCAPIResponse {
   }
 
   // @ts-ignore: We know response.vp_token exists and is an object
-  const presentationEntries: [unknown][] = Object.values(response.vp_token);
+  const presentationEntries: [unknown][] = Object.values(data.vp_token);
   let entriesValid = true;
   for (const cred of presentationEntries) {
     if (!entriesValid) {
