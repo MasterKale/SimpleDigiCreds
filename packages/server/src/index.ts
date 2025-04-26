@@ -1,4 +1,8 @@
-export { generatePresentationRequest } from './generatePresentationRequest.ts';
+export {
+  type GeneratedPresentationRequest,
+  generatePresentationRequest,
+  type PresentationRequestOptions,
+} from './generatePresentationRequest.ts';
 export { verifyPresentationResponse } from './verifyPresentationResponse.ts';
 
 export type {

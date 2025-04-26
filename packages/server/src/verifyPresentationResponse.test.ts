@@ -1,70 +1,12 @@
 import { assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
 
 import type { CredentialRequestOptions, DCAPIResponse } from './dcapi.ts';
+import type { GeneratedPresentationRequest } from './generatePresentationRequest.ts';
 import { verifyPresentationResponse } from './verifyPresentationResponse.ts';
 import { SimpleDigiCredsError } from './helpers/index.ts';
 
-const options: CredentialRequestOptions = {
-  digital: {
-    requests: [
-      {
-        protocol: 'openid4vp',
-        data: {
-          response_type: 'vp_token',
-          response_mode: 'dc_api',
-          client_id: 'web-origin:http://localhost:8000',
-          nonce: '9M90LkDtCtucTZq8brlkpKHnGf1HpQKCpPKYTPk5MaA',
-          dcql_query: {
-            credentials: [
-              {
-                id: 'cred1',
-                format: 'mso_mdoc',
-                meta: { doctype_value: 'org.iso.18013.5.1.mDL' },
-                claims: [
-                  { path: ['org.iso.18013.5.1', 'family_name'] },
-                  { path: ['org.iso.18013.5.1', 'given_name'] },
-                ],
-              },
-            ],
-          },
-        },
-      },
-    ],
-  },
-};
-
-Deno.test('should error on missing `vp_token`', async () => {
-  const response = {};
-  const rejected = await assertRejects(() => verifyPresentationResponse({ response, options }));
-
-  assertInstanceOf(rejected, SimpleDigiCredsError);
-  assertEquals(rejected.code, 'InvalidDCAPIResponse');
-  assertEquals(rejected.message, 'Required object `response.vp_token` was missing');
-});
-
-Deno.test('should error on bad `vp_token`', async () => {
-  const response = { vp_token: '' };
-  const rejected = await assertRejects(() => verifyPresentationResponse({ response, options }));
-
-  assertInstanceOf(rejected, SimpleDigiCredsError);
-  assertEquals(rejected.code, 'InvalidDCAPIResponse');
-  assertEquals(rejected.message, 'Required object `response.vp_token` was missing');
-});
-
-Deno.test('should error on bad `vp_token` entries', async () => {
-  const response = { vp_token: { cred1: 12345 } };
-  const rejected = await assertRejects(() => verifyPresentationResponse({ response, options }));
-
-  assertInstanceOf(rejected, SimpleDigiCredsError);
-  assertEquals(rejected.code, 'InvalidDCAPIResponse');
-  assertEquals(
-    rejected.message,
-    'Object `response.vp_token` contained non-base64url-encoded entries',
-  );
-});
-
-Deno.test('should verify a well-formed mdoc presentation', async () => {
-  const options: CredentialRequestOptions = {
+const request: GeneratedPresentationRequest = {
+  dcapiOptions: {
     digital: {
       requests: [
         {
@@ -73,7 +15,7 @@ Deno.test('should verify a well-formed mdoc presentation', async () => {
             response_type: 'vp_token',
             response_mode: 'dc_api',
             client_id: 'web-origin:http://localhost:8000',
-            nonce: 'Glgd3WVI_6Uy8fjtI22ol0JGiJVq4GLuHGW6OCHV3_o',
+            nonce: '9M90LkDtCtucTZq8brlkpKHnGf1HpQKCpPKYTPk5MaA',
             dcql_query: {
               credentials: [
                 {
@@ -91,6 +33,71 @@ Deno.test('should verify a well-formed mdoc presentation', async () => {
         },
       ],
     },
+  },
+  requestMetadata: {},
+};
+
+Deno.test('should error on missing `vp_token`', async () => {
+  const response = {};
+  const rejected = await assertRejects(() => verifyPresentationResponse({ response, request }));
+
+  assertInstanceOf(rejected, SimpleDigiCredsError);
+  assertEquals(rejected.code, 'InvalidDCAPIResponse');
+  assertEquals(rejected.message, 'Required object `response.vp_token` was missing');
+});
+
+Deno.test('should error on bad `vp_token`', async () => {
+  const response = { vp_token: '' };
+  const rejected = await assertRejects(() => verifyPresentationResponse({ response, request }));
+
+  assertInstanceOf(rejected, SimpleDigiCredsError);
+  assertEquals(rejected.code, 'InvalidDCAPIResponse');
+  assertEquals(rejected.message, 'Required object `response.vp_token` was missing');
+});
+
+Deno.test('should error on bad `vp_token` entries', async () => {
+  const response = { vp_token: { cred1: 12345 } };
+  const rejected = await assertRejects(() => verifyPresentationResponse({ response, request }));
+
+  assertInstanceOf(rejected, SimpleDigiCredsError);
+  assertEquals(rejected.code, 'InvalidDCAPIResponse');
+  assertEquals(
+    rejected.message,
+    'Object `response.vp_token` contained non-base64url-encoded entries',
+  );
+});
+
+Deno.test('should verify a well-formed mdoc presentation', async () => {
+  const _request: GeneratedPresentationRequest = {
+    dcapiOptions: {
+      digital: {
+        requests: [
+          {
+            protocol: 'openid4vp',
+            data: {
+              response_type: 'vp_token',
+              response_mode: 'dc_api',
+              client_id: 'web-origin:http://localhost:8000',
+              nonce: 'Glgd3WVI_6Uy8fjtI22ol0JGiJVq4GLuHGW6OCHV3_o',
+              dcql_query: {
+                credentials: [
+                  {
+                    id: 'cred1',
+                    format: 'mso_mdoc',
+                    meta: { doctype_value: 'org.iso.18013.5.1.mDL' },
+                    claims: [
+                      { path: ['org.iso.18013.5.1', 'family_name'] },
+                      { path: ['org.iso.18013.5.1', 'given_name'] },
+                    ],
+                  },
+                ],
+              },
+            },
+          },
+        ],
+      },
+    },
+    requestMetadata: {},
   };
 
   const response: DCAPIResponse = {
@@ -100,7 +107,7 @@ Deno.test('should verify a well-formed mdoc presentation', async () => {
     },
   };
 
-  const verified = await verifyPresentationResponse({ response, options });
+  const verified = await verifyPresentationResponse({ response, request: _request });
 
   assertEquals(
     verified,
@@ -121,38 +128,41 @@ Deno.test('should verify a well-formed mdoc presentation', async () => {
 });
 
 Deno.test('should verify a well-formed SD-JWT presentation', async () => {
-  const options: CredentialRequestOptions = {
-    digital: {
-      requests: [
-        {
-          protocol: 'openid4vp',
-          data: {
-            response_type: 'vp_token',
-            response_mode: 'dc_api',
-            client_id: 'web-origin:http://localhost:8000',
-            nonce: 'p58vuKZuAjkh3kJVgZhOf1l-6Z52uD8sBzgcCANs65Y',
-            dcql_query: {
-              credentials: [
-                {
-                  id: 'cred1',
-                  format: 'dc+sd-jwt',
-                  meta: { vct_values: ['urn:eu.europa.ec.eudi:pid:1'] },
-                  claims: [{ path: ['family_name'] }, { path: ['given_name'] }],
-                },
-              ],
-            },
-            client_metadata: {
-              vp_formats: {
-                'dc+sd-jwt': {
-                  'sd-jwt_alg_values': ['ES256'],
-                  'kb-jwt_alg_values': ['ES256'],
+  const _request: GeneratedPresentationRequest = {
+    dcapiOptions: {
+      digital: {
+        requests: [
+          {
+            protocol: 'openid4vp',
+            data: {
+              response_type: 'vp_token',
+              response_mode: 'dc_api',
+              client_id: 'web-origin:http://localhost:8000',
+              nonce: 'p58vuKZuAjkh3kJVgZhOf1l-6Z52uD8sBzgcCANs65Y',
+              dcql_query: {
+                credentials: [
+                  {
+                    id: 'cred1',
+                    format: 'dc+sd-jwt',
+                    meta: { vct_values: ['urn:eu.europa.ec.eudi:pid:1'] },
+                    claims: [{ path: ['family_name'] }, { path: ['given_name'] }],
+                  },
+                ],
+              },
+              client_metadata: {
+                vp_formats: {
+                  'dc+sd-jwt': {
+                    'sd-jwt_alg_values': ['ES256'],
+                    'kb-jwt_alg_values': ['ES256'],
+                  },
                 },
               },
             },
           },
-        },
-      ],
+        ],
+      },
     },
+    requestMetadata: {},
   };
 
   const response: DCAPIResponse = {
@@ -162,7 +172,7 @@ Deno.test('should verify a well-formed SD-JWT presentation', async () => {
     },
   };
 
-  const verified = await verifyPresentationResponse({ response, options });
+  const verified = await verifyPresentationResponse({ response, request: _request });
 
   assertEquals(
     verified,

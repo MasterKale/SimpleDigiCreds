@@ -1,4 +1,3 @@
-import type { CredentialRequestOptions } from './dcapi.ts';
 import type {
   OID4VPCredentialQuery,
   OID4VPCredentialQueryMdoc,
@@ -8,14 +7,16 @@ import { verifyMDLPresentation } from './formats/mdl/index.ts';
 import { verifySDJWTPresentation } from './formats/sd-jwt-vc/index.ts';
 import { isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
 import type { VerifiedPresentation } from './helpers/types.ts';
+import type { GeneratedPresentationRequest } from './generatePresentationRequest.ts';
 
 /**
  * Verify and return a credential presentation out of a call to the Digital Credentials API
  */
-export async function verifyPresentationResponse({ response, options }: {
+export async function verifyPresentationResponse({ response, request }: {
   response: unknown;
-  options: CredentialRequestOptions;
+  request: GeneratedPresentationRequest;
 }): Promise<VerifiedPresentation> {
+  const { dcapiOptions, requestMetadata } = request;
   const verifiedValues: VerifiedPresentation = {};
 
   if (!isDCAPIResponse(response)) {
@@ -26,7 +27,7 @@ export async function verifyPresentationResponse({ response, options }: {
   }
 
   // We've verified the shape of the response, now verify it
-  for (const request of options.digital.requests) {
+  for (const request of dcapiOptions.digital.requests) {
     const { dcql_query } = request.data;
 
     for (const requestedCred of dcql_query.credentials) {

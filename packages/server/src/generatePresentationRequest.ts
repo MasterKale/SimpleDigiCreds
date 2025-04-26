@@ -21,7 +21,7 @@ export async function generatePresentationRequest({
   credentialOptions,
   protocol = 'openid4vp',
   encryptResponse = false,
-}: PresentationOptions): Promise<PresentationRequest> {
+}: PresentationRequestOptions): Promise<GeneratedPresentationRequest> {
   let request: DigitalCredentialRequest;
   let privateKeyJWK: JsonWebKey | undefined = undefined;
 
@@ -48,13 +48,13 @@ export async function generatePresentationRequest({
   };
 }
 
-export type PresentationOptions = {
+export type PresentationRequestOptions = {
   credentialOptions: OID4VPMDLCredentialOptions | OID4VPSDJWTCredentialOptions;
   protocol?: 'openid4vp';
   encryptResponse?: boolean;
 };
 
-export type PresentationRequest = {
+export type GeneratedPresentationRequest = {
   dcapiOptions: CredentialRequestOptions;
   requestMetadata: {
     privateKeyJWK?: JsonWebKey;
