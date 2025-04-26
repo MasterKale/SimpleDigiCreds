@@ -1,4 +1,4 @@
-import type { DigitalCredentialRequest } from '../../dcapi.ts';
+import type { DigitalCredentialRequest } from '../../dcapi/types.ts';
 import { generateNonce } from '../../helpers/generateNonce.ts';
 import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
 import { generateMDLRequestOptions } from './generateMDLRequestOptions.ts';

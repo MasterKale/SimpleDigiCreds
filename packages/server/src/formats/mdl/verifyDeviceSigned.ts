@@ -1,6 +1,6 @@
 import { CBORTag, decodeCBOR, encodeCBOR } from '@levischuck/tiny-cbor';
 
-import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
+import type { DCAPIRequestOID4VP } from '../../dcapi/types.ts';
 import { generateSessionTranscript } from './generateSessionTranscript.ts';
 import { verifyEC2 } from '../../helpers/verifyEC2.ts';
 import { COSEALG, COSEHEADER, COSEKEYS, isCOSEPublicKeyEC2 } from '../../cose.ts';

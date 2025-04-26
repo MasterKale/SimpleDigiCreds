@@ -4,7 +4,7 @@ import type {
   OID4VPCredentialQuery,
   OID4VPCredentialQueryMdoc,
   OID4VPCredentialQuerySDJWT,
-} from './protocols/oid4vp/types.ts';
+} from '../protocols/oid4vp/types.ts';
 
 /**
  * Options suitable for passing directly into `navigator.credentials.get()` in the browser to

@@ -1,4 +1,4 @@
-import type { DigitalCredentialRequest } from '../../dcapi.ts';
+import type { DigitalCredentialRequest } from '../../dcapi/types.ts';
 import { generateEncryptionKeypair } from '../../helpers/generateEncryptionKeypair.ts';
 
 /**

@@ -1,6 +1,6 @@
 import { decodeCBOR } from '@levischuck/tiny-cbor';
 
-import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
+import type { DCAPIRequestOID4VP } from '../../dcapi/types.ts';
 import type { DecodedCredentialResponse } from './types.ts';
 import { verifyIssuerSigned } from './verifyIssuerSigned.ts';
 import { verifyDeviceSigned } from './verifyDeviceSigned.ts';

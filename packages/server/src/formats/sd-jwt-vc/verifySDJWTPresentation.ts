@@ -5,7 +5,7 @@ import type { IssuerSignedJWTPayload, SDJWTHeader } from '../../formats/sd-jwt-v
 import { SimpleDigiCredsError } from '../../helpers/index.ts';
 import type { VerifiedClaimsMap, VerifiedCredential } from '../../helpers/types.ts';
 import type { OID4VPCredentialQuerySDJWT } from '../../protocols/oid4vp/types.ts';
-import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
+import type { DCAPIRequestOID4VP } from '../../dcapi/types.ts';
 import type { GeneratedPresentationRequestMetadata } from '../../generatePresentationRequest.ts';
 import { hashSDJWTVCData } from './hashSDJWTVCData.ts';
 import { getIssuerVerifier } from './getIssuerSignedVerifiers.ts';

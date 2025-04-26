@@ -1,6 +1,6 @@
 import { assertEquals } from '@std/assert';
 
-import type { CredentialRequestOptions } from '../../dcapi.ts';
+import type { CredentialRequestOptions } from '../../dcapi/types.ts';
 import { generateSessionTranscript } from './generateSessionTranscript.ts';
 import { base64url } from '../../helpers/index.ts';
 

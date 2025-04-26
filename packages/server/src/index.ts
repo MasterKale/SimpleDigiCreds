@@ -10,7 +10,7 @@ export type {
   DCAPIRequestOID4VP,
   DigitalCredentialRequest,
   DigitalCredentialRequestOptions,
-} from './dcapi.ts';
+} from './dcapi/types.ts';
 
 export type {
   OID4VPClaimQuery,

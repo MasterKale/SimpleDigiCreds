@@ -1,6 +1,6 @@
 import { encodeCBOR } from '@levischuck/tiny-cbor';
 
-import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
+import type { DCAPIRequestOID4VP } from '../../dcapi/types.ts';
 import type { DCAPIOID4VPSessionTranscript } from './types.ts';
 import type { GeneratedPresentationRequestMetadata } from '../../generatePresentationRequest.ts';
 

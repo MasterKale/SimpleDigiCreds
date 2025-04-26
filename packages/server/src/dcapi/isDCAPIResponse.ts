@@ -1,5 +1,5 @@
-import type { DCAPIResponse } from '../dcapi.ts';
-import { SimpleDigiCredsError } from './index.ts';
+import type { DCAPIResponse } from './types.ts';
+import { SimpleDigiCredsError } from '../helpers/index.ts';
 
 /**
  * Take a response from the Digital Credential API and make sure it's the expected shape

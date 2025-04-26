@@ -1,6 +1,7 @@
 import { assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
+import * as jose from 'jose';
 
-import type { CredentialRequestOptions, DCAPIResponse } from './dcapi.ts';
+import type { CredentialRequestOptions, DCAPIResponse } from './dcapi/types.ts';
 import type { GeneratedPresentationRequest } from './generatePresentationRequest.ts';
 import { verifyPresentationResponse } from './verifyPresentationResponse.ts';
 import { SimpleDigiCredsError } from './helpers/index.ts';
@@ -190,6 +191,111 @@ Deno.test('should verify a well-formed SD-JWT presentation', async () => {
         claims: {
           given_name: 'Erika',
           family_name: 'Mustermann',
+        },
+        issuerMeta: {
+          expiresOn: new Date('2029-09-01T23:33:20.000Z'),
+          issuedAt: new Date('2023-05-02T04:00:00.000Z'),
+          validFrom: undefined,
+        },
+      },
+    },
+  );
+});
+
+Deno.test('should verify an encrypted SD-JWT presentation', async () => {
+  const _request: GeneratedPresentationRequest = {
+    dcapiOptions: {
+      digital: {
+        requests: [
+          {
+            protocol: 'openid4vp',
+            data: {
+              response_type: 'vp_token',
+              response_mode: 'dc_api.jwt',
+              nonce: 'DPSphq_AUAqnetG7Vda0m5ygrduCoNR6AsmpRxUaI64',
+              dcql_query: {
+                credentials: [
+                  {
+                    id: 'cred1',
+                    format: 'dc+sd-jwt',
+                    meta: { vct_values: ['urn:eu.europa.ec.eudi:pid:1'] },
+                    claims: [
+                      { path: ['family_name'] },
+                      { path: ['given_name'] },
+                    ],
+                  },
+                ],
+              },
+              client_metadata: {
+                vp_formats: {
+                  'dc+sd-jwt': {
+                    'sd-jwt_alg_values': ['ES256'],
+                    'kb-jwt_alg_values': ['ES256'],
+                  },
+                },
+                jwks: {
+                  keys: [
+                    {
+                      kty: 'EC',
+                      crv: 'P-256',
+                      x: 'KLNpJOIrk6mYI9gWxvnRkK4vRMBg5L4Ck45bQTc4wq4',
+                      y: 'aGFIxhvtP71Gdyk4A0FaK-cNB6cr4rve1E8Bz5AMbTk',
+                    },
+                  ],
+                },
+                authorization_encrypted_response_alg: 'ECDH-ES',
+                authorization_encrypted_response_enc: 'A128GCM',
+              },
+            },
+          },
+        ],
+      },
+    },
+    requestMetadata: {
+      requestOrigin: 'http://localhost:8000',
+      privateKeyJWK: {
+        kty: 'EC',
+        crv: 'P-256',
+        x: 'KLNpJOIrk6mYI9gWxvnRkK4vRMBg5L4Ck45bQTc4wq4',
+        y: 'aGFIxhvtP71Gdyk4A0FaK-cNB6cr4rve1E8Bz5AMbTk',
+        d: 'tEI4CVPb2YSIeDstsb7wIWa650CgM8B4WhJQf2wClC0',
+      },
+      clientID: 'web-origin:http://localhost:8000',
+    },
+  };
+
+  const response: unknown = {
+    response:
+      'eyJhcHUiOiIiLCJhcHYiOiIiLCJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOEdDTSIsImVwayI6eyJrdHkiOiJFQyIsImNydiI6IlAtMjU2IiwieCI6IkRySnRzV0NQX1QwbTVIbHhYc3FhbmVJQWlka1VfOWhGWjVaX1dHRkIxSWciLCJ5IjoiT1Y0QVJtekkzRUo5T05mTDVxZllKU01kMTJUZ3JNMDRkLXZ0cGZnVk15cyJ9fQ.._o-J0a2Yht93e4S_.CuyJZ5wFz-Tp6yZnfBdHBKV0IhRk0ZSK-4phJTcT_uGpvyJHuKKL7O9a8r2uGEjpM7YtnshXzrZydhbRLPCATEwJ5md6GknixV1AbtBbVdr7_1dBeK6lZiyRbffaKtC0RTnPrAPcOvBlPp8p9TCd4ZKobrqxJWAOSYDLanwSTo3XPpymbAtGVwumsUDT5ZH2kPP8NKUVPPBcalTs8_MwmE3d5g8L6Etnyo3xsDNhXn4ij9jVqRHqXExv4FL233N_8bRLRrNo1y6irb-GAaXUJW5FWrCp3tRfyPIqVu5AEFEzUaD5zC_ajoPWbsjDYP8W125l1JymrI4ZFPpcC2UZxFZilsOA-4fwD80abPOeXTtO12_-DbygKBN2iFQmToamIOuL8aH9_BAZrQwunXSkatP3LmTZEk6MUy8JptFCwy4eyJdy0lfD4I1JfoCVw8jXnd1lZS-d4pszIqz937E_rN6ylS2IFO7J-SJdgL2t59Bc-SWi5ZrbZwIg0Murtwp0LTz5ZCjoV7lScDeQ2iFSxwK_BGlvapSRVQMRcm8R2UTzqzccWNnbfqpJt_ulatarFmDLeUNJv3tbbE6rwVQcP5yUBYKaZeloyGIBdlxgqdmAWPXcF5aUQyx1l1Le6Vmq3B9-_HkweJ9nDfrw59bk1edzrbss2_iY3E11DL4RazQq2eGsF-iQRXYpXIERmrTA-sda9zwpDTKK6dnykbQOM4chJRFT-qUFJznRdOMqs0a9BVen0fj5VHmC-AGKhQCVyBsjQza4hthpOfyIeqWH7Mk6hrLc5oOTaxFiUTNHmCrW1w7oR80L8ACNS0BLti8ufy_YKVN4gOQ1O7INypMp2nR-bBp2gweSqoUzYynm9xBIGzX6Qw3Z6r3dg2mOcrjbI_5sBhQICsGcjUYDlPkPX9xcA2fNXg3jxuHKbgFo-bhdUi60v2fizYDDAJ5z8bSdlKgps-wuiOWWeVloaj1XeN3pDgAPDumCvb-Mye9w5WcQ5oFSrofjm3SraJe-S_KpppAH_q5pSrMF5itZuLGdyotWV4Yfoyj-6Hbjwhs25ItgRsJaoKmbQ2J44P5UBxTRvvwEcez2ZbSDQvosq93LMujp6eDxG6yock0NaX0FHufNtYJYYzuwE6trNY0wD6bEsaLWUxlcolbwO_Bbuc1howFgR9ddyz1-5I69KwdC9N1Pg998Nj4tUM9ijWdq_JnrXIwBsNq_0DiaU-A2mc4OkIcR6uRI6edIt5zp1OTRoGHCYB6BIZsd8SOw8qTsNSWBToGHwJa5xAj7vJbh-2ODhljGlNuhl2hnj7NJXo4kdAsq25aMRuRbUDsWJPOojwi_W5ZtSKyeBNUeto18I5SC1hbo8hT1JnvtGaJV9Fn-5Ec5FpUzLXw0OBCZJ3rKq-gTIBfhOVszvX9BaiVYDB5UjX9CfgBaXw6Hrza_8Q-TffAZGZnD6zO4tJu4peZ5fc2uobQ3dklJrvvonLjksOlZ1sjvLUTlRLa2hNDhTIlBgiq15ih7tuEHX7vaK-QPl5JMP30rODDBCMLC5WR5AFmZY1h6GZasnd93ivU8qXRodotiyd9PqSi9WOowvkyyGk7X7pG-8qveCcxXypxVX9kvSXbkynI_gkt4HRqYEtmf3HqwiddSjI-QC1rfR9J-vrKmu8OpyABRZ3D7L1GQRVFbZEdY5rwBTP5EgryVPdIdTuIHx9bKWcmeEJBuDIPipZEaOrLuJ59PyoayIcjkm9MTAVFGYJ5jivvWmKie9yg50ECDoBAZ-btero5F05FdvMcvNJrUZVK2-np6F6RYyQMLoIHdU2JF957v-2ZFqrpOjg-dQ1Vx-hd-visjsip4CrJUQJOyG-U61Tx3TA_1UkZZCfzgcIh8G4vedUhLAlltW6wXQOezJNSm9NJ8sFwYCawB5wG3ZXoYApexUGd5Vrnhqn-TKrMBsr5-CIiBt5dONJJRaAYfYd5t3-TaQKyUagQl8s2XAyfOjMuzc-J5SY7VBjY4n_9NDpSl6ueWSCY2oi9O7r4bYrqdbgrJoBcbQwqbdtDojlVkbJsOPS5BaVxkxX9WF25niamND3496B7wA3VLvnXyU7cK_TC37SMkZfxHMyTgzcFGoy8FOGy3z5qQQw3Vew7rksVNncXrRZ1XDIyPDeRW0Ezl68ImiE-8dezE-9DJKHkyIgYcg2I9LvD_QRknIfn-L-Gom2U3wZuV1bdfzHYa8sigz8V63w1w3S3ff60ridos1A8sPFXtQiSXP7f86oDGl5aAn570BzPGeZcwQjQkwIXU5_H0OgixTdGP2sybEu_5zUmAW1pqRq2wuyBMk9UHkSIhQnLYW58YPfImIvcYAEDCbpS1rJ3Xf0SYc5qIe48Hy19ctKAZZJrB2RCfX5u1A-RznnNLMSGIQ8KwtSvttGY509N1fQPAYp4AsUje7liMIChyO3FqJZRnJvfj5nj5MgKYyIXJVZnmkRwf_pq81hFjYecLq1CROA0Jn_jU6WQBlwEVveXdNMwrER7UjMAPEhLXu0GWpq5bteuev5lJF2deyE2NQikBBGfHVThaBKNl5sziaIA0Zaxaras8ZQ36eKLbTHqzImbhqdDFmh00aL1du6JELSwfVq5-08HciZ00ZQsga4Ic70bqiKgHM50DavBK6HN2h6OeZMfiKNRh2Md9uC9KlL-bgv0etW444k_UPDqNk8ltaLm61tK1_ngeB66XYnHH1t5KkKbVkWdrcONuhSyI0LWYBxeYwh73Gxssc2Qnzi-hPsaeCNbVkfGY-auSE7s9xnXDZaQSn0BhLCOPkz8-aRMuL8dUCykJmHO-jFeWUZgPiI8O9URrSllKWXw4fErM9EbH6T8TSA5SmEL4gLz9n8SVfNFSUtIt6zrqNqCodYMUpXwjKSVlZcRv4g1_wfDbmw9niZEZZ3dRoxlw02YyJBBs7yTHNQCpoWlSk8DkSAwi0qBJahcwiqWdXI0CbjNws_6zMf9onJBT78sYSv_X9ALYq1Ki6pAaiFzAtnldBWRzDgNPDSyN25SBY_FlHl9Gve4s-ixsTfVa4TXmu5iYDqpZysjvQ_olA1s1PhwvBQFOCb2aXAUzDUWXAnmcjtGMSHOAABR-fnSBIy7rrinC3IxRHMr_OioAGscbvj1s9L6BrZeb2fM-mHALE-AeCcusvV0RrQ3hjHoiAk9BEHB1wbc-3JvRSYdNL5uorxp31RjVJ3-fc1QgxqdPwNY0jLBjxHyDwZ-aPQQK8U1lNF9jhs4gnes_4b4E0qY83Qw24ZKXfwJzt3_aDKdK-O3vikn0J7oP-f2umeUiq_37JKsXVjsoqxQZiigdOY_lbF1OCId_T5VJlrerQc1FDsEIGo0l6Pfw3nC4EeEi7CKdO1awK3T785Kah19Fh1wQWEcmf861GZyA78eEkuDgBTr0v0jJJGZA8RTTHMofA3IIw30s4nAjkBg6Hd83_CQKx2EAivbc8fDMhzOErz_6Zb4ILRLr1vVnzIeK9QMbEpz6sb-DXHE8iWnj-F4qjKMwDpOK9JF2_ny2mr4DqJROdVwr3SOp4CZ0jWpN1vHEHlU8GJhmr0JuhFc33YvNZK4K0uqPnaRfvh-FSVQqkBBTi9bzoxS0aTx4KwFADobXtRruPJNzkiJfMQDWfkisnWPc1HYa-FqN7RkBHaW0YMQFyWdpESOGtKxlOIOaoEiDwhWwRLixPLGd55tK62XMgvYugPlPpC1ZDVUdxN1oKBdhlRPdj1ySITffmWiC8YbDTkek_nZ00z1L-DIdShriuqmlYZRHw4x3EcoesmXthuV4Mm9eCPDa5k-7RUzK3RNsM_hSSJD_MF_GrSV9G5VhUIswmMFWU7_ElUqP7eKF9T8CTFL1ovZk6wfOe9ml7xTSHhF3NVIKW_iafBP3xdZUZiN3v1Wxi8Vb2kgwOFqtBJ_x39jm-3ZSMlveQCjeWd2F9nQ6PBvy8maT7UxPgPZMd4Z66OA2yhK-DkbFq1819deBWuDvHFx3NZofhpXCWzRQYQm5FuLI8Ot1btX6PdDcxBEgghE2yvJM8IasLrKa2w3b-lElKlhQEur8xpKQFMpWbxOzGFwPiPsbyB65rJ2HGErPdUnCas9ILGAD9HR224g8VDuQm0q1_qkg5h8S5puaDM7PvpmpNQ7OnAFCClrpKhr21tUeFNZE62roE0JdbKnKJvuVNprBG4Mwgfxg83-5JxoWRWaHakIVB1gv4SHCliLzBLZNDYPUyg9GgM8BqjHgXnSxsMp4DJK6SawjX9dIJPMjrpiJ2Cts2XEoE5APoOtSoQ_bmQjPiSzkj_LGugyQV-PbL3UhrrwYVxDbgHLKS_xVsmVNSack18u8uxLEfBA_qDwZrL5Zrs1Q2mzkjXLzkN3VPLflVal9t_RIAWgdVZDbpyOdjpnl41QZg2VrNH9-XskH9dpr7wH4uv4ux0OIKbHopwBfKQoiK6uCXtS9nAZt8u8ihJl_pJ9VHQquHEs7lqKtUJH_5zHcMjQ9r_6FehWmT1XMlAmOTCzdURc93RAlFYqQgEBQNJcmduChBtiSva4OGXaAQidj-fICJikSFsMbzUi-ErTJZzTQLlWKkdGfWdInQtneg3X9zx7Kdytu0kY4z9DRsKhmmh0GhHehoh-frAm4zI0zoJVzh8L8-XSukGrheM0IaSprnNxVo4mNrg3bg650sWffAI0E2R-Ng7eToGQ7hSh8uytY6iFcUpPrQKiQ0SdMTKLUPpZoppMwjRpQj16BgxWaT8vmh-YxD7Z34tbvu4tmNun6v-xwCB8aE8cpkGWaO7u7UNE-NslrIIk6jp88_r0z3Vqy9G8KGkPv7NspL04baM8qF1BZZqAClZlrCnxzCon7wa1b7hdApB5jNG8vZaZ_4Or0je3-p5wkLNM_3-kko0BHxvo_bEPpKeSpFNU6rCJ7fqIxdYXUKVPD_nueXk6v9AiwMnxaBKeZOO0gfLTc-4iCFXb5ujcJ37X5lGc4TFTiMMs5qF9MKhQNqPbqE03-1javWu8BJo8wcnTmXEVzzdkbfMKNoGCTQoijmUbGcwZ6boswxXsCJFSp1-obUtiLCTGCZEMWZHC4lqPdDfWOBI4gBG-btkS-WAXBR8sszVvV.qYAt3q-HifRHs3E4ilNgsA',
+  };
+
+  // Holy shit this worked...
+  // TODO: This needs to go into the actual method functionality
+  const decryptResult = await jose.jwtDecrypt(
+    // @ts-ignore: just playing around
+    response.response,
+    _request.requestMetadata.privateKeyJWK!,
+    {
+      keyManagementAlgorithms: ['ECDH-ES'],
+      contentEncryptionAlgorithms: ['A128GCM'],
+      clockTolerance: '1 second',
+    },
+  );
+
+  console.log(decryptResult);
+
+  const verified = await verifyPresentationResponse({
+    response: decryptResult.payload,
+    request: _request,
+  });
+
+  assertEquals(
+    verified,
+    {
+      cred1: {
+        claims: {
+          family_name: 'Mustermann',
+          given_name: 'Erika',
         },
         issuerMeta: {
           expiresOn: new Date('2029-09-01T23:33:20.000Z'),

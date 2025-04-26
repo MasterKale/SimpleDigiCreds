@@ -1,4 +1,4 @@
-import type { CredentialRequestOptions, DigitalCredentialRequest } from './dcapi.ts';
+import type { CredentialRequestOptions, DigitalCredentialRequest } from './dcapi/types.ts';
 import { SimpleDigiCredsError } from './helpers/index.ts';
 import {
   generateOID4VPRequest,
