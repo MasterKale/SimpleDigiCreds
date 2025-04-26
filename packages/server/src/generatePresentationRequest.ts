@@ -21,7 +21,7 @@ export async function generatePresentationRequest({
   credentialOptions,
   requestOrigin,
   protocol = 'openid4vp',
-  encryptResponse = false,
+  encryptResponse = true,
 }: PresentationRequestOptions): Promise<GeneratedPresentationRequest> {
   let request: DigitalCredentialRequest;
   let privateKeyJWK: JsonWebKey | undefined = undefined;

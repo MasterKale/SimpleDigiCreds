@@ -17,6 +17,7 @@ Deno.test('Should generate mDL options', async () => {
       desiredClaims: ['family_name', 'given_name', 'age_over_21'],
     },
     requestOrigin: 'https://digital-credentials.dev',
+    encryptResponse: false,
   });
 
   assertEquals(
@@ -70,6 +71,7 @@ Deno.test('Should generate SD-JWT-VC options', async () => {
       acceptedVCTValues: ['urn:eu.europa.ec.eudi:pid:1'],
     },
     requestOrigin: 'https://digital-credentials.dev',
+    encryptResponse: false,
   });
 
   assertEquals(
