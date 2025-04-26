@@ -2,12 +2,12 @@ import { Hono } from "hono";
 import { serveStatic } from "hono/deno";
 
 import {
-  CredentialRequestOptions,
+  GeneratedPresentationRequest,
   generatePresentationRequest,
   verifyPresentationResponse,
 } from "../packages/server/src/index.ts";
 
-let currentOptions: CredentialRequestOptions;
+let currentRequest: GeneratedPresentationRequest;
 
 const app = new Hono();
 
@@ -19,8 +19,9 @@ app.get("/options", async (ctx) => {
     credentialOptions: {
       format: "mdl",
       desiredClaims: ["family_name", "given_name"],
-      requestOrigin: "http://localhost:8000",
     },
+    requestOrigin: "http://localhost:8000",
+    encryptResponse: false,
   });
 
   const sdjwtOptions = await generatePresentationRequest({
@@ -28,21 +29,23 @@ app.get("/options", async (ctx) => {
       format: "sd-jwt",
       acceptedVCTValues: ["urn:eu.europa.ec.eudi:pid:1"],
       desiredClaims: ["family_name", "given_name"],
-      requestOrigin: "http://localhost:8000",
     },
+    requestOrigin: "http://localhost:8000",
+    encryptResponse: true,
   });
 
   /**
    * Toggle between these to test either format (until both can be included in one DC API call)
    */
-  // const options = mdlOptions;
-  const options = sdjwtOptions;
+  // const _options = mdlOptions;
+  const _options = sdjwtOptions;
+  const { dcapiOptions, requestMetadata } = _options;
 
-  console.log(JSON.stringify(options, null, 2));
+  console.log(JSON.stringify(_options, null, 2));
 
-  currentOptions = options;
+  currentRequest = _options;
 
-  return ctx.json(options);
+  return ctx.json(dcapiOptions);
 });
 
 app.post("/verify", async (ctx) => {
@@ -53,7 +56,7 @@ app.post("/verify", async (ctx) => {
 
   const verified = await verifyPresentationResponse({
     response: JSON.parse(body),
-    options: currentOptions,
+    request: currentRequest,
   });
 
   console.log("verified claims:\n", JSON.stringify(verified, null, 2));
