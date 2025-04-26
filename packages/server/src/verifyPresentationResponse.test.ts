@@ -70,7 +70,7 @@ Deno.test('should error on bad `vp_token` entries', async () => {
   assertEquals(rejected.code, 'InvalidDCAPIResponse');
   assertEquals(
     rejected.message,
-    'Object `response.vp_token` contained non-base64url-encoded entries',
+    'Object `response.vp_token` contained non-string entries',
   );
 });
 

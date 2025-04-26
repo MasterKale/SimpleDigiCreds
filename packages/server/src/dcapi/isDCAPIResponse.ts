@@ -27,7 +27,7 @@ export function isDCAPIResponse(data: object): data is DCAPIResponse {
   if (!entriesValid) {
     throw new SimpleDigiCredsError({
       code: 'InvalidDCAPIResponse',
-      message: 'Object `response.vp_token` contained non-base64url-encoded entries',
+      message: 'Object `response.vp_token` contained non-string entries',
     });
   }
 
