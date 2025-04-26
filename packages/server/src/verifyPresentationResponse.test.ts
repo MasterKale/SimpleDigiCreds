@@ -34,7 +34,10 @@ const request: GeneratedPresentationRequest = {
       ],
     },
   },
-  requestMetadata: {},
+  requestMetadata: {
+    requestOrigin: 'http://localhost:8000',
+    clientID: 'web-origin:http://localhost:8000',
+  },
 };
 
 Deno.test('should error on missing `vp_token`', async () => {
@@ -97,7 +100,10 @@ Deno.test('should verify a well-formed mdoc presentation', async () => {
         ],
       },
     },
-    requestMetadata: {},
+    requestMetadata: {
+      requestOrigin: 'http://localhost:8000',
+      clientID: 'web-origin:http://localhost:8000',
+    },
   };
 
   const response: DCAPIResponse = {
@@ -162,7 +168,10 @@ Deno.test('should verify a well-formed SD-JWT presentation', async () => {
         ],
       },
     },
-    requestMetadata: {},
+    requestMetadata: {
+      requestOrigin: 'http://localhost:8000',
+      clientID: 'web-origin:http://localhost:8000',
+    },
   };
 
   const response: DCAPIResponse = {

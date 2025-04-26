@@ -46,10 +46,11 @@ export async function verifyPresentationResponse({ response, request }: {
       }
 
       if (isMdocPresentation(requestedCred)) {
-        const verifiedCredential = await verifyMDLPresentation(
-          matchingPresentation,
-          request.data,
-        );
+        const verifiedCredential = await verifyMDLPresentation({
+          presentation: matchingPresentation,
+          request: request.data,
+          requestMetadata,
+        });
 
         verifiedValues[id] = verifiedCredential;
       } else if (isSDJWTPresentation(requestedCred)) {
@@ -57,6 +58,7 @@ export async function verifyPresentationResponse({ response, request }: {
           presentation: matchingPresentation,
           matchingCredentialQuery: requestedCred,
           request: request.data,
+          requestMetadata,
         });
 
         verifiedValues[id] = verifiedCredential;

@@ -34,7 +34,13 @@ Deno.test('should generate OID4VP-specific session transcript', async () => {
     },
   };
 
-  const sessionTranscript = await generateSessionTranscript(options.digital.requests[0].data);
+  const sessionTranscript = await generateSessionTranscript(
+    options.digital.requests[0].data,
+    {
+      requestOrigin: 'http://localhost:8000',
+      clientID: 'web-origin:http://localhost:8000',
+    },
+  );
 
   assertEquals(
     sessionTranscript,

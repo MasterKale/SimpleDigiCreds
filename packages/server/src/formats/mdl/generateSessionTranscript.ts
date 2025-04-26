@@ -2,7 +2,7 @@ import { encodeCBOR } from '@levischuck/tiny-cbor';
 
 import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
 import type { DCAPIOID4VPSessionTranscript } from './types.ts';
-import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
+import type { GeneratedPresentationRequestMetadata } from '../../generatePresentationRequest.ts';
 
 /**
  * See OID4VP for SessionTranscript composition:
@@ -10,6 +10,7 @@ import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
  */
 export async function generateSessionTranscript(
   request: DCAPIRequestOID4VP,
+  requestMetadata: GeneratedPresentationRequestMetadata,
 ): Promise<DCAPIOID4VPSessionTranscript> {
   type OpenID4VPDCAPIHandoverInfo = [
     origin: string,
@@ -17,19 +18,9 @@ export async function generateSessionTranscript(
     nonce: string,
   ];
 
-  // Get the origin out of "web-origin:http://localhost:8000"
-  const clientIDParts = request.client_id.match(/web-origin:(?<origin>.*)/i);
-
-  if (!clientIDParts?.groups?.origin) {
-    throw new SimpleDigiCredsError({
-      message: `Could not find an origin in client ID "${request.client_id}"`,
-      code: 'MdocVerificationError',
-    });
-  }
-
   const handoverInfo: OpenID4VPDCAPIHandoverInfo = [
-    clientIDParts.groups.origin,
-    request.client_id,
+    requestMetadata.requestOrigin,
+    requestMetadata.clientID,
     request.nonce,
   ];
 

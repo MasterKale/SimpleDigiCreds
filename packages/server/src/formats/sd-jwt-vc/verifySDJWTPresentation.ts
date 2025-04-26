@@ -6,6 +6,7 @@ import { SimpleDigiCredsError } from '../../helpers/index.ts';
 import type { VerifiedClaimsMap, VerifiedCredential } from '../../helpers/types.ts';
 import type { OID4VPCredentialQuerySDJWT } from '../../protocols/oid4vp/types.ts';
 import type { DCAPIRequestOID4VP } from '../../dcapi.ts';
+import type { GeneratedPresentationRequestMetadata } from '../../generatePresentationRequest.ts';
 import { hashSDJWTVCData } from './hashSDJWTVCData.ts';
 import { getIssuerVerifier } from './getIssuerSignedVerifiers.ts';
 import { getKeyBindingVerifier } from './getKeyBindingVerifier.ts';
@@ -19,10 +20,12 @@ export async function verifySDJWTPresentation({
   presentation,
   matchingCredentialQuery,
   request: dcapiRequestData,
+  requestMetadata,
 }: {
   presentation: string;
   matchingCredentialQuery: OID4VPCredentialQuerySDJWT;
   request: DCAPIRequestOID4VP;
+  requestMetadata: GeneratedPresentationRequestMetadata;
 }): Promise<VerifiedCredential> {
   let decoded: DecodedSDJwt;
   try {
@@ -104,7 +107,7 @@ export async function verifySDJWTPresentation({
     // Verify the claims in the Key Binding JWT
     assertKeyBindingJWTClaims({
       payload: verified.kb.payload,
-      expectedClientID: dcapiRequestData.client_id,
+      expectedClientID: requestMetadata.clientID,
       expectedNonce: dcapiRequestData.nonce,
     });
   }

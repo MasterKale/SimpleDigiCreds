@@ -12,10 +12,12 @@ import type {
 } from './types.ts';
 import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
 import type { Uint8Array_ } from '../../helpers/types.ts';
+import { GeneratedPresentationRequestMetadata } from '../../generatePresentationRequest.ts';
 
 export async function verifyDeviceSigned(
   document: DecodedDocument,
   request: DCAPIRequestOID4VP,
+  requestMetadata: GeneratedPresentationRequestMetadata,
 ): Promise<VerifiedDeviceSigned> {
   const issuerSigned = document.get('issuerSigned');
   const deviceSigned = document.get('deviceSigned');
@@ -51,7 +53,7 @@ export async function verifyDeviceSigned(
     });
   }
 
-  const sessionTranscript = await generateSessionTranscript(request);
+  const sessionTranscript = await generateSessionTranscript(request, requestMetadata);
 
   const deviceSignedNameSpaces = deviceSigned.get('nameSpaces');
 
