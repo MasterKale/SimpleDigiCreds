@@ -31,7 +31,6 @@ app.get("/options", async (ctx) => {
       acceptedVCTValues: ["urn:eu.europa.ec.eudi:pid:1"],
     },
     requestOrigin: "http://localhost:8000",
-    encryptResponse: true,
   });
 
   /**
