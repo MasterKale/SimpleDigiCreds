@@ -14,10 +14,13 @@ import type {
 /**
  * Generate an OID4VP credential presentation request usable with the Digital Credentials API
  */
-export function generateOID4VPRequest(
+export async function generateOID4VPRequest(
   credentialOptions: OID4VPMDLCredentialOptions | OID4VPSDJWTCredentialOptions,
   encryptResponse: boolean,
-): DigitalCredentialRequest {
+): Promise<{
+  request: DigitalCredentialRequest;
+  privateKeyJWK?: JsonWebKey;
+}> {
   const { format, desiredClaims, requestOrigin } = credentialOptions;
 
   let credentialQuery: OID4VPCredentialQueryMdoc | OID4VPCredentialQuerySDJWT;
@@ -39,7 +42,7 @@ export function generateOID4VPRequest(
     });
   }
 
-  let toReturn: DigitalCredentialRequest = {
+  let request: DigitalCredentialRequest = {
     // https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#name-protocol
     protocol: 'openid4vp',
     data: {
@@ -53,14 +56,15 @@ export function generateOID4VPRequest(
   };
 
   if (clientMetadata) {
-    toReturn.data.client_metadata = clientMetadata;
+    request.data.client_metadata = clientMetadata;
   }
 
+  let privateKeyJWK: JsonWebKey | undefined = undefined;
   if (encryptResponse) {
-    toReturn = modifyRequestToEncryptResponse(toReturn);
+    ({ request: request, privateKeyJWK } = await modifyRequestToEncryptResponse(request));
   }
 
-  return toReturn;
+  return { request, privateKeyJWK };
 }
 
 export type OID4VPMDLCredentialOptions = {

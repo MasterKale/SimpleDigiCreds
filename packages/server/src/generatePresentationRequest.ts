@@ -17,19 +17,20 @@ import {
  * - ISO 18013-5 mdoc (mDL)
  * - SD-JWT-VC
  */
-export function generatePresentationRequest({
+export async function generatePresentationRequest({
   credentialOptions,
   protocol = 'openid4vp',
   encryptResponse = false,
-}: PresentationOptions): CredentialRequestOptions {
+}: PresentationOptions): Promise<PresentationRequest> {
   let request: DigitalCredentialRequest;
+  let privateKeyJWK: JsonWebKey | undefined = undefined;
 
   /**
    * I'd love to be able to include multiple requests in different protocols, but alas, the
    * DC API does not yet support this.
    */
   if (protocol === 'openid4vp') {
-    request = generateOID4VPRequest(credentialOptions, encryptResponse);
+    ({ request, privateKeyJWK } = await generateOID4VPRequest(credentialOptions, encryptResponse));
   } else {
     throw new SimpleDigiCredsError({
       message: `Unsupported presentation protocol "${protocol}"`,
@@ -38,9 +39,12 @@ export function generatePresentationRequest({
   }
 
   return {
-    digital: {
-      requests: [request],
+    dcapiOptions: {
+      digital: {
+        requests: [request],
+      },
     },
+    requestMetadata: { privateKeyJWK },
   };
 }
 
@@ -48,4 +52,11 @@ export type PresentationOptions = {
   credentialOptions: OID4VPMDLCredentialOptions | OID4VPSDJWTCredentialOptions;
   protocol?: 'openid4vp';
   encryptResponse?: boolean;
+};
+
+export type PresentationRequest = {
+  dcapiOptions: CredentialRequestOptions;
+  requestMetadata: {
+    privateKeyJWK?: JsonWebKey;
+  };
 };

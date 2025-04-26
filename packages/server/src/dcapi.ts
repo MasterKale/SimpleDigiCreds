@@ -30,8 +30,8 @@ export type DigitalCredentialRequest = {
 export type DCAPIRequestOID4VP = {
   /** The value `"vp_token"` */
   response_type: 'vp_token';
-  /** The value `"dc_api"` */
-  response_mode: 'dc_api';
+  /** The value `"dc_api"` (when unsigned and unencrypted) or `"dc_api.jwt"` (when signed or encrypted) */
+  response_mode: 'dc_api' | 'dc_api.jwt';
   /** Ex: `"web-origin:https://example.com"` */
   client_id: string;
   /** Base64URL-encoded random bytes to ensure uniqueness of the presentation */
