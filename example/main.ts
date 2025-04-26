@@ -28,7 +28,7 @@ app.get("/options", async (ctx) => {
     credentialOptions: {
       format: "sd-jwt-vc",
       desiredClaims: ["family_name", "given_name"],
-      acceptedVCTValues: ["urn:eu.europa.ec.eudi:pid:1"],
+      acceptedVCTValues: ["urn:eu.europa.ec.eudi:pid:1", "urn:eudi:pid:1"],
     },
     requestOrigin: "http://localhost:8000",
   });
