@@ -69,3 +69,11 @@ export type DCAPIRequestOID4VPSDJWTVC = DCAPIRequestOID4VP & {
 export type DCAPIResponse = {
   vp_token: { [key: string]: string };
 };
+
+/**
+ * The shape of the value returned from a call to `navigator.credentials.get({ digital: { ... } })`
+ * when the response is an encrypted JWT (JWE)
+ */
+export type DCAPIEncryptedResponse = {
+  response: string;
+};
