@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.3.0
+
+- **[server]** Supports encrypted responses by default
+  ([#14](https://github.com/MasterKale/SimpleDigiCreds/pull/14))
+
 ## v0.2.1
 
 - **[server]** Change CBOR library source from JSR to NPM
