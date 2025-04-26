@@ -28,7 +28,7 @@ export async function generateOID4VPRequest(
 
   if (format === 'mdl') {
     ({ credentialQuery } = generateMDLRequestOptions({ id: 'cred1', desiredClaims }));
-  } else if (format === 'sd-jwt') {
+  } else if (format === 'sd-jwt-vc') {
     const { acceptedVCTValues } = credentialOptions;
     ({ credentialQuery, clientMetadata } = generateSDJWTRequestOptions({
       id: 'cred1',
@@ -74,7 +74,7 @@ export type OID4VPMDLCredentialOptions = {
 };
 
 export type OID4VPSDJWTCredentialOptions = {
-  format: 'sd-jwt';
+  format: 'sd-jwt-vc';
   desiredClaims: string[];
   acceptedVCTValues?: string[];
 };

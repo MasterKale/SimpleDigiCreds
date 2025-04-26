@@ -65,7 +65,7 @@ Deno.test('Should generate SD-JWT-VC options', async () => {
 
   const options = await generatePresentationRequest({
     credentialOptions: {
-      format: 'sd-jwt',
+      format: 'sd-jwt-vc',
       desiredClaims: ['family_name', 'given_name', 'age_over_21'],
       acceptedVCTValues: ['urn:eu.europa.ec.eudi:pid:1'],
     },
@@ -120,7 +120,7 @@ Deno.test('Should generate SD-JWT-VC options', async () => {
 Deno.test('Should generate options set up to encrypt response', async () => {
   const { dcapiOptions, requestMetadata } = await generatePresentationRequest({
     credentialOptions: {
-      format: 'sd-jwt',
+      format: 'sd-jwt-vc',
       desiredClaims: ['family_name', 'given_name', 'age_over_21'],
     },
     requestOrigin: 'https://digital-credentials.dev',
