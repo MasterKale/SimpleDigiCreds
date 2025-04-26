@@ -11,16 +11,16 @@ import {
  * `navigator.credentials.get()` as per the Digital Credentials API.
  *
  * Supported Protocols:
- * - OID4VP
+ * - OID4VP (`"oid4vp"`)
  *
  * Supported Document Formats:
- * - ISO 18013-5 mdoc (mDL)
- * - SD-JWT-VC
+ * - ISO 18013-5 mDL (`"mdl"`)
+ * - IETF SD-JWT-VC (`"sd-jwt-vc"`)
  */
 export async function generatePresentationRequest({
   credentialOptions,
   requestOrigin,
-  protocol = 'openid4vp',
+  protocol = 'oid4vp',
   encryptResponse = true,
 }: PresentationRequestOptions): Promise<GeneratedPresentationRequest> {
   let request: DigitalCredentialRequest;
@@ -30,7 +30,7 @@ export async function generatePresentationRequest({
    * I'd love to be able to include multiple requests in different protocols, but alas, the
    * DC API does not yet support this.
    */
-  if (protocol === 'openid4vp') {
+  if (protocol === 'oid4vp') {
     ({ request, privateKeyJWK } = await generateOID4VPRequest(credentialOptions, encryptResponse));
   } else {
     throw new SimpleDigiCredsError({
@@ -58,7 +58,7 @@ export async function generatePresentationRequest({
 export type PresentationRequestOptions = {
   credentialOptions: OID4VPMDLCredentialOptions | OID4VPSDJWTCredentialOptions;
   requestOrigin: string;
-  protocol?: 'openid4vp';
+  protocol?: 'oid4vp';
   encryptResponse?: boolean;
 };
 
