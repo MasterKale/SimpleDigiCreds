@@ -55,7 +55,7 @@ app.post("/verify", async (ctx) => {
   console.log(typeof body);
 
   const verified = await verifyPresentationResponse({
-    response: JSON.parse(body),
+    response: body,
     request: currentRequest,
   });
 
