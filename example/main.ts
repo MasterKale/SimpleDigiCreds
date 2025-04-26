@@ -52,10 +52,9 @@ app.post("/verify", async (ctx) => {
   const body = await ctx.req.json();
 
   console.log("verifying presentation", body);
-  console.log(typeof body);
 
   const verified = await verifyPresentationResponse({
-    response: body,
+    data: body,
     request: currentRequest,
   });
 
