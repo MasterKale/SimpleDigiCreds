@@ -8,20 +8,48 @@ import { verifySDJWTPresentation } from './formats/sd-jwt-vc/index.ts';
 import { isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
 import type { VerifiedPresentation } from './helpers/types.ts';
 import type { GeneratedPresentationRequest } from './generatePresentationRequest.ts';
+import type { DCAPIEncryptedResponse, DCAPIResponse } from './dcapi/types.ts';
+import { isEncryptedDCAPIResponse } from './dcapi/isEncryptedDCAPIResponse.ts';
+import { decryptDCAPIResponse } from './dcapi/decryptDCAPIResponse.ts';
 
 /**
  * Verify and return a credential presentation out of a call to the Digital Credentials API
  */
-export async function verifyPresentationResponse({ response, request }: {
-  response: unknown;
+export async function verifyPresentationResponse({ data, request }: {
+  data: DCAPIResponse | DCAPIEncryptedResponse;
   request: GeneratedPresentationRequest;
 }): Promise<VerifiedPresentation> {
   const { dcapiOptions, requestMetadata } = request;
   const verifiedValues: VerifiedPresentation = {};
 
-  if (!isDCAPIResponse(response)) {
+  if (data === null || typeof data !== 'object') {
     throw new SimpleDigiCredsError({
-      message: 'Response was not the expected shape',
+      code: 'InvalidDCAPIResponse',
+      message: `data was type ${typeof data}, not an object`,
+    });
+  }
+
+  /**
+   * Presence of a private key JWK in the request metadata indicates that the response should be
+   * encrypted.
+   */
+  if (request.requestMetadata.privateKeyJWK) {
+    if (!isEncryptedDCAPIResponse(data)) {
+      throw new SimpleDigiCredsError({
+        message: 'Response did not appear to be encrypted JWT',
+        code: 'InvalidDCAPIResponse',
+      });
+    }
+
+    data = await decryptDCAPIResponse(
+      data.response,
+      request.requestMetadata.privateKeyJWK,
+    ) as DCAPIResponse;
+  }
+
+  if (!isDCAPIResponse(data)) {
+    throw new SimpleDigiCredsError({
+      message: 'data was not the expected shape',
       code: 'InvalidDCAPIResponse',
     });
   }
@@ -38,7 +66,7 @@ export async function verifyPresentationResponse({ response, request }: {
         issuerMeta: {},
       };
 
-      const matchingPresentation = response.vp_token[id];
+      const matchingPresentation = data.vp_token[id];
 
       if (!matchingPresentation) {
         console.warn(`could not find matching response for cred id "${id}", skipping`);
