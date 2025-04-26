@@ -1,5 +1,4 @@
 import { assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
-import * as jose from 'jose';
 
 import type { DCAPIEncryptedResponse, DCAPIResponse } from './dcapi/types.ts';
 import type { GeneratedPresentationRequest } from './generatePresentationRequest.ts';

@@ -8,7 +8,7 @@ import { verifyNameSpaces } from './verifyNameSpaces.ts';
 // import { convertX509BufferToPEM } from '../../helpers/x509/index.ts';
 import { base64url, SimpleDigiCredsError } from '../../helpers/index.ts';
 import type { VerifiedClaimsMap, VerifiedCredential } from '../../helpers/types.ts';
-import { GeneratedPresentationRequestMetadata } from '../../generatePresentationRequest.ts';
+import type { GeneratedPresentationRequestMetadata } from '../../generatePresentationRequest.ts';
 
 /**
  * Verify an mdoc presentation as returned through the DC API

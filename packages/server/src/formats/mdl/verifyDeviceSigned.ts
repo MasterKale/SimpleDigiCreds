@@ -12,7 +12,7 @@ import type {
 } from './types.ts';
 import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
 import type { Uint8Array_ } from '../../helpers/types.ts';
-import { GeneratedPresentationRequestMetadata } from '../../generatePresentationRequest.ts';
+import type { GeneratedPresentationRequestMetadata } from '../../generatePresentationRequest.ts';
 
 export async function verifyDeviceSigned(
   document: DecodedDocument,
