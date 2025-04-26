@@ -167,7 +167,8 @@ export type OID4VPClientMetadata = {
    * > unspecified, the default algorithm to use for signing authorization responses is `RS256`.
    * > The algorithm `none` is not allowed._
    */
-  authorization_signed_response_alg?: JWSALG;
+  // TODO: Uncomment when we support request signing
+  // authorization_signed_response_alg?: JWSALG;
   /**
    * From https://openid.net/specs/oauth-v2-jarm-final.html#section-3-3.4.1:
    *
@@ -192,7 +193,8 @@ export type OID4VPClientMetadata = {
  * JWS [RFC7515] `alg` algorithms. Recommended+ values. See
  * https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-algorithms
  */
-type JWSALG = 'ECDH-ES' | 'RSA-OAEP' | 'ES256';
+// Uncomment when we support request signing
+// type JWSALG = 'ECDH-ES' | 'RSA-OAEP' | 'ES256';
 
 /**
  * JWE [RFC7516] `alg` algorithms. Required and Recommended+ values. See
