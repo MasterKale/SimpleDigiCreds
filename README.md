@@ -1,16 +1,25 @@
 # SimpleDigiCreds <!-- omit in toc -->
 
+- [Disclaimer](#disclaimer)
 - [Overview](#overview)
 - [Installation](#installation)
+- [Supported Features](#supported-features)
+  - [OID4VP - All doc formats](#oid4vp---all-doc-formats)
+  - [OID4VP - SD-JWT-VC](#oid4vp---sd-jwt-vc)
 - [Contributions](#contributions)
 - [Example Site](#example-site)
 - [Development](#development)
 
+## Disclaimer
+
+**THIS PROJECT IS A WIP RIGHT NOW! THE CORE API MAY CHANGE MORE QUICKLY THAN YOU LIKE!**
+
 ## Overview
 
-This project makes it easier to combine **OID4VP (draft 24) + mdoc** for meaningful identity
-proofing via the [Digital Credentials API](https://w3c-fedid.github.io/digital-credentials/). The
-following packages are maintained here to achieve this:
+This project makes it easier to request presentations of **ISO 18013-5 mDL** and **IETF SD-JWT-VC**
+digital credentials using **OID4VP (draft 24)** via the
+[Digital Credentials API](https://w3c-fedid.github.io/digital-credentials/). The following packages
+are maintained here to achieve this:
 
 - [@simpledigicreds/browser](https://github.com/MasterKale/SimpleDigiCreds/tree/main/packages/browser)
 - [@simpledigicreds/server](https://github.com/MasterKale/SimpleDigiCreds/tree/main/packages/server)
@@ -22,6 +31,19 @@ and **[JSR](https://jsr.io/@simpledigicreds)** in **Node LTS 22.x and higher**, 
 higher** projects, and other compatible runtimes (Cloudflare Workers, Bun, etc...)
 
 See the packages' READMEs for more specific installation information.
+
+## Supported Features
+
+### OID4VP - All doc formats
+
+- Unencrypted requests
+- Unencrypted responses
+- Encrypted responses (following
+  [OID4VC HAIP](https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0-03.html#section-6))
+
+### OID4VP - SD-JWT-VC
+
+- Key binding verification
 
 ## Contributions
 
