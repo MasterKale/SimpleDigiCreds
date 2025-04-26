@@ -23,8 +23,10 @@ export function assertKeyBindingJWTClaims({
   const currentDatePlus1Second = new Date(currentDate.getTime() + 1000);
 
   if (issuedAtDate > currentDatePlus1Second) {
+    const iatISO = issuedAtDate.toISOString();
+    const currentISO = currentDatePlus1Second.toISOString();
     throw new SimpleDigiCredsError({
-      message: 'Key Binding JWT was issued in the future',
+      message: `Key Binding JWT was issued at (${iatISO}), after the current date (${currentISO})`,
       code: 'SDJWTVerificationError',
     });
   }
