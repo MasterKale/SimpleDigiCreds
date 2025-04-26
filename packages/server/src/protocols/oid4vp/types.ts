@@ -154,7 +154,9 @@ export type OID4VPSupportedMdocClaimName = Exclude<Identifier, 'age_over_NN'> | 
  * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#section-5.1-4.2.1
  */
 export type OID4VPClientMetadata = {
-  jwks?: JsonWebKey;
+  jwks?: {
+    keys: JsonWebKey[];
+  };
   /**
    * The shape of this depends on the type of credential being requested
    */
