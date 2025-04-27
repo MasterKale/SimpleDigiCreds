@@ -9,14 +9,12 @@ import type { OID4VPCredentialQueryMdoc } from './types.ts';
  */
 export function generateMdocRequestOptions({
   id,
-  desiredClaims,
   doctype,
-  claimPathPrefix,
+  claimPaths,
 }: {
   id: string;
-  desiredClaims: string[];
   doctype: string;
-  claimPathPrefix: string;
+  claimPaths: string[][];
 }): {
   credentialQuery: OID4VPCredentialQueryMdoc;
 } {
@@ -27,9 +25,7 @@ export function generateMdocRequestOptions({
       meta: {
         doctype_value: doctype,
       },
-      claims: desiredClaims.map((claimName) => ({
-        path: [claimPathPrefix, claimName],
-      })),
+      claims: claimPaths.map((path) => ({ path })),
     },
   };
 }
