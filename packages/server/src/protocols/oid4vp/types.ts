@@ -1,4 +1,4 @@
-import type { Identifier } from '../../formats/mdl/types.ts';
+import type { Identifier } from '../../formats/mdoc/types.ts';
 
 /**
  * OID4VP: Protocol for requesting documents
@@ -84,13 +84,18 @@ export type OID4VPCredentialQuery = {
   claims?: OID4VPClaimQuery[];
 };
 
-/** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#name-mobile-documents-or-mdocs-i */
-export type OID4VPCredentialQueryMDL = OID4VPCredentialQuery & {
+export type OID4VPCredentialQueryMdoc = OID4VPCredentialQuery & {
   /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3-2 */
   format: 'mso_mdoc';
   /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3.1.1-2.2 */
-  meta: { doctype_value: 'org.iso.18013.5.1.mDL' };
+  meta: { doctype_value: string };
   claims: OID4VPClaimQueryMdoc[];
+};
+
+/** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#name-mobile-documents-or-mdocs-i */
+export type OID4VPCredentialQueryMDL = OID4VPCredentialQueryMdoc & {
+  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3.1.1-2.2 */
+  meta: { doctype_value: 'org.iso.18013.5.1.mDL' };
 };
 
 /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.4 */
@@ -147,7 +152,7 @@ export type PathPointer = string[];
 /**
  * Valid mdoc identifiers that can be used in an OID4VP request as a value for `claim_name`
  */
-export type OID4VPSupportedMdocClaimName = Exclude<Identifier, 'age_over_NN'> | 'age_over_21';
+export type OID4VPSupportedMDLClaimName = Exclude<Identifier, 'age_over_NN'> | 'age_over_21';
 
 /**
  * Verifier metadata values. See

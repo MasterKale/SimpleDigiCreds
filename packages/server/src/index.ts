@@ -17,11 +17,11 @@ export type {
   OID4VPClaimQueryMdoc,
   OID4VPCredentialQuery,
   OID4VPCredentialQueryMDL,
-  OID4VPSupportedMdocClaimName,
+  OID4VPSupportedMDLClaimName as OID4VPSupportedMdocClaimName,
   PathPointer,
 } from './protocols/oid4vp/types.ts';
 
-export type { DocumentTypeMDLv1, Identifier, NamespaceMDLv1 } from './formats/mdl/types.ts';
+export type { DocumentTypeMDLv1, Identifier, NamespaceMDLv1 } from './formats/mdoc/types.ts';
 export type {
   IssuerSignedJWTPayload,
   SDJWTHeader,

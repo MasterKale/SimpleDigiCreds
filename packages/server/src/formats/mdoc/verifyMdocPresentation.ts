@@ -13,7 +13,7 @@ import type { GeneratedPresentationRequestMetadata } from '../../generatePresent
 /**
  * Verify an mdoc presentation as returned through the DC API
  */
-export async function verifyMDLPresentation({
+export async function verifyMDocPresentation({
   presentation,
   request,
   requestMetadata,

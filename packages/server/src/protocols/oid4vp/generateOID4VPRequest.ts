@@ -1,21 +1,25 @@
 import type { DigitalCredentialRequest } from '../../dcapi/types.ts';
 import { generateNonce } from '../../helpers/generateNonce.ts';
 import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
-import { generateMDLRequestOptions } from './generateMDLRequestOptions.ts';
+import { generateMdocRequestOptions } from './generateMdocRequestOptions.ts';
 import { generateSDJWTRequestOptions } from './generateSDJWTRequestOptions.ts';
 import { modifyRequestToEncryptResponse } from './modifyRequestToEncryptResponse.ts';
 import type {
   OID4VPClientMetadataSDJWTVC,
   OID4VPCredentialQueryMDL,
+  OID4VPCredentialQueryMdoc,
   OID4VPCredentialQuerySDJWTVC,
-  OID4VPSupportedMdocClaimName,
+  OID4VPSupportedMDLClaimName,
 } from './types.ts';
 
 /**
  * Generate an OID4VP credential presentation request usable with the Digital Credentials API
  */
 export async function generateOID4VPRequest(
-  credentialOptions: OID4VPMDLCredentialOptions | OID4VPSDJWTCredentialOptions,
+  credentialOptions:
+    | OID4VPMDLCredentialOptions
+    | OID4VPMdocCredentialOptions
+    | OID4VPSDJWTCredentialOptions,
   encryptResponse: boolean,
 ): Promise<{
   request: DigitalCredentialRequest;
@@ -23,11 +27,26 @@ export async function generateOID4VPRequest(
 }> {
   const { format, desiredClaims } = credentialOptions;
 
-  let credentialQuery: OID4VPCredentialQueryMDL | OID4VPCredentialQuerySDJWTVC;
+  let credentialQuery:
+    | OID4VPCredentialQueryMdoc
+    | OID4VPCredentialQueryMDL
+    | OID4VPCredentialQuerySDJWTVC;
   let clientMetadata: OID4VPClientMetadataSDJWTVC | undefined = undefined;
 
   if (format === 'mdl') {
-    ({ credentialQuery } = generateMDLRequestOptions({ id: 'cred1', desiredClaims }));
+    ({ credentialQuery } = generateMdocRequestOptions({
+      id: 'cred1',
+      doctype: 'org.iso.18013.5.1.mDL',
+      claimPathPrefix: 'org.iso.18013.5.1',
+      desiredClaims,
+    }));
+  } else if (format === 'mdoc') {
+    ({ credentialQuery } = generateMdocRequestOptions({
+      id: 'cred1',
+      doctype: credentialOptions.doctype,
+      claimPathPrefix: credentialOptions.claimPathPrefix,
+      desiredClaims,
+    }));
   } else if (format === 'sd-jwt-vc') {
     const { acceptedVCTValues } = credentialOptions;
     ({ credentialQuery, clientMetadata } = generateSDJWTRequestOptions({
@@ -70,7 +89,14 @@ export async function generateOID4VPRequest(
 
 export type OID4VPMDLCredentialOptions = {
   format: 'mdl';
-  desiredClaims: OID4VPSupportedMdocClaimName[];
+  desiredClaims: OID4VPSupportedMDLClaimName[];
+};
+
+export type OID4VPMdocCredentialOptions = {
+  format: 'mdoc';
+  doctype: string;
+  claimPathPrefix: string;
+  desiredClaims: string[];
 };
 
 export type OID4VPSDJWTCredentialOptions = {
