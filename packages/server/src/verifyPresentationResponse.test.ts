@@ -1,4 +1,4 @@
-import { assertEquals, assertInstanceOf, assertRejects } from '@std/assert';
+import { assertEquals, assertExists, assertInstanceOf, assertRejects } from '@std/assert';
 
 import type { DCAPIEncryptedResponse, DCAPIResponse } from './dcapi/types.ts';
 import type { GeneratedPresentationRequest } from './generatePresentationRequest.ts';
@@ -289,4 +289,76 @@ Deno.test('should verify an encrypted SD-JWT presentation', async () => {
       },
     },
   );
+});
+
+Deno.test('should return all claims from a heterogenous mdoc presentation', async () => {
+  const _request: GeneratedPresentationRequest = {
+    dcapiOptions: {
+      digital: {
+        requests: [
+          {
+            protocol: 'openid4vp',
+            data: {
+              response_type: 'vp_token',
+              response_mode: 'dc_api.jwt',
+              nonce: 'OMQiYIhGDcsY_FFBrD-ysECe2mJCH4OVZBkb0Cb6taU',
+              dcql_query: {
+                credentials: [
+                  {
+                    id: 'cred1',
+                    format: 'mso_mdoc',
+                    meta: { doctype_value: 'org.iso.7367.1.mVRC' },
+                    claims: [
+                      { path: ['org.iso.23220.1', 'issue_date'] },
+                      { path: ['org.iso.23220.1', 'issuing_authority_unicode'] },
+                      { path: ['org.iso.7367.1', 'vehicle_holder'] },
+                      { path: ['org.iso.7367.1', 'registration_number'] },
+                    ],
+                  },
+                ],
+              },
+              client_metadata: {
+                jwks: {
+                  keys: [
+                    {
+                      kty: 'EC',
+                      crv: 'P-256',
+                      x: 'sBo1cKraLaOnbPNG2LL_m1l1cKO19zL4fy4W6ZAFiUo',
+                      y: 'pDDVJwOa2uci_R7vk9v6iDBKJTAWO7C60X3UNnN9Msc',
+                    },
+                  ],
+                },
+                authorization_encrypted_response_alg: 'ECDH-ES',
+                authorization_encrypted_response_enc: 'A128GCM',
+              },
+            },
+          },
+        ],
+      },
+    },
+    requestMetadata: {
+      requestOrigin: 'http://localhost:8000',
+      privateKeyJWK: {
+        kty: 'EC',
+        crv: 'P-256',
+        x: 'sBo1cKraLaOnbPNG2LL_m1l1cKO19zL4fy4W6ZAFiUo',
+        y: 'pDDVJwOa2uci_R7vk9v6iDBKJTAWO7C60X3UNnN9Msc',
+        d: 'Tqz2SJFK5O8f1m4BvjBjGTFTROfkd9vAZyq1LGqflcA',
+      },
+      clientID: 'web-origin:http://localhost:8000',
+    },
+  };
+
+  const data: DCAPIEncryptedResponse = {
+    response:
+      'eyJhcHUiOiIiLCJhcHYiOiIiLCJhbGciOiJFQ0RILUVTIiwiZW5jIjoiQTEyOEdDTSIsImVwayI6eyJrdHkiOiJFQyIsImNydiI6IlAtMjU2IiwieCI6InNJTkpEdnZnRGlOc1U1MGJMcEluQ0JTYjFhcHUzXy03N0hEYUZrRlRwQlUiLCJ5IjoiUDljamlJY2lDc21jSl9janVJVXF6TktIWXYyYWpnSEVBM2U4YkNWZHdwcyJ9fQ..O2rFA74T2a1Rr5rD.tdnW8SJn0bmK1oKtIt-BVZUtOUrf5jNDH8qZlPE7US2ZPrsuLiHP9WQ8yOUFlVvZQU9psf4t3RP4utnMOcWhqbGWgXKiNk6mVB08LVAxguGuu0HdugwvDTB6y-ScmLOJHjlCihm5bamYAW4ksYptx0Dd2Ez4nuAkRZbKyW0A8uGSN3VWExe6vfvCSRaj9PEVB6yO_uTaYrSU1TS--u45CJgpALS0FyuueY9ryew8zKCHmGbfziA7em5bCM4rj3HhBhoigU1CCMKrT6mE_EnXU44NzCzp6X2Ta3VXXs396jquPXwq4Qs9N5EbivoSNvpBdA0p20QifxXuYAHpMgW6vTlld4ErIkxcXDnyuosE7l3BfPSoD5sAWSwoTBx6FEMCYtulwkWqZMRxas82Kt14PKunYiW22jJMDnaMWs3UPr5QjPXEU6Damjbmh5ycinjO6mxf6kOxmBO4Anu6ODT7Gtj0760weP5q3kPAbutfJrVLVPIf33TT3cybaPeWUBOTteN2SQiFb5Yl-wJoEgpJI7Yk-25XtUNwA56-u-PLI8aZ7XOtaUoLHxHnufkGE7Gq2kKIiXADgjpXI8bo3AwyEiZjw9p9grJh9ZfKfJGnx_gzXl1L3zk7zMj95VlVU0TPQ0fCQL_5vp1U77Fo-Z_BehRNKsyo1rGMIs_8E1Fj1j0dDq8fOo7RJW5SdHCt7M2cz1Em7DP0fMUJBWT6ZkxioYeidJDgT5iniGskeTuvJKo2DoT09GFxrwiB9-thH4o3cMFfIJFwaCAQeEH8T6C4QuKTiWBaWFydLpfw8zeKJe0YNTDaOYqtWoZk-Z9w-l1LshS7sv3SXhTaBtMkr30jNikDVMnB8s9JtibkriGfgfo3W3jYXFB48veW7wbfbKDGOsxZyzCQInNe2iSCaWb1xHmfOd95LKBWtqGk3Qe83_3YUXEwuvUhC19vmEiUbTEnhZHIObUKj-83Zl0ATooOkvxo3EbjWKElk7u1lHCc_hApJD7Zn6md35pOoS0OWq8n3HQ8VSC85iAf8s-E5UN2f9u70yESt9vnTgmQFphhXbMAJwEzwAgnzcT1J0jMWE-rmxqQWo44ifM-2lWQTKd-SRu8yUfsOhPSNNXvx2bZTBMd5GaRgLfrEk3r0xj4rUMXy0Daw3Bt3rQ0cZZxnFdtZYJZYevgxBKsDJH5hIGoTXWFb0IF-tlUm_NCfnmcJc20VxaKYokCtwolBPE9fm21N-Z-NHSYEklTqe_w8Oe_1mEggRV0gT6KSYiWJ7pds9AGAYoL59xGATgCOj5BROiyP8tgQboKrZu5PpeMuCLK6wnDwHFPk_KjmtA1PKqd_TJY_5QRfIu7uRbrj_B5JmTdJD_tUP7m0I3kUpttKu9z88LBY-VRCqnpVpk2GZND2dnN1ripbu1uZDfYcTMxXEJwrMbd_sIVw1pegBdF2m18__IGsr2GrFqFZUn9dSdbH34ydbrmrpTj2zM0FHpuLsWXTM9epF_yuEQWGdK-4i-eKJIc1CMMCEzmFU3KjgRb9uCZTUZ8SwLxKV7vYxq4Hf6K4nfG_foWLPZy-CAyg7gXH10e2ezaWtzjjZMvgrcuvNYSj-8kC-AIepyyDdeJ3vDZ7ff2Chy1xdwRTmkRZKLAl4TCP0unOATaKlVekWmKyYPm80X5H19u0GGL_feBV7VGelb6Mu6XTdlfq085uTvM0gT03zsdCfgn8SKhfcm9fCiDCgBUYqNLOWoJwmlq3ioAa4ADTvy3Lzcytme2xBh4GTz4HpVjHsh1FXcrVygpD-6kpN1eCi6dx1pkEANhQg1fQjVYZoradTkB3po41vUBuc6uePYueLxFkK6_aa_xfGbgMXU5AKfRRFkbO-y5m9lvJI28ec57YfsZb7gKCnbHNec3H3vd0v7DNdsEpubJ-KtzNIbr1Ugjn-AS_SVZKpk2qnJLGhnYVW2DtZVwvw1Nrfi_m9M4yXmPFWPtBehlOpnc3qQPyP52h3l3ZhpxfTKR9hClo5nAfnng4-yYeIkEor-e8pfaQtt6PxkQwukAGsZ3s0GdFWAxLm091IGQXhMeo_KBaA6h6j33V4lM0Z3EO9LT6SM3lnnk1KOg3RKSubC-jD48AXlOkj2tzyXkqGQnFDMEDhnK4vsepn_FWvrIqZ3yLjr0znoVeg-gGa0Fw2KqJEBUthK4sCE8cQYTaP4ChBrkBsPN5oaSNktqNLUgFxtQvD4eBnM-GTNKDd_ANVkyN5E01pFwHlAzqrxcPG6K65hwvJ7gUuT_wdsGNT4fRqGut21SbJoXtyOjidPgmFkW4CPISHszbBxW5KpATS1nP268NoDTecpWG9vpALP3c_hqFSXnqf1tLpuQ4O0-dnS_3gibps6RmIi6rbXLkggzCwVWJKO4cYc5xXvFXI_ybZKidn_-bY1KT4D8kMr2nx6k-A78gRYQYB0zk5M5Sj1y3tU8fUF1B27TyoV57mWHWBOTfcGLQOwqsv-y5HvrZ7YmcgZU7aLh0JOIAs12jl4h3qQVHEmhwIx2mihnti6ZTxwAasTb9ofydSxdAIySejpQ-ek-avg-z2PfENbdHhwtNy5ZjAulYZI4Hus84bWi6XBAW6GyGBuMjX8jL0UGOw_b4N1GRZbFz4COsYc8Ej3sCt6geatWcGTKdcr7Z4GbI67gaRJI4OD0gCGglN4C-Qp38VR3VHh6HeB4kAkGt-POyx1aDINOJqetYHQIvbovfuOVwT35o9-h6xfruH5-8CaAHRZ4x3K7gSSQuIW9QRcJbwnrimAWL70RehnrIfzRENh_-6sbfjJiX8GAy3P4btyytAPICpl4yJEL-8hMJHeTVIIFXtuGQvVqxmKgs8InVZpXqGFz1EPRmvujrQXZzR8Pj1XI_U1rRF7TlTJiRi9sUQARAMe163uWO-RWNx9gcyMWpfXacfIFXBOGm474QG54skIngX7oITaiT46hXB-mj8uOS6cXG_340te_BA4g-iAsU78FVqN5Eg6R1wUk2uxqz6XmlOhwt_C59mCq6SzmGhmQ-NaIXt5S6Afz7plFcCgroyvoPTtE59oHNEDXCxw-YVxN6rWmQqxXYUwFT0vAYvHomfEBjBt6O0JPu8TOrIYN6eli_9ox3w5opCEmCeusAQuSd2IQNzM7YtKAJG5rxDe12_W49ngMhwjznEw3PvIVKOieq4tYSk7YpVPeQMzCH9yVI7Rm9hNjyzf7Ojgf-gkl3Mre-NslPlMtYVDfRK1Lkyr8T-iuHeY3LEgyAkMIcQ6Mi85lIRid8GAr-dljZNVZxMwBOdxMwKvaJH_YWM17IgMHFAzzDejXYyl8gXI9Bo9zp5UZZoWZUSqP0_x39OnlIHuTORrisblKQKCYdSyCBgT9Bbi_CYaWJN6I0LsWFmMp4Wwo7i2YItIlp4KXeh2glrJvH7ohGmla43M8htafrTxUlAsj9SKm2n7pL6OkznWAr281V6pm938UTfi51-KnAaa3m6zPSJI0-h045x26Mm496_xbk7WsaKtjc8cELxJ3UHpo86SSeN4JypVvxqVrJ_EsWsesoQvZDmW1bhpBURDANKuMeTGETqWU1IS4ZO6dfT6KsTG3mmVZksYtJ4qa-RM5kV79u72Hps8rcnWj6erehckqROdkHQBFy9NS4rpKDOMViimdzD__d36Llx42T8JrEb6G5xYXLujc-Cjtw8yLgJfML7-QzFk4p6VPXvwjz6Z8gWyQDj1dPiyjaH8owRuc9zTG6CwGWAiGrZSB5ysrlBFu1ngUumup80iIhKCFX2T2ttTLo8fEMHDDNZKjEYUUoj6Z1Sqo9eTLoJbHTSUWZAdJ0VNbW1Vs7kcWBsz1-XwHYS-GM-wPaqDSfDDeli3bJbkSHgbJlo0MijK7iCHciewddESjlE0YRMeQjPX9GOOS37Oshf8-k2Ra2_0.NhIwmlgdJP0zW-kSAtDEAQ',
+  };
+
+  const verified = await verifyPresentationResponse({ data, request: _request });
+
+  assertExists(verified.cred1);
+  assertEquals(verified.cred1.claims.issue_date, '2022-01-01');
+  assertEquals(verified.cred1.claims.issuing_authority_unicode, 'DC.dev');
+  assertEquals(verified.cred1.claims.vehicle_holder, '94043');
+  assertEquals(verified.cred1.claims.registration_number, '1941000043');
 });
