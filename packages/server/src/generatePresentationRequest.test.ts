@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertExists, assertInstanceOf } from '@std/assert';
+import { assert, assertEquals, assertExists } from '@std/assert';
 import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
 import { type Stub, stub } from '@std/testing/mock';
 
@@ -145,5 +145,170 @@ describe('Method: generatePresentationRequest()', () => {
     // TODO: Verify public key in `jwks` encrypts something the private key JWKS can decrypt?
   });
 
-  it('', async () => {});
+  it('should generate a straightforward European PID mdoc request', async () => {
+    const options = await generatePresentationRequest({
+      credentialOptions: {
+        format: 'mdoc',
+        doctype: 'eu.europa.ec.eudi.pid.1',
+        claimPathPrefix: 'eu.europa.ec.eudi.pid.1',
+        desiredClaims: ['family_name', 'given_name', 'nationality'],
+      },
+      requestOrigin: 'https://digital-credentials.dev',
+    });
+
+    assertEquals(
+      options.dcapiOptions.digital.requests[0].data.dcql_query.credentials[0],
+      {
+        id: 'cred1',
+        format: 'mso_mdoc',
+        meta: { doctype_value: 'eu.europa.ec.eudi.pid.1' },
+        claims: [
+          { path: ['eu.europa.ec.eudi.pid.1', 'family_name'] },
+          { path: ['eu.europa.ec.eudi.pid.1', 'given_name'] },
+          { path: ['eu.europa.ec.eudi.pid.1', 'nationality'] },
+        ],
+      },
+    );
+  });
+
+  it('should generate a straightforward EMVCo payment card mdoc request', async () => {
+    const options = await generatePresentationRequest({
+      credentialOptions: {
+        format: 'mdoc',
+        doctype: 'com.emvco.payment_card',
+        claimPathPrefix: 'com.emvco.payment_card.1',
+        desiredClaims: ['card_number', 'card_network', 'expiry_year', 'expiry_month'],
+      },
+      requestOrigin: 'https://digital-credentials.dev',
+    });
+
+    assertEquals(
+      options.dcapiOptions.digital.requests[0].data.dcql_query.credentials[0],
+      {
+        id: 'cred1',
+        format: 'mso_mdoc',
+        meta: { doctype_value: 'com.emvco.payment_card' },
+        claims: [
+          { path: ['com.emvco.payment_card.1', 'card_number'] },
+          { path: ['com.emvco.payment_card.1', 'card_network'] },
+          { path: ['com.emvco.payment_card.1', 'expiry_year'] },
+          { path: ['com.emvco.payment_card.1', 'expiry_month'] },
+        ],
+      },
+    );
+  });
+
+  it('should generate a straightforward mVRC mdoc request', async () => {
+    const options = await generatePresentationRequest({
+      credentialOptions: {
+        format: 'mdoc',
+        doctype: 'org.iso.7367.1.mVRC',
+        claimPathPrefix: 'org.iso.18013.5.1',
+        desiredClaims: ['registration_number', 'date_of_registration', 'vehicle_holder'],
+      },
+      requestOrigin: 'https://digital-credentials.dev',
+      encryptResponse: false,
+    });
+
+    assertEquals(
+      options.dcapiOptions.digital.requests[0].data.dcql_query.credentials[0],
+      {
+        id: 'cred1',
+        format: 'mso_mdoc',
+        meta: { doctype_value: 'org.iso.7367.1.mVRC' },
+        claims: [
+          { path: ['org.iso.18013.5.1', 'registration_number'] },
+          { path: ['org.iso.18013.5.1', 'date_of_registration'] },
+          { path: ['org.iso.18013.5.1', 'vehicle_holder'] },
+        ],
+      },
+    );
+  });
+
+  it('should generate an mdoc request with claims across multiple namespaces', async () => {
+    const options = await generatePresentationRequest({
+      credentialOptions: {
+        format: 'mdoc',
+        doctype: 'org.iso.7367.1.mVRC',
+        desiredClaims: [
+          ['org.iso.23220.1', 'issue_date'],
+          ['org.iso.23220.1', 'issuing_authority_unicode'],
+          ['org.iso.7367.1', 'vehicle_holder'],
+          ['org.iso.7367.1', 'registration_number'],
+        ],
+      },
+      requestOrigin: 'https://digital-credentials.dev',
+      encryptResponse: false,
+    });
+
+    assertEquals(
+      options.dcapiOptions.digital.requests[0].data.dcql_query.credentials[0],
+      {
+        id: 'cred1',
+        format: 'mso_mdoc',
+        meta: { doctype_value: 'org.iso.7367.1.mVRC' },
+        claims: [
+          { path: ['org.iso.23220.1', 'issue_date'] },
+          { path: ['org.iso.23220.1', 'issuing_authority_unicode'] },
+          { path: ['org.iso.7367.1', 'vehicle_holder'] },
+          { path: ['org.iso.7367.1', 'registration_number'] },
+        ],
+      },
+    );
+  });
+
+  it('should generate a straightforward European PID SD-JWT-VC request', async () => {
+    const options = await generatePresentationRequest({
+      credentialOptions: {
+        format: 'sd-jwt-vc',
+        desiredClaims: ['family_name', 'given_name'],
+        acceptedVCTValues: ['urn:eu.europa.ec.eudi:pid:1'],
+      },
+      requestOrigin: 'https://digital-credentials.dev',
+      encryptResponse: false,
+    });
+
+    assertEquals(
+      options.dcapiOptions.digital.requests[0].data.dcql_query.credentials[0],
+      {
+        id: 'cred1',
+        format: 'dc+sd-jwt',
+        meta: { vct_values: ['urn:eu.europa.ec.eudi:pid:1'] },
+        claims: [
+          { path: ['family_name'] },
+          { path: ['given_name'] },
+        ],
+      },
+    );
+  });
+
+  it('should generate a more complex SD-JWT-VC request with a mix of single-path and multi-path claims', async () => {
+    const options = await generatePresentationRequest({
+      credentialOptions: {
+        format: 'sd-jwt-vc',
+        desiredClaims: [
+          'given_name',
+          'family_name',
+          ['age_equal_or_over', '18'],
+        ],
+        acceptedVCTValues: ['urn:eu.europa.ec.eudi:pid:1', 'urn:eudi:pid:1'],
+      },
+      requestOrigin: 'https://digital-credentials.dev',
+      encryptResponse: false,
+    });
+
+    assertEquals(
+      options.dcapiOptions.digital.requests[0].data.dcql_query.credentials[0],
+      {
+        id: 'cred1',
+        format: 'dc+sd-jwt',
+        meta: { vct_values: ['urn:eu.europa.ec.eudi:pid:1', 'urn:eudi:pid:1'] },
+        claims: [
+          { path: ['given_name'] },
+          { path: ['family_name'] },
+          { path: ['age_equal_or_over', '18'] },
+        ],
+      },
+    );
+  });
 });
