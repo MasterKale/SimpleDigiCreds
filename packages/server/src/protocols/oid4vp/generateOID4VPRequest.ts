@@ -167,8 +167,11 @@ export type OID4VPMdocCredentialOptionsFull = {
   desiredClaims: string[][];
 };
 
+/**
+ * Supports SD-JWT-VC-based credentials
+ */
 export type OID4VPSDJWTCredentialOptions = {
   format: 'sd-jwt-vc';
-  desiredClaims: string[];
+  desiredClaims: (string | string[])[];
   acceptedVCTValues?: string[];
 };
