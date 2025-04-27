@@ -19,13 +19,13 @@ app.use("/static/*", serveStatic({ root: "./" }));
 app.get("/", serveStatic({ path: "./static/index.html" }));
 
 app.get("/options", async (ctx) => {
-  // Simple mDL request
+  // A streamlined mDL request
   const mdlRequest: OID4VPMDLCredentialOptions = {
     format: "mdl",
     desiredClaims: ["family_name", "given_name"],
   };
 
-  // Simple European PID mdoc request
+  // A straightforward European PID mdoc request
   const mdocPIDRequest: OID4VPMdocCredentialOptionsSimple = {
     format: "mdoc",
     doctype: "eu.europa.ec.eudi.pid.1",
@@ -33,7 +33,7 @@ app.get("/options", async (ctx) => {
     desiredClaims: ["family_name", "given_name", "nationality"],
   };
 
-  // Simple EMVCo payment card mdoc request
+  // A straightforward EMVCo payment card mdoc request
   const mdocEMVCORequest: OID4VPMdocCredentialOptionsSimple = {
     format: "mdoc",
     doctype: "com.emvco.payment_card",
@@ -41,7 +41,7 @@ app.get("/options", async (ctx) => {
     desiredClaims: ["card_number", "card_network", "expiry_year", "expiry_month"],
   };
 
-  // Simple mVRC mdoc request
+  // A straightforward mVRC mdoc request
   const mdocMVRCRequest: OID4VPMdocCredentialOptionsSimple = {
     format: "mdoc",
     doctype: "org.iso.7367.1.mVRC",
@@ -49,13 +49,26 @@ app.get("/options", async (ctx) => {
     desiredClaims: ["registration_number", "date_of_registration", "vehicle_holder"],
   };
 
-  // Simple European PID SD-JWT-VC request
+  // An mdoc request with claims across multiple namespaces
+  const mdocRequestFull: OID4VPMdocCredentialOptionsFull = {
+    format: "mdoc",
+    doctype: "org.iso.7367.1.mVRC",
+    desiredClaims: [
+      ["org.iso.23220.1", "issue_date"],
+      ["org.iso.23220.1", "issuing_authority_unicode"],
+      ["org.iso.7367.1", "vehicle_holder"],
+      ["org.iso.7367.1", "registration_number"],
+    ],
+  };
+
+  // A straightforward European PID SD-JWT-VC request
   const sdjwtvcRequest: OID4VPSDJWTCredentialOptions = {
     format: "sd-jwt-vc",
     desiredClaims: ["family_name", "given_name"],
     acceptedVCTValues: ["urn:eu.europa.ec.eudi:pid:1", "urn:eudi:pid:1"],
   };
 
+  // A more complex SD-JWT-VC request with a mix of single-path and multi-path claims
   const sdjwtvcRequestComplex: OID4VPSDJWTCredentialOptions = {
     format: "sd-jwt-vc",
     desiredClaims: [
@@ -65,6 +78,7 @@ app.get("/options", async (ctx) => {
     ],
     acceptedVCTValues: ["urn:eudi:pid:1"],
   };
+
   /**
    * Toggle between these to test either format (until both can be included in one DC API call)
    */
