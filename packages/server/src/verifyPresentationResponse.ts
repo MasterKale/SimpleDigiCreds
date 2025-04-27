@@ -3,7 +3,7 @@ import type {
   OID4VPCredentialQueryMdoc,
   OID4VPCredentialQuerySDJWTVC,
 } from './protocols/oid4vp/types.ts';
-import { verifyMDLPresentation } from './formats/mdl/index.ts';
+import { verifyMDocPresentation } from './formats/mdoc/index.ts';
 import { verifySDJWTPresentation } from './formats/sd-jwt-vc/index.ts';
 import { isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
 import type { VerifiedPresentation } from './helpers/types.ts';
@@ -74,7 +74,7 @@ export async function verifyPresentationResponse({ data, request }: {
       }
 
       if (isMdocPresentation(requestedCred)) {
-        const verifiedCredential = await verifyMDLPresentation({
+        const verifiedCredential = await verifyMDocPresentation({
           presentation: matchingPresentation,
           request: request.data,
           requestMetadata,
@@ -104,12 +104,13 @@ export async function verifyPresentationResponse({ data, request }: {
 }
 
 /**
- * Type guard to make sure a query is for an mdoc
+ * Type guard to make sure a query is for an mDL
  */
 function isMdocPresentation(
   query: OID4VPCredentialQuery | OID4VPCredentialQueryMdoc,
 ): query is OID4VPCredentialQueryMdoc {
-  return (query as OID4VPCredentialQueryMdoc).format === 'mso_mdoc';
+  const _query = query as OID4VPCredentialQueryMdoc;
+  return _query.format === 'mso_mdoc';
 }
 
 /**

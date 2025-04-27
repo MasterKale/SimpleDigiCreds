@@ -3,6 +3,8 @@ import { SimpleDigiCredsError } from './helpers/index.ts';
 import {
   generateOID4VPRequest,
   type OID4VPMDLCredentialOptions,
+  type OID4VPMdocCredentialOptionsFull,
+  type OID4VPMdocCredentialOptionsSimple,
   type OID4VPSDJWTCredentialOptions,
 } from './protocols/oid4vp/generateOID4VPRequest.ts';
 
@@ -56,7 +58,11 @@ export async function generatePresentationRequest({
 }
 
 export type PresentationRequestOptions = {
-  credentialOptions: OID4VPMDLCredentialOptions | OID4VPSDJWTCredentialOptions;
+  credentialOptions:
+    | OID4VPMdocCredentialOptionsSimple
+    | OID4VPMdocCredentialOptionsFull
+    | OID4VPMDLCredentialOptions
+    | OID4VPSDJWTCredentialOptions;
   requestOrigin: string;
   protocol?: 'oid4vp';
   encryptResponse?: boolean;

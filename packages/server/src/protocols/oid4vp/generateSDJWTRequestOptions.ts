@@ -14,7 +14,7 @@ export function generateSDJWTRequestOptions({
   acceptedVCTValues,
 }: {
   id: string;
-  desiredClaims: string[];
+  desiredClaims: (string | string[])[];
   acceptedVCTValues?: string[];
 }): {
   credentialQuery: OID4VPCredentialQuerySDJWTVC;
@@ -27,9 +27,13 @@ export function generateSDJWTRequestOptions({
       meta: {
         vct_values: acceptedVCTValues,
       },
-      claims: desiredClaims.map((claimName) => ({
-        path: [claimName],
-      })),
+      claims: desiredClaims.map((claimName) => {
+        if (Array.isArray(claimName)) {
+          return { path: claimName };
+        } else {
+          return { path: [claimName] };
+        }
+      }),
     },
     clientMetadata: {
       vp_formats: {

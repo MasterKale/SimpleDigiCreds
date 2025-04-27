@@ -13,7 +13,7 @@ import type { GeneratedPresentationRequestMetadata } from '../../generatePresent
 /**
  * Verify an mdoc presentation as returned through the DC API
  */
-export async function verifyMDLPresentation({
+export async function verifyMDocPresentation({
   presentation,
   request,
   requestMetadata,
@@ -75,9 +75,12 @@ export async function verifyMDLPresentation({
   // Extract the verified data
   const verifiedClaims = Object.values(verifiedNameSpaces);
 
+  // Iterate through all the namespaces in the document and extract the verified claims
   const claims: VerifiedClaimsMap = {};
-  for (const [claimName, claimValue] of verifiedClaims[0]) {
-    claims[claimName] = claimValue;
+  for (const claimSet of verifiedClaims) {
+    for (const [claimName, claimValue] of claimSet) {
+      claims[claimName] = claimValue;
+    }
   }
 
   return {
