@@ -24,6 +24,27 @@ app.get("/options", async (ctx) => {
     encryptResponse: false,
   });
 
+  const mdocPIDRequest = await generatePresentationRequest({
+    credentialOptions: {
+      format: "mdoc",
+      doctype: "eu.europa.ec.eudi.pid.1",
+      claimPathPrefix: "eu.europa.ec.eudi.pid.1",
+      desiredClaims: ["family_name", "given_name", "nationality"],
+    },
+    requestOrigin: "http://localhost:8000",
+    encryptResponse: false,
+  });
+
+  const mdocEMVCORequest = await generatePresentationRequest({
+    credentialOptions: {
+      format: "mdoc",
+      doctype: "com.emvco.payment_card",
+      claimPathPrefix: "com.emvco.payment_card.1",
+      desiredClaims: ["card_number", "card_network", "expiry_year", "expiry_month"],
+    },
+    requestOrigin: "http://localhost:8000",
+  });
+
   const sdjwtvcRequest = await generatePresentationRequest({
     credentialOptions: {
       format: "sd-jwt-vc",
