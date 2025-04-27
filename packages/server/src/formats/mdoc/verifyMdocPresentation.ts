@@ -75,9 +75,12 @@ export async function verifyMDocPresentation({
   // Extract the verified data
   const verifiedClaims = Object.values(verifiedNameSpaces);
 
+  // Iterate through all the namespaces in the document and extract the verified claims
   const claims: VerifiedClaimsMap = {};
-  for (const [claimName, claimValue] of verifiedClaims[0]) {
-    claims[claimName] = claimValue;
+  for (const claimSet of verifiedClaims) {
+    for (const [claimName, claimValue] of claimSet) {
+      claims[claimName] = claimValue;
+    }
   }
 
   return {
