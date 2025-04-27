@@ -73,7 +73,7 @@ Deno.test('should error on bad `vp_token` entries', async () => {
   );
 });
 
-Deno.test('should verify a well-formed mdoc presentation', async () => {
+Deno.test('should verify a well-formed unencrypted mdoc presentation', async () => {
   const _request: GeneratedPresentationRequest = {
     dcapiOptions: {
       digital: {
@@ -136,7 +136,7 @@ Deno.test('should verify a well-formed mdoc presentation', async () => {
   );
 });
 
-Deno.test('should verify a well-formed SD-JWT presentation', async () => {
+Deno.test('should verify a well-formed unencrypted SD-JWT presentation', async () => {
   const _request: GeneratedPresentationRequest = {
     dcapiOptions: {
       digital: {
