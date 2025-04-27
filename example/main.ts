@@ -85,7 +85,7 @@ app.get("/options", async (ctx) => {
   const request = await generatePresentationRequest({
     credentialOptions: sdjwtvcRequestComplex,
     requestOrigin: "http://localhost:8000",
-    encryptResponse: true,
+    // encryptResponse: true, // Optional, defaults to `true`
   });
 
   console.log(JSON.stringify(request, null, 2));
