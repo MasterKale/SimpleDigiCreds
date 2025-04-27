@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.4.0
+
+- **[server]** Presentation requests can now be generated for mdoc credentials using different
+  doctypes and more complex claim paths, and for SD-JWT-VC credentials with more complex paths
+  ([#16](https://github.com/MasterKale/SimpleDigiCreds/pull/16))
+
 ## v0.3.0
 
 - **[server]** Supports encrypted responses by default
