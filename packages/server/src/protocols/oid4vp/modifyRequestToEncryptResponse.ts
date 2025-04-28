@@ -1,15 +1,20 @@
 import type { DigitalCredentialRequest } from '../../dcapi/types.ts';
 import { generateEncryptionKeypair } from '../../helpers/generateEncryptionKeypair.ts';
+import { generateNonce } from '../../helpers/nonce.ts';
+import type { Uint8Array_ } from '../../helpers/types.ts';
 
 /**
  * Modify the DC API request to ensure that the response is encrypted.
  */
-export async function modifyRequestToEncryptResponse(
-  request: DigitalCredentialRequest,
-): Promise<{
+export async function modifyRequestToEncryptResponse({
+  request,
+  serverAESKeySecret,
+  presentationLifetime,
+}: {
   request: DigitalCredentialRequest;
-  privateKeyJWK: JsonWebKey;
-}> {
+  serverAESKeySecret: Uint8Array_;
+  presentationLifetime: number;
+}): Promise<DigitalCredentialRequest> {
   const clientMetadata = request.data.client_metadata || {};
 
   /**
@@ -24,6 +29,11 @@ export async function modifyRequestToEncryptResponse(
   clientMetadata.jwks = {
     keys: [publicKeyJWK],
   };
+  request.data.nonce = await generateNonce({
+    serverAESKeySecret,
+    presentationLifetime,
+    privateKeyJWK,
+  });
 
   /**
    * Add `authorization_encrypted_response_alg` and `authorization_encrypted_response_enc` as per
@@ -38,5 +48,5 @@ export async function modifyRequestToEncryptResponse(
    */
   request.data.client_metadata = clientMetadata;
 
-  return { request, privateKeyJWK };
+  return request;
 }
