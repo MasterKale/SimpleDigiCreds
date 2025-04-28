@@ -1,6 +1,5 @@
 import { decodeCBOR } from '@levischuck/tiny-cbor';
 
-import type { DCAPIRequestOID4VP } from '../../dcapi/types.ts';
 import type { DecodedCredentialResponse } from './types.ts';
 import { verifyIssuerSigned } from './verifyIssuerSigned.ts';
 import { verifyDeviceSigned } from './verifyDeviceSigned.ts';
@@ -8,19 +7,18 @@ import { verifyNameSpaces } from './verifyNameSpaces.ts';
 // import { convertX509BufferToPEM } from '../../helpers/x509/index.ts';
 import { base64url, SimpleDigiCredsError } from '../../helpers/index.ts';
 import type { VerifiedClaimsMap, VerifiedCredential } from '../../helpers/types.ts';
-import type { GeneratedPresentationRequestMetadata } from '../../generatePresentationRequest.ts';
 
 /**
  * Verify an mdoc presentation as returned through the DC API
  */
 export async function verifyMDocPresentation({
   presentation,
-  request,
-  requestMetadata,
+  nonce,
+  possibleOrigins,
 }: {
   presentation: string;
-  request: DCAPIRequestOID4VP;
-  requestMetadata: GeneratedPresentationRequestMetadata;
+  nonce: string;
+  possibleOrigins: string[];
 }): Promise<VerifiedCredential> {
   if (!base64url.isBase64URLString(presentation)) {
     throw new SimpleDigiCredsError({
@@ -44,21 +42,24 @@ export async function verifyMDocPresentation({
     return {
       claims: {},
       issuerMeta: {},
+      credentialMeta: { verifiedOrigin: '' },
     };
   }
 
   // Verify the device-signed data within the verified issuer-signed data
   const {
     verified: deviceSignedVerified,
+    verifiedOrigin,
     expiresOn,
     issuedAt,
     validFrom,
-  } = await verifyDeviceSigned(document, request, requestMetadata);
+  } = await verifyDeviceSigned({ document, nonce, possibleOrigins });
   if (!deviceSignedVerified) {
     console.error('could not verify DeviceSigned (mdoc)');
     return {
       claims: {},
       issuerMeta: {},
+      credentialMeta: { verifiedOrigin: '' },
     };
   }
 
@@ -89,6 +90,9 @@ export async function verifyMDocPresentation({
       issuedAt,
       expiresOn,
       validFrom,
+    },
+    credentialMeta: {
+      verifiedOrigin,
     },
   };
 }

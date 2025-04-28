@@ -1,6 +1,5 @@
 import { CBORTag, decodeCBOR, encodeCBOR } from '@levischuck/tiny-cbor';
 
-import type { DCAPIRequestOID4VP } from '../../dcapi/types.ts';
 import { generateSessionTranscript } from './generateSessionTranscript.ts';
 import { verifyEC2 } from '../../helpers/verifyEC2.ts';
 import { COSEALG, COSEHEADER, COSEKEYS, isCOSEPublicKeyEC2 } from '../../cose.ts';
@@ -12,13 +11,12 @@ import type {
 } from './types.ts';
 import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
 import type { Uint8Array_ } from '../../helpers/types.ts';
-import type { GeneratedPresentationRequestMetadata } from '../../generatePresentationRequest.ts';
 
-export async function verifyDeviceSigned(
-  document: DecodedDocument,
-  request: DCAPIRequestOID4VP,
-  requestMetadata: GeneratedPresentationRequestMetadata,
-): Promise<VerifiedDeviceSigned> {
+export async function verifyDeviceSigned({ document, nonce, possibleOrigins }: {
+  document: DecodedDocument;
+  nonce: string;
+  possibleOrigins: string[];
+}): Promise<VerifiedDeviceSigned> {
   const issuerSigned = document.get('issuerSigned');
   const deviceSigned = document.get('deviceSigned');
   const issuerAuth = issuerSigned.get('issuerAuth');
@@ -53,61 +51,80 @@ export async function verifyDeviceSigned(
     });
   }
 
-  const sessionTranscript = await generateSessionTranscript(request, requestMetadata);
+  let verified: boolean = false;
+  let verifiedOrigin: string = '';
+  for (const origin of possibleOrigins) {
+    const clientID = `web-origin:${origin}`;
 
-  const deviceSignedNameSpaces = deviceSigned.get('nameSpaces');
+    const sessionTranscript = await generateSessionTranscript(origin, clientID, nonce);
 
-  /**
-   * The shape of this is defined in mdoc
-   */
-  const deviceAuthentication = [
-    'DeviceAuthentication',
-    sessionTranscript,
-    document.get('docType'),
-    deviceSignedNameSpaces,
-  ];
-  const deviceAuthenticationCBOR = encodeCBOR(deviceAuthentication);
-  const deviceAuthenticationCBORBstr = encodeCBOR(
-    new CBORTag(24, deviceAuthenticationCBOR),
-  ) as Uint8Array_;
+    const deviceSignedNameSpaces = deviceSigned.get('nameSpaces');
 
-  const deviceAuth = deviceSigned.get('deviceAuth');
-  const deviceSignature = deviceAuth.get('deviceSignature');
+    /**
+     * The shape of this is defined in mdoc
+     */
+    const deviceAuthentication = [
+      'DeviceAuthentication',
+      sessionTranscript,
+      document.get('docType'),
+      deviceSignedNameSpaces,
+    ];
+    const deviceAuthenticationCBOR = encodeCBOR(deviceAuthentication);
+    const deviceAuthenticationCBORBstr = encodeCBOR(
+      new CBORTag(24, deviceAuthenticationCBOR),
+    ) as Uint8Array_;
 
-  const deviceData: MdocCOSESign1SigStructure = [
-    'Signature1',
-    deviceSignature[0],
-    new Uint8Array(),
-    deviceAuthenticationCBORBstr,
-  ];
+    const deviceAuth = deviceSigned.get('deviceAuth');
+    const deviceSignature = deviceAuth.get('deviceSignature');
 
-  const deviceKeyInfo = decodedMSO.get('deviceKeyInfo');
-  const devicePublicKey = deviceKeyInfo.get('deviceKey');
+    const deviceData: MdocCOSESign1SigStructure = [
+      'Signature1',
+      deviceSignature[0],
+      new Uint8Array(),
+      deviceAuthenticationCBORBstr,
+    ];
 
-  // Add a default alg if it's missing (`digestAlg` will override it within verifyEC2())
-  if (!devicePublicKey.get(COSEKEYS.alg)) {
-    devicePublicKey.set(COSEKEYS.alg, COSEALG.ES256);
+    const deviceKeyInfo = decodedMSO.get('deviceKeyInfo');
+    const devicePublicKey = deviceKeyInfo.get('deviceKey');
+
+    // Add a default alg if it's missing (`digestAlg` will override it within verifyEC2())
+    if (!devicePublicKey.get(COSEKEYS.alg)) {
+      devicePublicKey.set(COSEKEYS.alg, COSEALG.ES256);
+    }
+
+    if (!isCOSEPublicKeyEC2(devicePublicKey)) {
+      throw new SimpleDigiCredsError({
+        message: `Unsupported public key type ${devicePublicKey.get(COSEKEYS.kty)}`,
+        code: 'MdocVerificationError',
+      });
+    }
+
+    const decodedMdocIssuerAuthProtected = decodeCBOR(issuerAuth[0]) as MdocIssuerAuthProtected;
+    const hashAlg = decodedMdocIssuerAuthProtected.get(COSEHEADER.ALG);
+
+    verified = await verifyEC2({
+      cosePublicKey: devicePublicKey,
+      data: encodeCBOR(deviceData) as Uint8Array_,
+      signature: deviceSignature[3],
+      shaHashOverride: hashAlg,
+    });
+
+    if (verified) {
+      verifiedOrigin = origin;
+      break;
+    }
   }
 
-  if (!isCOSEPublicKeyEC2(devicePublicKey)) {
+  if (!verifiedOrigin) {
     throw new SimpleDigiCredsError({
-      message: `Unsupported public key type ${devicePublicKey.get(COSEKEYS.kty)}`,
+      message: 'Presentation did not occur at any of the expected origins',
       code: 'MdocVerificationError',
     });
   }
 
-  const decodedMdocIssuerAuthProtected = decodeCBOR(issuerAuth[0]) as MdocIssuerAuthProtected;
-  const hashAlg = decodedMdocIssuerAuthProtected.get(COSEHEADER.ALG);
-
-  const verified = await verifyEC2({
-    cosePublicKey: devicePublicKey,
-    data: encodeCBOR(deviceData) as Uint8Array_,
-    signature: deviceSignature[3],
-    shaHashOverride: hashAlg,
-  });
-
   return {
     verified,
+    verifiedOrigin,
     issuedAt: new Date(Date.parse(signed)),
     validFrom: dateValidFrom,
     expiresOn: dateValidUntil,
@@ -116,6 +133,7 @@ export async function verifyDeviceSigned(
 
 type VerifiedDeviceSigned = {
   verified: boolean;
+  verifiedOrigin: string;
   issuedAt: Date;
   validFrom: Date;
   expiresOn: Date;
