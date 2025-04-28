@@ -1,31 +1,48 @@
-import type {
-  OID4VPCredentialQuery,
-  OID4VPCredentialQueryMdoc,
-  OID4VPCredentialQuerySDJWTVC,
-} from './protocols/oid4vp/types.ts';
 import { verifyMDocPresentation } from './formats/mdoc/index.ts';
 import { verifySDJWTPresentation } from './formats/sd-jwt-vc/index.ts';
-import { isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
-import type { VerifiedPresentation } from './helpers/types.ts';
-import type { GeneratedPresentationRequest } from './generatePresentationRequest.ts';
-import type { DCAPIEncryptedResponse, DCAPIResponse } from './dcapi/types.ts';
+import { base64url, isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
+import type { Uint8Array_, VerifiedPresentation } from './helpers/types.ts';
+import type { DCAPIResponse } from './dcapi/types.ts';
 import { isEncryptedDCAPIResponse } from './dcapi/isEncryptedDCAPIResponse.ts';
 import { decryptDCAPIResponse } from './dcapi/decryptDCAPIResponse.ts';
+import { decryptNonce } from './helpers/nonce.ts';
 
 /**
  * Verify and return a credential presentation out of a call to the Digital Credentials API
  */
-export async function verifyPresentationResponse({ data, request }: {
-  data: DCAPIResponse | DCAPIEncryptedResponse;
-  request: GeneratedPresentationRequest;
+export async function verifyPresentationResponse({
+  data,
+  nonce,
+  expectedOrigin,
+  serverAESKeySecret,
+}: {
+  data: object | string;
+  nonce: string;
+  expectedOrigin: string | string[];
+  serverAESKeySecret: Uint8Array_;
 }): Promise<VerifiedPresentation> {
-  const { dcapiOptions, requestMetadata } = request;
   const verifiedValues: VerifiedPresentation = {};
 
-  if (data === null || typeof data !== 'object') {
+  // If the data is a string then parse it as JSON as the DC API sometimes returns stringified JSON
+  if (typeof data === 'string') {
+    data = JSON.parse(data);
+  }
+
+  if (typeof data !== 'object') {
     throw new SimpleDigiCredsError({
       code: 'InvalidDCAPIResponse',
       message: `data was type ${typeof data}, not an object`,
+    });
+  }
+
+  // Extract values like expiration time and privateKeyJWK from the nonce
+  const { expiresOn, privateKeyJWK } = await decryptNonce({ nonce, serverAESKeySecret });
+  const now = new Date();
+
+  if (expiresOn < now) {
+    throw new SimpleDigiCredsError({
+      message: `Nonce expired at ${expiresOn.toISOString()}, current time is ${now.toISOString()}`,
+      code: 'InvalidDCAPIResponse',
     });
   }
 
@@ -33,7 +50,7 @@ export async function verifyPresentationResponse({ data, request }: {
    * Presence of a private key JWK in the request metadata indicates that the response should be
    * encrypted.
    */
-  if (request.requestMetadata.privateKeyJWK) {
+  if (privateKeyJWK) {
     if (!isEncryptedDCAPIResponse(data)) {
       throw new SimpleDigiCredsError({
         message: 'Response did not appear to be encrypted JWT',
@@ -41,10 +58,7 @@ export async function verifyPresentationResponse({ data, request }: {
       });
     }
 
-    data = await decryptDCAPIResponse(
-      data.response,
-      request.requestMetadata.privateKeyJWK,
-    ) as DCAPIResponse;
+    data = await decryptDCAPIResponse(data.response, privateKeyJWK) as DCAPIResponse;
   }
 
   if (!isDCAPIResponse(data)) {
@@ -54,49 +68,43 @@ export async function verifyPresentationResponse({ data, request }: {
     });
   }
 
+  let possibleOrigins: string[] = [];
+  if (Array.isArray(expectedOrigin)) {
+    possibleOrigins = expectedOrigin;
+  } else {
+    possibleOrigins = [expectedOrigin];
+  }
+
   // We've verified the shape of the response, now verify it
-  for (const request of dcapiOptions.digital.requests) {
-    const { dcql_query } = request.data;
+  for (const key of Object.keys(data.vp_token)) {
+    const presentation = data.vp_token[key];
 
-    for (const requestedCred of dcql_query.credentials) {
-      const { id } = requestedCred;
+    if (!presentation) {
+      console.warn(`could not find matching response for cred id "${key}", skipping`);
+      continue;
+    }
 
-      verifiedValues[id] = {
-        claims: {},
-        issuerMeta: {},
-      };
+    if (isMdocPresentation(presentation)) {
+      const verifiedCredential = await verifyMDocPresentation({
+        presentation,
+        nonce,
+        possibleOrigins,
+      });
 
-      const matchingPresentation = data.vp_token[id];
+      verifiedValues[key] = verifiedCredential;
+    } else if (isSDJWTPresentation(presentation)) {
+      const verifiedCredential = await verifySDJWTPresentation({
+        presentation,
+        nonce,
+        possibleOrigins,
+      });
 
-      if (!matchingPresentation) {
-        console.warn(`could not find matching response for cred id "${id}", skipping`);
-        continue;
-      }
-
-      if (isMdocPresentation(requestedCred)) {
-        const verifiedCredential = await verifyMDocPresentation({
-          presentation: matchingPresentation,
-          request: request.data,
-          requestMetadata,
-        });
-
-        verifiedValues[id] = verifiedCredential;
-      } else if (isSDJWTPresentation(requestedCred)) {
-        const verifiedCredential = await verifySDJWTPresentation({
-          presentation: matchingPresentation,
-          matchingCredentialQuery: requestedCred,
-          request: request.data,
-          requestMetadata,
-        });
-
-        verifiedValues[id] = verifiedCredential;
-      } else {
-        throw new SimpleDigiCredsError({
-          message:
-            `Unsupported credential format "${requestedCred.format}" for cred id "${requestedCred.id}")`,
-          code: 'InvalidDCAPIResponse',
-        });
-      }
+      verifiedValues[key] = verifiedCredential;
+    } else {
+      throw new SimpleDigiCredsError({
+        message: `Could not determine type of presentation for "${key}"`,
+        code: 'InvalidDCAPIResponse',
+      });
     }
   }
 
@@ -106,18 +114,23 @@ export async function verifyPresentationResponse({ data, request }: {
 /**
  * Type guard to make sure a query is for an mDL
  */
-function isMdocPresentation(
-  query: OID4VPCredentialQuery | OID4VPCredentialQueryMdoc,
-): query is OID4VPCredentialQueryMdoc {
-  const _query = query as OID4VPCredentialQueryMdoc;
-  return _query.format === 'mso_mdoc';
+function isMdocPresentation(presentation: string): boolean {
+  // Best I can come up with is to make sure it's a base64url string. JWT periods and SD-JWT tildes
+  // will definitely fail this test.
+  return base64url.isBase64URLString(presentation);
 }
 
 /**
  * Type guard to make sure a query is for an SD-JWT
  */
-function isSDJWTPresentation(
-  query: OID4VPCredentialQuery | OID4VPCredentialQuerySDJWTVC,
-): query is OID4VPCredentialQuerySDJWTVC {
-  return (query as OID4VPCredentialQuerySDJWTVC).format === 'dc+sd-jwt';
+function isSDJWTPresentation(presentation: string): boolean {
+  // JWTs are two periods each, with a KB JWT there can be up to four matches
+  const jwtSeparators = presentation.match(/\./g);
+  // SD-JWTs have at least one match in the worst case of no disclosures and no KB JWT
+  const sdJWTVCSeparators = presentation.match(/~/g);
+
+  return !!(
+    jwtSeparators && jwtSeparators.length >= 2 &&
+    sdJWTVCSeparators && sdJWTVCSeparators.length >= 1
+  );
 }

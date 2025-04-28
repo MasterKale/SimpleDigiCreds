@@ -86,7 +86,10 @@
 
             const verification = await fetch("/verify", {
               method: "post",
-              body: response.data,
+              body: JSON.stringify({
+                data: response.data,
+                nonce: dcapiOptions.digital.requests[0].data.nonce,
+              }),
               headers: {
                 "Content-Type": "application/json",
               },

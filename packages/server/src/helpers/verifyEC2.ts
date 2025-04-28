@@ -1,6 +1,6 @@
 import { type COSEALG, COSECRV, COSEKEYS, type COSEPublicKeyEC2 } from '../cose.ts';
 import { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';
-import { base64url, importKey } from './index.ts';
+import { base64url, importPublicKeyJWK } from './index.ts';
 import type { SubtleCryptoAlg, SubtleCryptoCrv, Uint8Array_ } from './types.ts';
 
 /**
@@ -66,7 +66,7 @@ export async function verifyEC2(opts: {
     namedCurve: _crv,
   };
 
-  const key = await importKey({
+  const key = await importPublicKeyJWK({
     keyData,
     algorithm: keyAlgorithm,
   });

@@ -9,13 +9,13 @@ import { SimpleDigiCredsError } from '../../helpers/index.ts';
  */
 export function assertKeyBindingJWTClaims({
   payload,
-  expectedClientID,
-  expectedNonce,
+  nonce,
+  possibleOrigins,
 }: {
   payload: kbPayload;
-  expectedClientID: string;
-  expectedNonce: string;
-}): void {
+  nonce: string;
+  possibleOrigins: string[];
+}): { verifiedOrigin: string } {
   // Verify `iat`
   const issuedAtDate = new Date(payload.iat * 1000);
   const currentDate = new Date();
@@ -32,20 +32,31 @@ export function assertKeyBindingJWTClaims({
   }
 
   // Verify `aud`
-  if (payload.aud !== expectedClientID) {
+  let verifiedAUD = false;
+  let verifiedOrigin = '';
+  for (const origin of possibleOrigins) {
+    if (payload.aud === `web-origin:${origin}`) {
+      verifiedAUD = true;
+      verifiedOrigin = origin;
+      break;
+    }
+  }
+
+  if (!verifiedAUD) {
     throw new SimpleDigiCredsError({
-      message:
-        `Key Binding JWT audience "${payload.aud}" did not match expected client_id "${expectedClientID}"`,
+      message: `Key Binding JWT audience "${payload.aud}" did not match any expected client IDs`,
       code: 'SDJWTVerificationError',
     });
   }
 
   // Verify `nonce`
-  if (payload.nonce !== expectedNonce) {
+  if (payload.nonce !== nonce) {
     throw new SimpleDigiCredsError({
       message:
-        `Key Binding JWT expectedNonce "${payload.nonce}" did not match expected nonce "${expectedNonce}"`,
+        `Key Binding JWT expectedNonce "${payload.nonce}" did not match expected nonce "${nonce}"`,
       code: 'SDJWTVerificationError',
     });
   }
+
+  return { verifiedOrigin };
 }

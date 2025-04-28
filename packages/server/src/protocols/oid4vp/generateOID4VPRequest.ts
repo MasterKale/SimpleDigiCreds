@@ -1,6 +1,7 @@
 import type { DigitalCredentialRequest } from '../../dcapi/types.ts';
-import { generateNonce } from '../../helpers/generateNonce.ts';
+import { generateNonce } from '../../helpers/nonce.ts';
 import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
+import type { Uint8Array_ } from '../../helpers/types.ts';
 import { generateMdocRequestOptions } from './generateMdocRequestOptions.ts';
 import { generateSDJWTRequestOptions } from './generateSDJWTRequestOptions.ts';
 import { modifyRequestToEncryptResponse } from './modifyRequestToEncryptResponse.ts';
@@ -15,17 +16,21 @@ import type {
 /**
  * Generate an OID4VP credential presentation request usable with the Digital Credentials API
  */
-export async function generateOID4VPRequest(
+export async function generateOID4VPRequest({
+  credentialOptions,
+  serverAESKeySecret,
+  encryptResponse,
+  presentationLifetime,
+}: {
   credentialOptions:
     | OID4VPMDLCredentialOptions
     | OID4VPMdocCredentialOptionsSimple
     | OID4VPMdocCredentialOptionsFull
-    | OID4VPSDJWTCredentialOptions,
-  encryptResponse: boolean,
-): Promise<{
-  request: DigitalCredentialRequest;
-  privateKeyJWK?: JsonWebKey;
-}> {
+    | OID4VPSDJWTCredentialOptions;
+  serverAESKeySecret: Uint8Array_;
+  presentationLifetime: number;
+  encryptResponse: boolean;
+}): Promise<{ request: DigitalCredentialRequest }> {
   const { format, desiredClaims } = credentialOptions;
 
   let credentialQuery:
@@ -93,9 +98,7 @@ export async function generateOID4VPRequest(
     data: {
       response_type: 'vp_token',
       response_mode: 'dc_api',
-      // Omitting this for now, to come back later and set if/when we add request signing
-      // client_id: `web-origin:${requestOrigin}`,
-      nonce: generateNonce(),
+      nonce: await generateNonce({ serverAESKeySecret, presentationLifetime }),
       // https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#dcql_query
       dcql_query: { credentials: [credentialQuery] },
     },
@@ -105,12 +108,15 @@ export async function generateOID4VPRequest(
     request.data.client_metadata = clientMetadata;
   }
 
-  let privateKeyJWK: JsonWebKey | undefined = undefined;
   if (encryptResponse) {
-    ({ request: request, privateKeyJWK } = await modifyRequestToEncryptResponse(request));
+    request = await modifyRequestToEncryptResponse({
+      request,
+      serverAESKeySecret,
+      presentationLifetime,
+    });
   }
 
-  return { request, privateKeyJWK };
+  return { request };
 }
 
 /**

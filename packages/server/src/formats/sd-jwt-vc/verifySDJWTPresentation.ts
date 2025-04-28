@@ -4,9 +4,6 @@ import { type DecodedSDJwt, decodeSdJwt, getClaims } from '@sd-jwt/decode';
 import type { IssuerSignedJWTPayload, SDJWTHeader } from '../../formats/sd-jwt-vc/types.ts';
 import { SimpleDigiCredsError } from '../../helpers/index.ts';
 import type { VerifiedClaimsMap, VerifiedCredential } from '../../helpers/types.ts';
-import type { OID4VPCredentialQuerySDJWTVC } from '../../protocols/oid4vp/types.ts';
-import type { DCAPIRequestOID4VP } from '../../dcapi/types.ts';
-import type { GeneratedPresentationRequestMetadata } from '../../generatePresentationRequest.ts';
 import { hashSDJWTVCData } from './hashSDJWTVCData.ts';
 import { getIssuerVerifier } from './getIssuerSignedVerifiers.ts';
 import { getKeyBindingVerifier } from './getKeyBindingVerifier.ts';
@@ -18,14 +15,12 @@ import { assertKeyBindingJWTClaims } from './assertKeyBindingJWTClaims.ts';
  */
 export async function verifySDJWTPresentation({
   presentation,
-  matchingCredentialQuery,
-  request: dcapiRequestData,
-  requestMetadata,
+  nonce,
+  possibleOrigins,
 }: {
   presentation: string;
-  matchingCredentialQuery: OID4VPCredentialQuerySDJWTVC;
-  request: DCAPIRequestOID4VP;
-  requestMetadata: GeneratedPresentationRequestMetadata;
+  nonce: string;
+  possibleOrigins: string[];
 }): Promise<VerifiedCredential> {
   let decoded: DecodedSDJwt;
   try {
@@ -72,7 +67,7 @@ export async function verifySDJWTPresentation({
   } catch (err) {
     const _err = err as Error;
     throw new SimpleDigiCredsError({
-      message: 'Could not verify SD-JWT-VC, see cause',
+      message: 'Could not verify SD-JWT-VC',
       code: 'SDJWTVerificationError',
       cause: _err,
     });
@@ -91,9 +86,9 @@ export async function verifySDJWTPresentation({
     hashSDJWTVCData,
   );
 
-  const { vct_values: allowedCredentialTypes } = matchingCredentialQuery.meta || {};
-  assertIssuerSignedJWTClaims({ claims: issuerClaims, allowedCredentialTypes });
+  assertIssuerSignedJWTClaims({ claims: issuerClaims });
 
+  let verifiedOrigin = '';
   if (verifyKeyBinding) {
     // This _shouldn't_ happen but just in case because the typing says `kb` can be undefined
     if (!verified.kb) {
@@ -105,11 +100,11 @@ export async function verifySDJWTPresentation({
     }
 
     // Verify the claims in the Key Binding JWT
-    assertKeyBindingJWTClaims({
+    ({ verifiedOrigin } = assertKeyBindingJWTClaims({
       payload: verified.kb.payload,
-      expectedClientID: requestMetadata.clientID,
-      expectedNonce: dcapiRequestData.nonce,
-    });
+      possibleOrigins,
+      nonce,
+    }));
   }
 
   /**
@@ -130,6 +125,10 @@ export async function verifySDJWTPresentation({
       expiresOn: issuerClaims.exp ? new Date(issuerClaims.exp * 1000) : undefined,
       issuedAt: issuerClaims.iat ? new Date(issuerClaims.iat * 1000) : undefined,
       validFrom: issuerClaims.nbf ? new Date(issuerClaims.nbf * 1000) : undefined,
+    },
+    credentialMeta: {
+      verifiedOrigin,
+      vct: issuerClaims.vct,
     },
   };
 }

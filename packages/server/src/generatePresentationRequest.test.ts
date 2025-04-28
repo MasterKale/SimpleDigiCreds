@@ -3,21 +3,36 @@ import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
 import { type Stub, stub } from '@std/testing/mock';
 
 import { generatePresentationRequest } from './generatePresentationRequest.ts';
-import { _generateNonceInternals } from './helpers/generateNonce.ts';
+import { decryptNonce } from './helpers/nonce.ts';
+import { _generateEncryptionKeypairInternals } from './helpers/generateEncryptionKeypair.ts';
+
+const serverAESKeySecret = new Uint8Array(32);
+const publicKeyJWK: JsonWebKey = {
+  kty: 'EC',
+  crv: 'P-256',
+  x: 'RIlPj8_a_azZ5Ed1ffhja2GFqRDKvjktB_8VK6S7hFo',
+  y: 'atJc71TYgZ9jUwgunsTGd8v2nxW0geCT9AvnIqmm4TQ',
+};
+const privateKeyJWK: JsonWebKey = {
+  kty: 'EC',
+  crv: 'P-256',
+  x: 'RIlPj8_a_azZ5Ed1ffhja2GFqRDKvjktB_8VK6S7hFo',
+  y: 'atJc71TYgZ9jUwgunsTGd8v2nxW0geCT9AvnIqmm4TQ',
+  d: 'TVIl8mDFJV_QtM4RmwTLpHgHaCGePZ1qNZVIlT84Df8',
+};
 
 describe('Method: generatePresentationRequest()', () => {
-  let mockGenerateNonce: Stub;
+  let mockGenerateEncryptionKeypair: Stub;
 
   beforeEach(() => {
-    mockGenerateNonce = stub(
-      _generateNonceInternals,
-      'stubThis',
-      () => '9kMlSgHQW8oBv_AdkSaZKM0ajrEUatzg2f24vV6AgnI',
-    );
+    mockGenerateEncryptionKeypair = stub(_generateEncryptionKeypairInternals, 'stubThis', () => ({
+      publicKeyJWK,
+      privateKeyJWK,
+    }));
   });
 
   afterEach(() => {
-    mockGenerateNonce.restore();
+    mockGenerateEncryptionKeypair.restore();
   });
 
   it('should generate DC API options suitable for passing into `navigator.credentials.get()`', async () => {
@@ -26,8 +41,8 @@ describe('Method: generatePresentationRequest()', () => {
         format: 'mdl',
         desiredClaims: ['family_name', 'given_name', 'age_over_21'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
       encryptResponse: false,
+      serverAESKeySecret,
     });
 
     assertExists(options.dcapiOptions.digital.requests);
@@ -40,7 +55,7 @@ describe('Method: generatePresentationRequest()', () => {
         format: 'mdl',
         desiredClaims: ['family_name'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
+      serverAESKeySecret,
       encryptResponse: false,
     });
 
@@ -50,7 +65,7 @@ describe('Method: generatePresentationRequest()', () => {
     assertEquals(request.protocol, 'openid4vp');
     assertEquals(request.data.response_type, 'vp_token');
     assertEquals(request.data.response_mode, 'dc_api');
-    assertEquals(request.data.nonce, '9kMlSgHQW8oBv_AdkSaZKM0ajrEUatzg2f24vV6AgnI');
+    assertEquals(typeof request.data.nonce, 'string');
     assertExists(request.data.dcql_query.credentials);
     assertEquals(request.data.dcql_query.credentials.length, 1);
   });
@@ -61,7 +76,7 @@ describe('Method: generatePresentationRequest()', () => {
         format: 'mdl',
         desiredClaims: ['family_name', 'given_name', 'age_over_21'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
+      serverAESKeySecret,
       encryptResponse: false,
     });
 
@@ -87,7 +102,7 @@ describe('Method: generatePresentationRequest()', () => {
         desiredClaims: ['family_name', 'given_name', 'age_over_21'],
         acceptedVCTValues: ['urn:eu.europa.ec.eudi:pid:1'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
+      serverAESKeySecret,
       encryptResponse: false,
     });
 
@@ -109,12 +124,12 @@ describe('Method: generatePresentationRequest()', () => {
   });
 
   it('should generate options set up to encrypt response', async () => {
-    const { dcapiOptions, requestMetadata } = await generatePresentationRequest({
+    const { dcapiOptions } = await generatePresentationRequest({
       credentialOptions: {
         format: 'sd-jwt-vc',
         desiredClaims: ['family_name', 'given_name', 'age_over_21'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
+      serverAESKeySecret,
       encryptResponse: true,
     });
 
@@ -131,18 +146,20 @@ describe('Method: generatePresentationRequest()', () => {
     assertEquals(client_metadata.jwks.keys.length, 1);
     assertEquals(client_metadata.jwks.keys[0].kty, 'EC');
     assertEquals(client_metadata.jwks.keys[0].crv, 'P-256');
-    assertEquals(typeof client_metadata.jwks.keys[0].x, 'string');
-    assertEquals(typeof client_metadata.jwks.keys[0].y, 'string');
+    assertEquals(client_metadata.jwks.keys[0].x, 'RIlPj8_a_azZ5Ed1ffhja2GFqRDKvjktB_8VK6S7hFo');
+    assertEquals(client_metadata.jwks.keys[0].y, 'atJc71TYgZ9jUwgunsTGd8v2nxW0geCT9AvnIqmm4TQ');
 
-    // Assert we have a valid private key JWK
-    assertExists(requestMetadata.privateKeyJWK);
-    assertEquals(requestMetadata.privateKeyJWK.kty, 'EC');
-    assertEquals(requestMetadata.privateKeyJWK.crv, 'P-256');
-    assertEquals(typeof requestMetadata.privateKeyJWK.x, 'string');
-    assertEquals(typeof requestMetadata.privateKeyJWK.y, 'string');
-    assertEquals(typeof requestMetadata.privateKeyJWK.d, 'string');
+    // Verify the corresponding private key is encrypted into the nonce
+    const { nonce } = dcapiOptions.digital.requests[0].data;
 
-    // TODO: Verify public key in `jwks` encrypts something the private key JWKS can decrypt?
+    const decryptedNonce = await decryptNonce({ serverAESKeySecret, nonce });
+
+    assertExists(decryptedNonce.privateKeyJWK);
+    assertEquals(decryptedNonce.privateKeyJWK.kty, 'EC');
+    assertEquals(decryptedNonce.privateKeyJWK.crv, 'P-256');
+    assertEquals(decryptedNonce.privateKeyJWK.d, 'TVIl8mDFJV_QtM4RmwTLpHgHaCGePZ1qNZVIlT84Df8');
+    assertEquals(decryptedNonce.privateKeyJWK.x, 'RIlPj8_a_azZ5Ed1ffhja2GFqRDKvjktB_8VK6S7hFo');
+    assertEquals(decryptedNonce.privateKeyJWK.y, 'atJc71TYgZ9jUwgunsTGd8v2nxW0geCT9AvnIqmm4TQ');
   });
 
   it('should generate a straightforward European PID mdoc request', async () => {
@@ -153,7 +170,7 @@ describe('Method: generatePresentationRequest()', () => {
         claimPathPrefix: 'eu.europa.ec.eudi.pid.1',
         desiredClaims: ['family_name', 'given_name', 'nationality'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
+      serverAESKeySecret,
     });
 
     assertEquals(
@@ -179,7 +196,7 @@ describe('Method: generatePresentationRequest()', () => {
         claimPathPrefix: 'com.emvco.payment_card.1',
         desiredClaims: ['card_number', 'card_network', 'expiry_year', 'expiry_month'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
+      serverAESKeySecret,
     });
 
     assertEquals(
@@ -206,7 +223,7 @@ describe('Method: generatePresentationRequest()', () => {
         claimPathPrefix: 'org.iso.18013.5.1',
         desiredClaims: ['registration_number', 'date_of_registration', 'vehicle_holder'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
+      serverAESKeySecret,
       encryptResponse: false,
     });
 
@@ -237,7 +254,7 @@ describe('Method: generatePresentationRequest()', () => {
           ['org.iso.7367.1', 'registration_number'],
         ],
       },
-      requestOrigin: 'https://digital-credentials.dev',
+      serverAESKeySecret,
       encryptResponse: false,
     });
 
@@ -264,7 +281,7 @@ describe('Method: generatePresentationRequest()', () => {
         desiredClaims: ['family_name', 'given_name'],
         acceptedVCTValues: ['urn:eu.europa.ec.eudi:pid:1'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
+      serverAESKeySecret,
       encryptResponse: false,
     });
 
@@ -293,7 +310,7 @@ describe('Method: generatePresentationRequest()', () => {
         ],
         acceptedVCTValues: ['urn:eu.europa.ec.eudi:pid:1', 'urn:eudi:pid:1'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
+      serverAESKeySecret,
       encryptResponse: false,
     });
 
