@@ -30,10 +30,7 @@ export async function generateOID4VPRequest({
   serverAESKeySecret: Uint8Array_;
   presentationLifetime: number;
   encryptResponse: boolean;
-}): Promise<{
-  request: DigitalCredentialRequest;
-  privateKeyJWK?: JsonWebKey;
-}> {
+}): Promise<{ request: DigitalCredentialRequest }> {
   const { format, desiredClaims } = credentialOptions;
 
   let credentialQuery:

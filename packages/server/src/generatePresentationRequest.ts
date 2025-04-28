@@ -1,3 +1,4 @@
+import type { Uint8Array_ } from './helpers/types.ts';
 import type { CredentialRequestOptions, DigitalCredentialRequest } from './dcapi/types.ts';
 import { SimpleDigiCredsError } from './helpers/index.ts';
 import {
@@ -22,18 +23,24 @@ import {
 export async function generatePresentationRequest({
   credentialOptions,
   requestOrigin,
+  serverAESKeySecret,
+  presentationLifetime = 300,
   protocol = 'oid4vp',
   encryptResponse = true,
 }: PresentationRequestOptions): Promise<GeneratedPresentationRequest> {
   let request: DigitalCredentialRequest;
-  let privateKeyJWK: JsonWebKey | undefined = undefined;
 
   /**
    * I'd love to be able to include multiple requests in different protocols, but alas, the
    * DC API does not yet support this.
    */
   if (protocol === 'oid4vp') {
-    ({ request, privateKeyJWK } = await generateOID4VPRequest(credentialOptions, encryptResponse));
+    ({ request } = await generateOID4VPRequest({
+      credentialOptions,
+      serverAESKeySecret,
+      presentationLifetime,
+      encryptResponse,
+    }));
   } else {
     throw new SimpleDigiCredsError({
       message: `Unsupported presentation protocol "${protocol}"`,
@@ -47,13 +54,6 @@ export async function generatePresentationRequest({
         requests: [request],
       },
     },
-    requestMetadata: {
-      requestOrigin,
-      privateKeyJWK,
-      // TODO: SD-JWT-VC and mDL use this `web-origin:...` client ID as of Draft 24, but I can't
-      // find where it's defined for use after Draft 24...I guess it's going away?
-      clientID: `web-origin:${requestOrigin}`,
-    },
   };
 }
 
@@ -63,8 +63,15 @@ export type PresentationRequestOptions = {
     | OID4VPMdocCredentialOptionsFull
     | OID4VPMDLCredentialOptions
     | OID4VPSDJWTCredentialOptions;
+  /** Where the request should take place */
   requestOrigin: string;
+  /** AES-GCM key material needed to symmetrically encrypt and decrypt information in the nonce. Must be 32 bytes */
+  serverAESKeySecret: Uint8Array_;
+  /** For how long in **seconds** the presentation ceremony should be valid. Defaults to 300s */
+  presentationLifetime?: number;
+  /** Which protocol to use to request the credential. Defaults to `'oid4vp'` */
   protocol?: 'oid4vp';
+  /** Protect the response from the wallet. Defaults to `true` */
   encryptResponse?: boolean;
 };
 
@@ -73,7 +80,6 @@ export type PresentationRequestOptions = {
  */
 export type GeneratedPresentationRequest = {
   dcapiOptions: CredentialRequestOptions;
-  requestMetadata: GeneratedPresentationRequestMetadata;
 };
 
 /**
