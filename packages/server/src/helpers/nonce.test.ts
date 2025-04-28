@@ -172,7 +172,7 @@ describe('Method: decryptNonce()', () => {
     await assertRejects(
       () => decryptNonce({ serverAESKeySecret: invalidServerAESKeySecret, nonce }),
       SimpleDigiCredsError,
-      'serverAESKeySecret was not 32 bytes',
+      'AES key secret was not 32 bytes',
     );
   });
 });
