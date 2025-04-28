@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
 import { type Stub, stub } from '@std/testing/mock';
 
 import { generatePresentationRequest } from './generatePresentationRequest.ts';
-import { _generateNonceInternals } from './helpers/generateNonce.ts';
+import { _generateNonceInternals } from './helpers/nonce.ts';
 
 describe('Method: generatePresentationRequest()', () => {
   let mockGenerateNonce: Stub;

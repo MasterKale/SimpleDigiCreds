@@ -1,6 +1,6 @@
 export * as base64url from './base64url.ts';
 export * as x509 from './x509/index.ts';
-export { generateNonce } from './generateNonce.ts';
+export { generateNonce } from './nonce.ts';
 export { importKey } from './importKey.ts';
 export { isDCAPIResponse } from '../dcapi/isDCAPIResponse.ts';
 export { mapCoseAlgToWebCryptoAlg } from './mapCoseAlgToWebCryptoAlg.ts';

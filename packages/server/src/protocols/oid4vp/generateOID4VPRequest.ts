@@ -1,5 +1,5 @@
 import type { DigitalCredentialRequest } from '../../dcapi/types.ts';
-import { generateNonce } from '../../helpers/generateNonce.ts';
+import { generateNonce } from '../../helpers/nonce.ts';
 import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
 import { generateMdocRequestOptions } from './generateMdocRequestOptions.ts';
 import { generateSDJWTRequestOptions } from './generateSDJWTRequestOptions.ts';
