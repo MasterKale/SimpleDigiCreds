@@ -94,7 +94,7 @@ app.get("/options", async (ctx) => {
    * Toggle between these to test either format (until both can be included in one DC API call)
    */
   const request = await generatePresentationRequest({
-    credentialOptions: mdocRequestFull,
+    credentialOptions: sdjwtvcRequestComplex,
     // encryptResponse: true, // Optional, defaults to `true`
     serverAESKeySecret,
   });

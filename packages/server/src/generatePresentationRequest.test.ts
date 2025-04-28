@@ -41,7 +41,6 @@ describe('Method: generatePresentationRequest()', () => {
         format: 'mdl',
         desiredClaims: ['family_name', 'given_name', 'age_over_21'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
       encryptResponse: false,
       serverAESKeySecret,
     });
@@ -56,7 +55,6 @@ describe('Method: generatePresentationRequest()', () => {
         format: 'mdl',
         desiredClaims: ['family_name'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
       serverAESKeySecret,
       encryptResponse: false,
     });
@@ -78,7 +76,6 @@ describe('Method: generatePresentationRequest()', () => {
         format: 'mdl',
         desiredClaims: ['family_name', 'given_name', 'age_over_21'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
       serverAESKeySecret,
       encryptResponse: false,
     });
@@ -105,7 +102,6 @@ describe('Method: generatePresentationRequest()', () => {
         desiredClaims: ['family_name', 'given_name', 'age_over_21'],
         acceptedVCTValues: ['urn:eu.europa.ec.eudi:pid:1'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
       serverAESKeySecret,
       encryptResponse: false,
     });
@@ -133,7 +129,6 @@ describe('Method: generatePresentationRequest()', () => {
         format: 'sd-jwt-vc',
         desiredClaims: ['family_name', 'given_name', 'age_over_21'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
       serverAESKeySecret,
       encryptResponse: true,
     });
@@ -175,7 +170,6 @@ describe('Method: generatePresentationRequest()', () => {
         claimPathPrefix: 'eu.europa.ec.eudi.pid.1',
         desiredClaims: ['family_name', 'given_name', 'nationality'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
       serverAESKeySecret,
     });
 
@@ -202,7 +196,6 @@ describe('Method: generatePresentationRequest()', () => {
         claimPathPrefix: 'com.emvco.payment_card.1',
         desiredClaims: ['card_number', 'card_network', 'expiry_year', 'expiry_month'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
       serverAESKeySecret,
     });
 
@@ -230,7 +223,6 @@ describe('Method: generatePresentationRequest()', () => {
         claimPathPrefix: 'org.iso.18013.5.1',
         desiredClaims: ['registration_number', 'date_of_registration', 'vehicle_holder'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
       serverAESKeySecret,
       encryptResponse: false,
     });
@@ -262,7 +254,6 @@ describe('Method: generatePresentationRequest()', () => {
           ['org.iso.7367.1', 'registration_number'],
         ],
       },
-      requestOrigin: 'https://digital-credentials.dev',
       serverAESKeySecret,
       encryptResponse: false,
     });
@@ -290,7 +281,6 @@ describe('Method: generatePresentationRequest()', () => {
         desiredClaims: ['family_name', 'given_name'],
         acceptedVCTValues: ['urn:eu.europa.ec.eudi:pid:1'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
       serverAESKeySecret,
       encryptResponse: false,
     });
@@ -320,7 +310,6 @@ describe('Method: generatePresentationRequest()', () => {
         ],
         acceptedVCTValues: ['urn:eu.europa.ec.eudi:pid:1', 'urn:eudi:pid:1'],
       },
-      requestOrigin: 'https://digital-credentials.dev',
       serverAESKeySecret,
       encryptResponse: false,
     });

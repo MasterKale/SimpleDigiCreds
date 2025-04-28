@@ -62,11 +62,18 @@ export async function decryptAESGCM(
 /**
  * Generate a key we can use for AES-GCM 256-bit encryption and decryption
  */
-export function importAESGCMKey(keyData: Uint8Array_): Promise<CryptoKey> {
+export function importAESGCMKey(keySecret: Uint8Array_): Promise<CryptoKey> {
+  if (keySecret?.length !== 32) {
+    throw new SimpleDigiCredsError({
+      message: 'AES key secret was not 32 bytes',
+      code: 'InvalidDCAPIResponse',
+    });
+  }
+
   try {
     return globalThis.crypto.subtle.importKey(
       'raw',
-      keyData,
+      keySecret,
       { name: 'AES-GCM', length: 256 },
       false,
       ['encrypt', 'decrypt'],

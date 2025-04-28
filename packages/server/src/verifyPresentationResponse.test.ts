@@ -220,4 +220,31 @@ describe('Method: verifyPresentationResponse()', () => {
 
     mockDate.restore();
   });
+
+  it('should support multiple possible origins', async () => {
+    const mockDate = new FakeTime(new Date('2025-04-28T17:40:48.169Z'));
+
+    const data: DCAPIResponse = {
+      vp_token: {
+        cred1:
+          'o2d2ZXJzaW9uYzEuMGlkb2N1bWVudHOBo2dkb2NUeXBldW9yZy5pc28uMTgwMTMuNS4xLm1ETGxpc3N1ZXJTaWduZWSiam5hbWVTcGFjZXOhcW9yZy5pc28uMTgwMTMuNS4xgtgYWFSkaGRpZ2VzdElEAGZyYW5kb21QowIG7A9ukVpUbf4JQk38jXFlbGVtZW50SWRlbnRpZmllcmtmYW1pbHlfbmFtZWxlbGVtZW50VmFsdWVlU21pdGjYGFhRpGhkaWdlc3RJRAFmcmFuZG9tUMzj8HaMUvdAFMAHJ6Zt25dxZWxlbWVudElkZW50aWZpZXJqZ2l2ZW5fbmFtZWxlbGVtZW50VmFsdWVjSm9uamlzc3VlckF1dGiEQ6EBJqEYIVkCxDCCAsAwggJnoAMCAQICFB5_GzKtTzTv5LDMB7ew4zOnCxhNMAoGCCqGSM49BAMCMHkxCzAJBgNVBAYTAlVTMRMwEQYDVQQIDApDYWxpZm9ybmlhMRYwFAYDVQQHDA1Nb3VudGFpbiBWaWV3MRwwGgYDVQQKDBNEaWdpdGFsIENyZWRlbnRpYWxzMR8wHQYDVQQDDBZkaWdpdGFsY3JlZGVudGlhbHMuZGV2MB4XDTI1MDIxOTIzMzAxOFoXDTI2MDIxOTIzMzAxOFoweTELMAkGA1UEBhMCVVMxEzARBgNVBAgMCkNhbGlmb3JuaWExFjAUBgNVBAcMDU1vdW50YWluIFZpZXcxHDAaBgNVBAoME0RpZ2l0YWwgQ3JlZGVudGlhbHMxHzAdBgNVBAMMFmRpZ2l0YWxjcmVkZW50aWFscy5kZXYwWTATBgcqhkjOPQIBBggqhkjOPQMBBwNCAATreTYr4tfzl8NQBH2D4eNiLONVazYPamjHWLsN3Gr4bAmvml1dDZk5dhLDWieRlpjKAA_IpMABbM2ISHjYBeNpo4HMMIHJMB8GA1UdIwQYMBaAFKJP9InZfEbobqOG2UdIzsy-3M_1MB0GA1UdDgQWBBTf_mpaEunAYsS8mKcl0tlw93pgKDA0BgNVHR8ELTArMCmgJ6AlhiNodHRwczovL2RpZ2l0YWwtY3JlZGVudGlhbHMuZGV2L2NybDAqBgNVHRIEIzAhhh9odHRwczovL2RpZ2l0YWwtY3JlZGVudGlhbHMuZGV2MA4GA1UdDwEB_wQEAwIHgDAVBgNVHSUBAf8ECzAJBgcogYxdBQECMAoGCCqGSM49BAMCA0cAMEQCIGHFy_V8weN78uCxM9ofIDEEXXCbWiEUDnpoMJvLB0LnAiBwr6LhxJv7p4wVzAnlGe0Ef8pqYxshyE8NufwfR_ULAlkDGNgYWQMTpmd2ZXJzaW9uYzEuMG9kaWdlc3RBbGdvcml0aG1nU0hBLTI1Nmdkb2NUeXBldW9yZy5pc28uMTgwMTMuNS4xLm1ETGx2YWx1ZURpZ2VzdHOhcW9yZy5pc28uMTgwMTMuNS4xrQBYILu5ibuAB7xz5TA1J31YS01Xph8CumuHvUxOqUE2OWFYAVggngwRC6EI2bOTa1TzvxVJ5ys-U0j8VBRm8w-zrtXO3dcCWCBZ8yZz3BnCJn0jfmIOydxtjwO73p5Dc8QrLVn04TWG3wNYIHbP3TYRZJ5w-oeuZhZ3MKrz0pQnasQkLTb306vTSfUaBFggCf63J-jnaQZV8TrJf7YCGQ2nZMDlfQTtr5RPM_x41b8FWCDblQsn_BzRcKkQiwjSGPXJfoojodcpPuKRC3utWNr45wZYIBmWZrBiD9Ahthc9j3I4H-zI59KynwHv3yK0dm-6A9SyB1ggJF0BWaxZ_m4nRi0BRbxMy42vWRcf5ur0HAsMsMqri6QIWCDJXpnYbOM6E8ZhjMmZfDgCD0kKNZNpWOGLH7ZPJCKMQglYIJOeWL6r0JFM5FHTzCou0hwyJP-bRLF-ucX8UWGgeToyClggs73eUbe8mXiDQpbfRfC8DtqAei-Q4ldxC0MNlIQvqKwLWCCAk4CaAwhSdmmmEUe92Rcl_onUT-ZWaxWALsPaPuJA8QxYIJX224tD_I90r-C3KpKQ9x9SyRDIQkBirWqxRnd8nmdWbWRldmljZUtleUluZm-haWRldmljZUtleaQBAiABIVggA30hYr0LwfvJH3s5RYJfVABWIkhpSae19vLndlHPU5giWCD4VPuW7U309tOp4vpwwAnOa-HovUUJWJi4axkRUjLTEGx2YWxpZGl0eUluZm-jZnNpZ25lZMB4GzIwMjUtMDQtMjVUMDY6NDU6MTEuOTY1MDAyWml2YWxpZEZyb23AeBsyMDI1LTA0LTI1VDA2OjQ1OjExLjk2NTAwOVpqdmFsaWRVbnRpbMB4GzIwMzUtMDQtMTNUMDY6NDU6MTEuOTY1MDEwWlhAswX7ivVe2SaCVPRrdMe2ZWISwkBFVSYepiRofVsBGtTlLGL26iAD8R2RfWoLxbYmNe9xCXgTDGFsFsmfX6xgn2xkZXZpY2VTaWduZWSiam5hbWVTcGFjZXPYGEGgamRldmljZUF1dGihb2RldmljZVNpZ25hdHVyZYRDoQEmoPZYQDboP-ZEpwAoG8mkXGCSXVE2-a2oGIaZh1Im6sM-b-KPLVzVDYHK6I9eVNv5aq6JxgRHgXStkz4Grko0I-Yu-eNmc3RhdHVzAA',
+      },
+    };
+
+    const verified = await verifyPresentationResponse({
+      data,
+      nonce:
+        'nBWacHSjO-2HFazXmC4Kej2ftuZL3jvWvJrqne9qnILBJGjkgcTwOrZ2DW8WXL7-deoOYcBB0pw.bHHdOd5C7ug5uBMk',
+      expectedOrigin: [
+        'http://localhost:12345',
+        'http://localhost:8000', // This is the the real origin
+      ],
+      serverAESKeySecret,
+    });
+
+    // Just make sure we get a successful verification
+    assertExists(verified.cred1);
+
+    mockDate.restore();
+  });
 });
