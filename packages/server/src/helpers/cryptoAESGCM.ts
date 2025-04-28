@@ -80,3 +80,12 @@ export function importAESGCMKey(keyData: Uint8Array_): Promise<CryptoKey> {
     });
   }
 }
+
+/**
+ * Generate random bytes needed for AES-GCM encryption and decryption. This can be used as the
+ * value of `serverAESKeySecret` when generating presentation request options and verifying
+ * the subsequent response.
+ */
+export function generateServerAESKeySecret(): Uint8Array_ {
+  return globalThis.crypto.getRandomValues(new Uint8Array(32));
+}

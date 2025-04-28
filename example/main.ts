@@ -11,6 +11,7 @@ import {
   verifyPresentationResponse,
 } from "../packages/server/src/index.ts";
 
+const serverAESKeySecret = new Uint8Array(32);
 let currentRequest: GeneratedPresentationRequest;
 
 const app = new Hono();
@@ -83,9 +84,10 @@ app.get("/options", async (ctx) => {
    * Toggle between these to test either format (until both can be included in one DC API call)
    */
   const request = await generatePresentationRequest({
-    credentialOptions: sdjwtvcRequestComplex,
+    credentialOptions: mdocRequestFull,
     requestOrigin: "http://localhost:8000",
     // encryptResponse: true, // Optional, defaults to `true`
+    serverAESKeySecret,
   });
 
   console.log(JSON.stringify(request, null, 2));
@@ -102,7 +104,9 @@ app.post("/verify", async (ctx) => {
 
   const verified = await verifyPresentationResponse({
     data: body,
-    request: currentRequest,
+    expectedOrigin: "http://localhost:8000",
+    nonce: currentRequest.dcapiOptions.digital.requests[0].data.nonce,
+    serverAESKeySecret,
   });
 
   console.log("verified claims:\n", JSON.stringify(verified, null, 2));
