@@ -2,7 +2,7 @@ import { verifyMDocPresentation } from './formats/mdoc/index.ts';
 import { verifySDJWTPresentation } from './formats/sd-jwt-vc/index.ts';
 import { base64url, isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
 import type { Uint8Array_, VerifiedPresentation } from './helpers/types.ts';
-import type { DCAPIEncryptedResponse, DCAPIResponse } from './dcapi/types.ts';
+import type { DCAPIResponse } from './dcapi/types.ts';
 import { isEncryptedDCAPIResponse } from './dcapi/isEncryptedDCAPIResponse.ts';
 import { decryptDCAPIResponse } from './dcapi/decryptDCAPIResponse.ts';
 import { decryptNonce } from './helpers/nonce.ts';
@@ -16,14 +16,19 @@ export async function verifyPresentationResponse({
   expectedOrigin,
   serverAESKeySecret,
 }: {
-  data: DCAPIResponse | DCAPIEncryptedResponse;
+  data: object | string;
   nonce: string;
   expectedOrigin: string | string[];
   serverAESKeySecret: Uint8Array_;
 }): Promise<VerifiedPresentation> {
   const verifiedValues: VerifiedPresentation = {};
 
-  if (data === null || typeof data !== 'object') {
+  // If the data is a string then parse it as JSON as the DC API sometimes returns stringified JSON
+  if (typeof data === 'string') {
+    data = JSON.parse(data);
+  }
+
+  if (typeof data !== 'object') {
     throw new SimpleDigiCredsError({
       code: 'InvalidDCAPIResponse',
       message: `data was type ${typeof data}, not an object`,
