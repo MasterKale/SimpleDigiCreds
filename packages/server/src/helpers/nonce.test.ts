@@ -6,8 +6,7 @@ import { type Stub, stub } from '@std/testing/mock';
 import { decryptNonce, generateNonce } from './nonce.ts';
 import { base64url, SimpleDigiCredsError } from './index.ts';
 import type { Uint8Array_ } from './types.ts';
-import { decryptAESGCM } from './decryptAESGCM.ts';
-import { importAESGCMKey } from './importAESGCMKey.ts';
+import { decryptAESGCM, importAESGCMKey } from './cryptoAESGCM.ts';
 import {
   _generateEncryptionKeypairInternals,
   generateEncryptionKeypair,
