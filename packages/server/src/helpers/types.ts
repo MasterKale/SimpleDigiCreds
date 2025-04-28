@@ -30,9 +30,9 @@ export type Uint8Array_ = ReturnType<Uint8Array['slice']>;
 export type VerifiedPresentation = {
   /**
    * TODO: Typing on this is kinda weird when working with output from this method. For example,
-   * `verified.cred1.verifiedClaims` requires you to know that this library chose "cred1" as
-   * the name when it generated credential request options. Can we collapse this type so that it's
-   * `verified.verifiedClaims` instead?
+   * `verified.credential1.verifiedClaims` requires you to know that this library chose
+   * "credential1" as the name when it generated credential request options. Can we collapse this
+   * type so that it's `verified.verifiedClaims` instead?
    */
   [credID: string]: VerifiedCredential;
 };

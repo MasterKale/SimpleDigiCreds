@@ -83,7 +83,7 @@ describe('Method: generatePresentationRequest()', () => {
     assertEquals(
       options.dcapiOptions.digital.requests[0].data.dcql_query.credentials[0],
       {
-        id: 'cred1',
+        id: 'credential1',
         format: 'mso_mdoc',
         meta: { doctype_value: 'org.iso.18013.5.1.mDL' },
         claims: [
@@ -109,7 +109,7 @@ describe('Method: generatePresentationRequest()', () => {
     assertEquals(
       options.dcapiOptions.digital.requests[0].data.dcql_query.credentials[0],
       {
-        id: 'cred1',
+        id: 'credential1',
         format: 'dc+sd-jwt',
         meta: {
           vct_values: ['urn:eu.europa.ec.eudi:pid:1'],
@@ -176,7 +176,7 @@ describe('Method: generatePresentationRequest()', () => {
     assertEquals(
       options.dcapiOptions.digital.requests[0].data.dcql_query.credentials[0],
       {
-        id: 'cred1',
+        id: 'credential1',
         format: 'mso_mdoc',
         meta: { doctype_value: 'eu.europa.ec.eudi.pid.1' },
         claims: [
@@ -202,7 +202,7 @@ describe('Method: generatePresentationRequest()', () => {
     assertEquals(
       options.dcapiOptions.digital.requests[0].data.dcql_query.credentials[0],
       {
-        id: 'cred1',
+        id: 'credential1',
         format: 'mso_mdoc',
         meta: { doctype_value: 'com.emvco.payment_card' },
         claims: [
@@ -230,7 +230,7 @@ describe('Method: generatePresentationRequest()', () => {
     assertEquals(
       options.dcapiOptions.digital.requests[0].data.dcql_query.credentials[0],
       {
-        id: 'cred1',
+        id: 'credential1',
         format: 'mso_mdoc',
         meta: { doctype_value: 'org.iso.7367.1.mVRC' },
         claims: [
@@ -261,7 +261,7 @@ describe('Method: generatePresentationRequest()', () => {
     assertEquals(
       options.dcapiOptions.digital.requests[0].data.dcql_query.credentials[0],
       {
-        id: 'cred1',
+        id: 'credential1',
         format: 'mso_mdoc',
         meta: { doctype_value: 'org.iso.7367.1.mVRC' },
         claims: [
@@ -288,7 +288,7 @@ describe('Method: generatePresentationRequest()', () => {
     assertEquals(
       options.dcapiOptions.digital.requests[0].data.dcql_query.credentials[0],
       {
-        id: 'cred1',
+        id: 'credential1',
         format: 'dc+sd-jwt',
         meta: { vct_values: ['urn:eu.europa.ec.eudi:pid:1'] },
         claims: [
@@ -317,7 +317,7 @@ describe('Method: generatePresentationRequest()', () => {
     assertEquals(
       options.dcapiOptions.digital.requests[0].data.dcql_query.credentials[0],
       {
-        id: 'cred1',
+        id: 'credential1',
         format: 'dc+sd-jwt',
         meta: { vct_values: ['urn:eu.europa.ec.eudi:pid:1', 'urn:eudi:pid:1'] },
         claims: [
