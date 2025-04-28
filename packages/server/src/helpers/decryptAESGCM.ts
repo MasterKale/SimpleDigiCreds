@@ -1,3 +1,4 @@
+import { SimpleDigiCredsError } from './index.ts';
 import type { Uint8Array_ } from './types.ts';
 
 /**
@@ -9,11 +10,22 @@ export async function decryptAESGCM(
   iv: Uint8Array_,
   encryptionKey: CryptoKey,
 ): Promise<Uint8Array_> {
-  const decrypted = await globalThis.crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv },
-    encryptionKey,
-    ciphertext,
-  );
+  let decrypted: ArrayBuffer;
+
+  try {
+    decrypted = await globalThis.crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      encryptionKey,
+      ciphertext,
+    );
+  } catch (err) {
+    const _err = err as Error;
+    throw new SimpleDigiCredsError({
+      message: `Failed to decrypt data`,
+      code: 'SubtleCryptoError',
+      cause: _err,
+    });
+  }
 
   return new Uint8Array(decrypted);
 }

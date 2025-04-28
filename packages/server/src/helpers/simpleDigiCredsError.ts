@@ -23,4 +23,5 @@ export type SimpleDigiCredsErrorCode =
   | 'InvalidPresentationOptions'
   | 'InvalidDCAPIResponse'
   | 'MdocVerificationError'
-  | 'SDJWTVerificationError';
+  | 'SDJWTVerificationError'
+  | 'SubtleCryptoError';
