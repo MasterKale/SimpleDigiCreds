@@ -19,7 +19,8 @@ import {
  * const serverAESKeySecret = globalThis.crypto.getRandomValues(new Uint8Array(32));
  * ```
  *
- * Then store `serverAESKeySecret` in a secure location (env var, etc...)
+ * Then store `serverAESKeySecret` in a secure location (env var, etc...) and pass it in when
+ * calling the `generatePresentationRequest()` and `verifyPresentationResponse()` methods.
  */
 const serverAESKeySecret = new Uint8Array(32);
 
@@ -94,7 +95,6 @@ app.get("/options", async (ctx) => {
    */
   const request = await generatePresentationRequest({
     credentialOptions: mdocRequestFull,
-    requestOrigin: "http://localhost:8000",
     // encryptResponse: true, // Optional, defaults to `true`
     serverAESKeySecret,
   });

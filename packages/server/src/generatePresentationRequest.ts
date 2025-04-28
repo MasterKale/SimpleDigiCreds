@@ -22,7 +22,6 @@ import {
  */
 export async function generatePresentationRequest({
   credentialOptions,
-  requestOrigin,
   serverAESKeySecret,
   presentationLifetime = 300,
   protocol = 'oid4vp',
@@ -63,8 +62,6 @@ export type PresentationRequestOptions = {
     | OID4VPMdocCredentialOptionsFull
     | OID4VPMDLCredentialOptions
     | OID4VPSDJWTCredentialOptions;
-  /** Where the request should take place */
-  requestOrigin: string;
   /** AES-GCM key material needed to symmetrically encrypt and decrypt information in the nonce. Must be 32 bytes */
   serverAESKeySecret: Uint8Array_;
   /** For how long in **seconds** the presentation ceremony should be valid. Defaults to 300s */
@@ -80,13 +77,4 @@ export type PresentationRequestOptions = {
  */
 export type GeneratedPresentationRequest = {
   dcapiOptions: CredentialRequestOptions;
-};
-
-/**
- * Various values necessary to verify the presentation request's response
- */
-export type GeneratedPresentationRequestMetadata = {
-  requestOrigin: string;
-  clientID: string;
-  privateKeyJWK?: JsonWebKey;
 };
