@@ -6,7 +6,7 @@ verification.
 - [Installation](#installation)
   - [Node LTS 22.x and higher](#node-lts-22x-and-higher)
   - [Deno 2.1 and higher](#deno-21-and-higher)
-- [Usage](#usage)
+- [Getting Started](#getting-started)
 - [Example Presentation Requests](#example-presentation-requests)
 
 ## Installation
@@ -26,15 +26,18 @@ npm install @simplewebauthn/server
 deno add jsr:@simplewebauthn/server
 ```
 
-## Usage
+## Getting Started
 
-The simplest way to get started is to import the methods required for generating a Digital
-Credentials API presentation request, then parsing the subsequent presentation response:
+Here's basic step-by-step instructions on how to use **@simpledigicreds/server** to request and
+verify a **mdoc** and **SD-JWT-VC** digital credential presentation over **OID4VP** using the
+**Digital Credentials API**:
+
+### Step 1: (Server) Generate a presentation request <!-- omit in toc -->
 
 ```ts
-import { generatePresentationOptions, verifyPresentationResponse } from '@simpledigicreds/server';
-
 /** Server */
+import { generatePresentationOptions } from '@simpledigicreds/server';
+
 // A random 32-byte value used for encryption and decryption
 const serverAESKeySecret: Uint8Array = secretKeyToBytes(process.env.AES_SECRET_KEY);
 
@@ -47,8 +50,15 @@ const { dcapiOptions } = await generatePresentationRequest({
   serverAESKeySecret,
 });
 
+sendOptionsToBrowser(dcapiOptions);
+```
+
+### Step 2: (Browser) Call the Digital Credentials API <!-- omit in toc -->
+
+```ts
 /** Browser */
 if (typeof window.DigitalCredential === 'function') {
+  const dcapiOptions = getOptionsFromServer();
   const response = await navigator.credentials.get(dcapiOptions);
 
   sendJSONToServer({
@@ -56,8 +66,14 @@ if (typeof window.DigitalCredential === 'function') {
     nonce: dcapiOptions.digital.requests[0].data.nonce,
   });
 }
+```
 
+### Step 3: (Server) Verify the credential presentation <!-- omit in toc -->
+
+```ts
 /** Server */
+import { verifyPresentationResponse } from '@simpledigicreds/server';
+
 const { data, nonce } = getJSONFromBrowser(req);
 
 const verified = await verifyPresentationResponse({
@@ -68,8 +84,19 @@ const verified = await verifyPresentationResponse({
 });
 ```
 
-`verified.credential1.claims` will contain any verified claims contained in the presented
-credential.
+### Step 4: (Server) Use the verified claims <!-- omit in toc -->
+
+```ts
+/** Server */
+const {
+  // Claim values that were disclosed by the user
+  claims,
+  // Issuer-specified validity of the credential, etc...
+  issuerMeta,
+  // Where a credential was presented, SD-JWT-VC type, etc...
+  credentialMeta,
+} = verified.credential1;
+```
 
 ## Example Presentation Requests
 
