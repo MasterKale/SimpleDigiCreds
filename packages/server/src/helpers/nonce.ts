@@ -58,6 +58,13 @@ export async function decryptNonce({
   serverAESKeySecret: Uint8Array_;
   nonce: string;
 }): Promise<NonceData> {
+  if (serverAESKeySecret?.length !== 32) {
+    throw new SimpleDigiCredsError({
+      message: 'serverAESKeySecret was not 32 bytes',
+      code: 'InvalidDCAPIResponse',
+    });
+  }
+
   const nonceParts = nonce.split('.');
 
   if (nonceParts.length !== 2) {
