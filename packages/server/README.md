@@ -27,31 +27,43 @@ deno add jsr:@simplewebauthn/server
 
 ## Usage
 
-The simplest way to get started is to import methods required for generating options, then parsing a
-presentation:
+The simplest way to get started is to import the methods required for generating a Digital
+Credentials API presentation request, then parsing the subsequent presentation response:
 
 ```ts
 import { generatePresentationOptions, verifyPresentationResponse } from '@simpledigicreds/server';
 
-/* server */
-const presentationRequest = await generatePresentationRequest({
+/** Server */
+// A random 32-byte value used for encryption and decryption
+const serverAESKeySecret: Uint8Array = secretKeyToBytes(process.env.AES_SECRET_KEY);
+
+const { dcapiOptions } = await generatePresentationRequest({
   credentialOptions: {
     format: 'mdl',
     desiredClaims: ['family_name', 'given_name'],
   },
-  requestOrigin: 'http://localhost:8000',
+  presentationLifetime: 600, // seconds, defaults to 300 seconds
+  serverAESKeySecret,
 });
-const { dcapiOptions } = presentationRequest;
 
-/* browser */
+/** Browser */
 if (typeof window.DigitalCredential === 'function') {
-  const presentation = await navigator.credentials.get(dcapiOptions);
+  const response = await navigator.credentials.get(dcapiOptions);
+
+  sendJSONToServer({
+    data: response.data,
+    nonce: dcapiOptions.digital.requests[0].data.nonce,
+  });
 }
 
-/* server */
+/** Server */
+const { data, nonce } = getJSONFromBrowser(req);
+
 const verified = await verifyPresentationResponse({
-  data: presentation.data,
-  request: presentationRequest,
+  data,
+  nonce,
+  expectedOrigin: 'http://localhost:8000',
+  serverAESKeySecret,
 });
 ```
 

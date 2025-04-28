@@ -21,7 +21,8 @@ digital credentials using **OID4VP (draft 24)** via the
 [Digital Credentials API](https://w3c-fedid.github.io/digital-credentials/). The following packages
 are maintained here to achieve this:
 
-- [@simpledigicreds/browser](https://github.com/MasterKale/SimpleDigiCreds/tree/main/packages/browser)
+- ~~[@simpledigicreds/browser](https://github.com/MasterKale/SimpleDigiCreds/tree/main/packages/browser)~~
+  (still pondering the necessity of this)
 - [@simpledigicreds/server](https://github.com/MasterKale/SimpleDigiCreds/tree/main/packages/server)
 
 ## Installation
@@ -40,6 +41,7 @@ See the packages' READMEs for more specific installation information.
 - Unencrypted responses
 - Encrypted responses (following
   [OID4VC HAIP](https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0-03.html#section-6))
+- Stateless presentation verification
 
 ### OID4VP - SD-JWT-VC
 
