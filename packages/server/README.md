@@ -11,19 +11,19 @@ verification.
 
 ## Installation
 
-This package can be installed from **[NPM](https://www.npmjs.com/package/@simplewebauthn/server)**
-and **[JSR](https://jsr.io/@simplewebauthn/server)**:
+This package can be installed from **[NPM](https://www.npmjs.com/package/@simpledigicreds/server)**
+and **[JSR](https://jsr.io/@simpledigicreds/server)**:
 
 ### Node LTS 22.x and higher
 
 ```sh
-npm install @simplewebauthn/server
+npm install @simpledigicreds/server
 ```
 
 ### Deno 2.1 and higher
 
 ```sh
-deno add jsr:@simplewebauthn/server
+deno add jsr:@simpledigicreds/server
 ```
 
 ## Getting Started
