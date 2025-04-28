@@ -39,9 +39,11 @@ export async function generateOID4VPRequest({
     | OID4VPCredentialQuerySDJWTVC;
   let clientMetadata: OID4VPClientMetadataSDJWTVC | undefined = undefined;
 
+  const requestID = 'credential1';
+
   if (format === 'mdl') {
     ({ credentialQuery } = generateMdocRequestOptions({
-      id: 'cred1',
+      id: requestID,
       doctype: 'org.iso.18013.5.1.mDL',
       claimPaths: desiredClaims.map((claim) => ['org.iso.18013.5.1', claim]),
     }));
@@ -74,14 +76,14 @@ export async function generateOID4VPRequest({
     }
 
     ({ credentialQuery } = generateMdocRequestOptions({
-      id: 'cred1',
+      id: requestID,
       doctype: credentialOptions.doctype,
       claimPaths,
     }));
   } else if (format === 'sd-jwt-vc') {
     const { acceptedVCTValues } = credentialOptions;
     ({ credentialQuery, clientMetadata } = generateSDJWTRequestOptions({
-      id: 'cred1',
+      id: requestID,
       desiredClaims,
       acceptedVCTValues,
     }));

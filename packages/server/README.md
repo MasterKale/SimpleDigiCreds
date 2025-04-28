@@ -67,4 +67,5 @@ const verified = await verifyPresentationResponse({
 });
 ```
 
-`verified.cred1.claims` will contain any verified claims contained in the presented credential.
+`verified.credential1.claims` will contain any verified claims contained in the presented
+credential.
