@@ -40,6 +40,7 @@ export type VerifiedPresentation = {
 export type VerifiedCredential = {
   claims: VerifiedClaimsMap;
   issuerMeta: VerifiedCredentialIssuerMeta;
+  credentialMeta: VerifiedCredentialMeta;
 };
 
 /**
@@ -54,4 +55,11 @@ export type VerifiedCredentialIssuerMeta = {
   validFrom?: Date;
   expiresOn?: Date;
   issuedAt?: Date;
+};
+
+export type VerifiedCredentialMeta = {
+  verifiedOrigin: string;
+  // SD-JWT-VC-specific metadata
+  /** Ex: "urn:eudi:pid:1" */
+  vct?: string;
 };
