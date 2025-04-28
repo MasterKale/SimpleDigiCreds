@@ -1,7 +1,5 @@
 import { base64url, SimpleDigiCredsError } from './index.ts';
-import { importAESGCMKey } from './importAESGCMKey.ts';
-import { encryptAESGCM } from './encryptAESGCM.ts';
-import { decryptAESGCM } from './decryptAESGCM.ts';
+import { decryptAESGCM, encryptAESGCM, importAESGCMKey } from './cryptoAESGCM.ts';
 import type { Uint8Array_ } from './types.ts';
 
 /**
