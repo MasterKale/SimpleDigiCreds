@@ -4,7 +4,6 @@ export {
   type PresentationRequestOptions,
 } from './generatePresentationRequest.ts';
 export { verifyPresentationResponse } from './verifyPresentationResponse.ts';
-export { generateServerAESKeySecret } from './helpers/cryptoAESGCM.ts';
 
 export type {
   CredentialRequestOptions,
