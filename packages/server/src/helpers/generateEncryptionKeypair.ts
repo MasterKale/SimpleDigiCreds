@@ -22,5 +22,13 @@ export async function generateEncryptionKeypair(): Promise<{
   const privateKeyJWK = await jose.exportJWK(privateKey);
   const publicKeyJWK = await jose.exportJWK(publicKey);
 
-  return { privateKeyJWK, publicKeyJWK };
+  return _generateEncryptionKeypairInternals.stubThis({ privateKeyJWK, publicKeyJWK });
 }
+
+/**
+ * Make it possible to stub the return value during testing
+ * @ignore Don't include this in docs output
+ */
+export const _generateEncryptionKeypairInternals = {
+  stubThis: (value: { privateKeyJWK: JsonWebKey; publicKeyJWK: JsonWebKey }) => value,
+};
