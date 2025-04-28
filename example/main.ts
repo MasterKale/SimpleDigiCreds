@@ -6,7 +6,7 @@ import {
   type OID4VPMDLCredentialOptions,
   type OID4VPMdocCredentialOptionsFull,
   type OID4VPMdocCredentialOptionsSimple,
-  type OID4VPSDJWTCredentialOptions,
+  type OID4VPSDJWTVCCredentialOptions,
   verifyPresentationResponse,
 } from "../packages/server/src/index.ts";
 
@@ -73,14 +73,14 @@ app.get("/options", async (ctx) => {
   };
 
   // A straightforward European PID SD-JWT-VC request
-  const sdjwtvcRequest: OID4VPSDJWTCredentialOptions = {
+  const sdjwtvcRequest: OID4VPSDJWTVCCredentialOptions = {
     format: "sd-jwt-vc",
     desiredClaims: ["family_name", "given_name"],
     acceptedVCTValues: ["urn:eu.europa.ec.eudi:pid:1", "urn:eudi:pid:1"],
   };
 
   // A more complex SD-JWT-VC request with a mix of single-path and multi-path claims
-  const sdjwtvcRequestComplex: OID4VPSDJWTCredentialOptions = {
+  const sdjwtvcRequestComplex: OID4VPSDJWTVCCredentialOptions = {
     format: "sd-jwt-vc",
     desiredClaims: [
       "given_name",

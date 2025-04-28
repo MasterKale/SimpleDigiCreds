@@ -6,7 +6,7 @@ import {
   type OID4VPMDLCredentialOptions,
   type OID4VPMdocCredentialOptionsFull,
   type OID4VPMdocCredentialOptionsSimple,
-  type OID4VPSDJWTCredentialOptions,
+  type OID4VPSDJWTVCCredentialOptions,
 } from './protocols/oid4vp/generateOID4VPRequest.ts';
 
 /**
@@ -61,7 +61,7 @@ export type PresentationRequestOptions = {
     | OID4VPMdocCredentialOptionsSimple
     | OID4VPMdocCredentialOptionsFull
     | OID4VPMDLCredentialOptions
-    | OID4VPSDJWTCredentialOptions;
+    | OID4VPSDJWTVCCredentialOptions;
   /** AES-GCM key material needed to symmetrically encrypt and decrypt information in the nonce. Must be 32 bytes */
   serverAESKeySecret: Uint8Array_;
   /** For how long in **seconds** the presentation ceremony should be valid. Defaults to 300s */

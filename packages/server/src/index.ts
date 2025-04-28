@@ -24,7 +24,7 @@ export type {
   OID4VPMDLCredentialOptions,
   OID4VPMdocCredentialOptionsFull,
   OID4VPMdocCredentialOptionsSimple,
-  OID4VPSDJWTCredentialOptions,
+  OID4VPSDJWTVCCredentialOptions,
 } from './protocols/oid4vp/generateOID4VPRequest.ts';
 
 export type { DocumentTypeMDLv1, Identifier, NamespaceMDLv1 } from './formats/mdoc/types.ts';

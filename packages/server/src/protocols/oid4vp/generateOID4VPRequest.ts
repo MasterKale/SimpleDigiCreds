@@ -26,7 +26,7 @@ export async function generateOID4VPRequest({
     | OID4VPMDLCredentialOptions
     | OID4VPMdocCredentialOptionsSimple
     | OID4VPMdocCredentialOptionsFull
-    | OID4VPSDJWTCredentialOptions;
+    | OID4VPSDJWTVCCredentialOptions;
   serverAESKeySecret: Uint8Array_;
   presentationLifetime: number;
   encryptResponse: boolean;
@@ -178,7 +178,7 @@ export type OID4VPMdocCredentialOptionsFull = {
 /**
  * Supports SD-JWT-VC-based credentials
  */
-export type OID4VPSDJWTCredentialOptions = {
+export type OID4VPSDJWTVCCredentialOptions = {
   format: 'sd-jwt-vc';
   desiredClaims: (string | string[])[];
   acceptedVCTValues?: string[];
