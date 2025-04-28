@@ -1,18 +1,25 @@
 import { verifyMDocPresentation } from './formats/mdoc/index.ts';
 import { verifySDJWTPresentation } from './formats/sd-jwt-vc/index.ts';
 import { base64url, isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
-import type { VerifiedPresentation } from './helpers/types.ts';
+import type { Uint8Array_, VerifiedPresentation } from './helpers/types.ts';
 import type { DCAPIEncryptedResponse, DCAPIResponse } from './dcapi/types.ts';
 import { isEncryptedDCAPIResponse } from './dcapi/isEncryptedDCAPIResponse.ts';
 import { decryptDCAPIResponse } from './dcapi/decryptDCAPIResponse.ts';
+import { decryptNonce } from './helpers/nonce.ts';
 
 /**
  * Verify and return a credential presentation out of a call to the Digital Credentials API
  */
-export async function verifyPresentationResponse({ data, nonce, expectedOrigin }: {
+export async function verifyPresentationResponse({
+  data,
+  nonce,
+  expectedOrigin,
+  serverAESKeySecret,
+}: {
   data: DCAPIResponse | DCAPIEncryptedResponse;
   nonce: string;
   expectedOrigin: string | string[];
+  serverAESKeySecret: Uint8Array_;
 }): Promise<VerifiedPresentation> {
   const verifiedValues: VerifiedPresentation = {};
 
@@ -23,8 +30,16 @@ export async function verifyPresentationResponse({ data, nonce, expectedOrigin }
     });
   }
 
-  // TODO: Extract values like expiration time and privateKeyJWK from the nonce
-  let privateKeyJWK: JsonWebKey | undefined = undefined;
+  // Extract values like expiration time and privateKeyJWK from the nonce
+  const { expiresOn, privateKeyJWK } = await decryptNonce({ nonce, serverAESKeySecret });
+  const now = new Date();
+
+  if (expiresOn < now) {
+    throw new SimpleDigiCredsError({
+      message: `Nonce expired at ${expiresOn.toISOString()}, current time is ${now.toISOString()}`,
+      code: 'InvalidDCAPIResponse',
+    });
+  }
 
   /**
    * Presence of a private key JWK in the request metadata indicates that the response should be
