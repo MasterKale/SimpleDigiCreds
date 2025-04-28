@@ -117,7 +117,8 @@ export async function verifyDeviceSigned({ document, nonce, possibleOrigins }: {
 
   if (!verifiedOrigin) {
     throw new SimpleDigiCredsError({
-      message: 'Presentation did not occur at any of the expected origins',
+      message:
+        'DeviceSigned could not be verified with any combination of expected origin and nonce',
       code: 'MdocVerificationError',
     });
   }
