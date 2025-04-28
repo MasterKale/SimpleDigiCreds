@@ -2,7 +2,6 @@ import { Hono } from "hono";
 import { serveStatic } from "hono/deno";
 
 import {
-  GeneratedPresentationRequest,
   generatePresentationRequest,
   type OID4VPMDLCredentialOptions,
   type OID4VPMdocCredentialOptionsFull,
@@ -11,8 +10,18 @@ import {
   verifyPresentationResponse,
 } from "../packages/server/src/index.ts";
 
+/**
+ * NEVER USE THIS EXAMPLE SERVER KEY IN PRODUCTION!
+ *
+ * If you need to generate a new key, use the following command instead:
+ *
+ * ```ts
+ * const serverAESKeySecret = globalThis.crypto.getRandomValues(new Uint8Array(32));
+ * ```
+ *
+ * Then store `serverAESKeySecret` in a secure location (env var, etc...)
+ */
 const serverAESKeySecret = new Uint8Array(32);
-let currentRequest: GeneratedPresentationRequest;
 
 const app = new Hono();
 
@@ -92,20 +101,19 @@ app.get("/options", async (ctx) => {
 
   console.log(JSON.stringify(request, null, 2));
 
-  currentRequest = request;
-
   return ctx.json(request.dcapiOptions);
 });
 
 app.post("/verify", async (ctx) => {
-  const body = await ctx.req.json();
+  const body: { data: string; nonce: string } = await ctx.req.json();
 
-  console.log("verifying presentation", body);
+  console.log("verifying presentation", body.data);
+  console.log("nonce", body.nonce);
 
   const verified = await verifyPresentationResponse({
-    data: body,
+    data: body.data,
+    nonce: body.nonce,
     expectedOrigin: "http://localhost:8000",
-    nonce: currentRequest.dcapiOptions.digital.requests[0].data.nonce,
     serverAESKeySecret,
   });
 
