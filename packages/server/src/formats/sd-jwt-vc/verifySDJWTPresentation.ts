@@ -67,7 +67,7 @@ export async function verifySDJWTPresentation({
   } catch (err) {
     const _err = err as Error;
     throw new SimpleDigiCredsError({
-      message: 'Could not verify SD-JWT-VC, see cause',
+      message: 'Could not verify SD-JWT-VC',
       code: 'SDJWTVerificationError',
       cause: _err,
     });
