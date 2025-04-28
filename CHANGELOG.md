@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.5.0
+
+- **[server]** Calls to `verifyPresentationResponse()` can now be stateless if the front end sends
+  back the request nonce after verification
+  ([#18](https://github.com/MasterKale/SimpleDigiCreds/pull/18))
+- **[server]** `verifyPresentationResponse()` now returns claims as `verified.credential1` instead
+  of `verified.cred1` ([#19](https://github.com/MasterKale/SimpleDigiCreds/pull/19))
+
 ## v0.4.0
 
 - **[server]** Presentation requests can now be generated for mdoc credentials using different
