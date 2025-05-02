@@ -35,7 +35,8 @@ export function assertKeyBindingJWTClaims({
   let verifiedAUD = false;
   let verifiedOrigin = '';
   for (const origin of possibleOrigins) {
-    if (payload.aud === `web-origin:${origin}`) {
+    /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-A.4-6 */
+    if (payload.aud === `origin:${origin}`) {
       verifiedAUD = true;
       verifiedOrigin = origin;
       break;
