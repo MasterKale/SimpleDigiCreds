@@ -4,7 +4,7 @@ import type { OID4VPClientMetadataSDJWTVC, OID4VPCredentialQuerySDJWTVC } from '
  * Generate an SD-JWT-VC-specific set of request options for the Digital Credentials API
  *
  * References:
- * - https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#name-ietf-sd-jwt-vc
+ * - https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#name-ietf-sd-jwt-vc
  * - https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html
  * - https://www.ietf.org/archive/id/draft-ietf-oauth-sd-jwt-vc-08.html
  */
@@ -15,7 +15,7 @@ export function generateSDJWTRequestOptions({
 }: {
   id: string;
   desiredClaims: (string | string[])[];
-  acceptedVCTValues?: string[];
+  acceptedVCTValues: string[];
 }): {
   credentialQuery: OID4VPCredentialQuerySDJWTVC;
   clientMetadata: OID4VPClientMetadataSDJWTVC;
@@ -36,7 +36,7 @@ export function generateSDJWTRequestOptions({
       }),
     },
     clientMetadata: {
-      vp_formats: {
+      vp_formats_supported: {
         'dc+sd-jwt': {
           'sd-jwt_alg_values': ['ES256'],
           'kb-jwt_alg_values': ['ES256'],

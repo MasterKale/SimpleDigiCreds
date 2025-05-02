@@ -62,7 +62,7 @@ describe('Method: generatePresentationRequest()', () => {
     const request = options.dcapiOptions.digital.requests[0];
     assertExists(request);
 
-    assertEquals(request.protocol, 'openid4vp');
+    assertEquals(request.protocol, 'openid4vp-v1-unsigned');
     assertEquals(request.data.response_type, 'vp_token');
     assertEquals(request.data.response_mode, 'dc_api');
     assertEquals(typeof request.data.nonce, 'string');
@@ -128,6 +128,7 @@ describe('Method: generatePresentationRequest()', () => {
       credentialOptions: {
         format: 'sd-jwt-vc',
         desiredClaims: ['family_name', 'given_name', 'age_over_21'],
+        acceptedVCTValues: ['urn:eu.europa.ec.eudi:pid:1'],
       },
       serverAESKeySecret,
       encryptResponse: true,
@@ -136,10 +137,13 @@ describe('Method: generatePresentationRequest()', () => {
     const { client_metadata } = dcapiOptions.digital.requests[0].data;
 
     assertEquals(dcapiOptions.digital.requests[0].data.response_mode, 'dc_api.jwt');
-    assertEquals(client_metadata?.authorization_encrypted_response_alg, 'ECDH-ES');
-    assertEquals(client_metadata?.authorization_encrypted_response_enc, 'A128GCM');
+    assertEquals(
+      client_metadata?.encrypted_response_enc_values_supported,
+      undefined,
+      'Encrypted responses should omit this so we can use the default of `A128GCM`',
+    );
     // Make sure existing client_metadata entries aren't overwritten
-    assertExists(client_metadata?.vp_formats);
+    assertExists(client_metadata?.vp_formats_supported);
 
     // Assert we're specifying a valid public key JWK
     assertExists(client_metadata?.jwks);
