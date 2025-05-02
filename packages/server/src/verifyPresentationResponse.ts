@@ -36,7 +36,7 @@ export async function verifyPresentationResponse({
   }
 
   // Extract values like expiration time and privateKeyJWK from the nonce
-  const { expiresOn, privateKeyJWK } = await decryptNonce({ nonce, serverAESKeySecret });
+  const { expiresOn, responseEncryptionKeys } = await decryptNonce({ nonce, serverAESKeySecret });
   const now = new Date();
 
   if (expiresOn < now) {
@@ -50,7 +50,7 @@ export async function verifyPresentationResponse({
    * Presence of a private key JWK in the request metadata indicates that the response should be
    * encrypted.
    */
-  if (privateKeyJWK) {
+  if (responseEncryptionKeys?.privateKeyJWK) {
     if (!isEncryptedDCAPIResponse(data)) {
       throw new SimpleDigiCredsError({
         message: 'Response did not appear to be encrypted JWT',
@@ -58,7 +58,10 @@ export async function verifyPresentationResponse({
       });
     }
 
-    data = await decryptDCAPIResponse(data.response, privateKeyJWK) as DCAPIResponse;
+    data = await decryptDCAPIResponse(
+      data.response,
+      responseEncryptionKeys.privateKeyJWK,
+    ) as DCAPIResponse;
   }
 
   if (!isDCAPIResponse(data)) {
@@ -89,6 +92,7 @@ export async function verifyPresentationResponse({
         presentation,
         nonce,
         possibleOrigins,
+        verifierPublicKeyJWK: responseEncryptionKeys?.publicKeyJWK,
       });
 
       verifiedValues[key] = verifiedCredential;
