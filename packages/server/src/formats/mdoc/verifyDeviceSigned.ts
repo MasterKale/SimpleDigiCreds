@@ -12,10 +12,16 @@ import type {
 import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
 import type { Uint8Array_ } from '../../helpers/types.ts';
 
-export async function verifyDeviceSigned({ document, nonce, possibleOrigins }: {
+export async function verifyDeviceSigned({
+  document,
+  nonce,
+  possibleOrigins,
+  verifierPublicKeyJWK,
+}: {
   document: DecodedDocument;
   nonce: string;
   possibleOrigins: string[];
+  verifierPublicKeyJWK?: JsonWebKey;
 }): Promise<VerifiedDeviceSigned> {
   const issuerSigned = document.get('issuerSigned');
   const deviceSigned = document.get('deviceSigned');
@@ -54,9 +60,11 @@ export async function verifyDeviceSigned({ document, nonce, possibleOrigins }: {
   let verified: boolean = false;
   let verifiedOrigin: string = '';
   for (const origin of possibleOrigins) {
-    const clientID = `web-origin:${origin}`;
-
-    const sessionTranscript = await generateSessionTranscript(origin, clientID, nonce);
+    const sessionTranscript = await generateSessionTranscript(
+      origin,
+      nonce,
+      verifierPublicKeyJWK,
+    );
 
     const deviceSignedNameSpaces = deviceSigned.get('nameSpaces');
 
