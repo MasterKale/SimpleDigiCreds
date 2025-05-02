@@ -40,7 +40,10 @@ export async function modifyRequestToEncryptResponse({
   request.data.nonce = await generateNonce({
     serverAESKeySecret,
     presentationLifetime,
-    privateKeyJWK,
+    responseEncryptionKeys: {
+      privateKeyJWK,
+      publicKeyJWK,
+    },
   });
 
   /**
