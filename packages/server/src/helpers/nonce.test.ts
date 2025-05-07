@@ -77,9 +77,9 @@ describe('Method: generateNonce()', () => {
       'Expiration time should be five minutes from now',
     );
     assertEquals(
-      decryptedJSON.responseEncryptionKeys?.privateKeyJWK,
+      decryptedJSON.responseEncryptionKeys,
       undefined,
-      'Private key JWK should not be present in the nonce when not provided',
+      'Response encryption keys should not be present in the nonce when not provided',
     );
   });
 
@@ -148,7 +148,7 @@ describe('Method: decryptNonce()', () => {
     assertEquals(decrypted.responseEncryptionKeys?.publicKeyJWK, undefined);
   });
 
-  it('should decrypt a nonce with expiration and private key', async () => {
+  it('should decrypt a nonce with expiration and encryption keypair', async () => {
     const nonce =
       'sWUJqF_goG37GcwWLRnEplIjT8DEA4l4OLS5vdf6W6ixHbADVeAxH_dkHXtv-IOeARinJQ7RT6ZVd7U3OP2GeksgKWEBvmaHaooIJRwgK_f1s1BCpwvkWqJBDsyUcyNblMV2xTc11OKEU3A3b20B9xvfnGSpqu8xC_LL1h3x7Vq8LX7X3c4L29OyZKHSgklcLwiTXkWYGclOWOFL3lBOZHxKfyto52wEx5j6Up5tpQLrXMtF6VeZHWHieGsX_yc-Lq5qfxB8ItOwmR-hn4KxDBMxqyIgHtPbMAQ2K8QaUGjznZQ4ZCX6_XqkxSdrYooB-l69PDw7bAKbsqHIC79jpvngtcRIa27xlMZSWHCdRTlRPlj1FBP_e2Z8BQqtMsqcrdqPDfX2pJDuncgZ1bGWIgTqfEoQl1dNzOPILXJZH2xBZ6917An9Ui30FBvLhj6vjJMDx1kseraHBPloK2NkphvkmIITAq4fjLS6W1FgRsx4C4PEfCyDNu2cwq7o21SFwhqTwXM0jeQxKhOvxiVMyYgCjq81QjN-Wl_3_nJ-jYbluA.oORY5OzMmUqPDPOW';
 

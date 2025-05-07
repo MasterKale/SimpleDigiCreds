@@ -158,12 +158,21 @@ describe('Method: generatePresentationRequest()', () => {
 
     const decryptedNonce = await decryptNonce({ serverAESKeySecret, nonce });
 
-    assertExists(decryptedNonce.privateKeyJWK);
-    assertEquals(decryptedNonce.privateKeyJWK.kty, 'EC');
-    assertEquals(decryptedNonce.privateKeyJWK.crv, 'P-256');
-    assertEquals(decryptedNonce.privateKeyJWK.d, 'TVIl8mDFJV_QtM4RmwTLpHgHaCGePZ1qNZVIlT84Df8');
-    assertEquals(decryptedNonce.privateKeyJWK.x, 'RIlPj8_a_azZ5Ed1ffhja2GFqRDKvjktB_8VK6S7hFo');
-    assertEquals(decryptedNonce.privateKeyJWK.y, 'atJc71TYgZ9jUwgunsTGd8v2nxW0geCT9AvnIqmm4TQ');
+    assertExists(decryptedNonce.responseEncryptionKeys?.privateKeyJWK);
+    assertEquals(decryptedNonce.responseEncryptionKeys.privateKeyJWK.kty, 'EC');
+    assertEquals(decryptedNonce.responseEncryptionKeys.privateKeyJWK.crv, 'P-256');
+    assertEquals(
+      decryptedNonce.responseEncryptionKeys.privateKeyJWK.d,
+      'TVIl8mDFJV_QtM4RmwTLpHgHaCGePZ1qNZVIlT84Df8',
+    );
+    assertEquals(
+      decryptedNonce.responseEncryptionKeys.privateKeyJWK.x,
+      'RIlPj8_a_azZ5Ed1ffhja2GFqRDKvjktB_8VK6S7hFo',
+    );
+    assertEquals(
+      decryptedNonce.responseEncryptionKeys.privateKeyJWK.y,
+      'atJc71TYgZ9jUwgunsTGd8v2nxW0geCT9AvnIqmm4TQ',
+    );
   });
 
   it('should generate a straightforward European PID mdoc request', async () => {
