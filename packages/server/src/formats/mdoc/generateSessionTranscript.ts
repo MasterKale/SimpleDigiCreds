@@ -27,7 +27,7 @@ export async function generateSessionTranscript(
      * "...the JWK SHA-256 Thumbprint...encoded as a CBOR Byte String..."
      * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2.6.1-6.3.2.3
      */
-    jwkThumbprint = encodeCBOR(base64url.base64URLToBuffer(thumbprintBase64URL)) as Uint8Array_;
+    jwkThumbprint = base64url.base64URLToBuffer(thumbprintBase64URL);
   }
 
   const handoverInfo: OpenID4VPDCAPIHandoverInfo = [requestOrigin, nonce, jwkThumbprint];
