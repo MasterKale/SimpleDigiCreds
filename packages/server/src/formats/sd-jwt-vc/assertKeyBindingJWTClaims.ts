@@ -19,7 +19,7 @@ export function assertKeyBindingJWTClaims({
   // Verify `iat`
   const issuedAtDate = new Date(payload.iat * 1000);
   const currentDate = new Date();
-  // Add 1 second to the current date to account for clock skew
+  // Add a bit of time to the current date to account for clock skew
   const currentDatePlusSkew = new Date(currentDate.getTime() + 1500);
 
   if (issuedAtDate > currentDatePlusSkew) {
