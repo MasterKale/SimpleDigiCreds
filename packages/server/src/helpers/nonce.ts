@@ -14,15 +14,18 @@ import type { Uint8Array_ } from './types.ts';
 export async function generateNonce({
   serverAESKeySecret,
   presentationLifetime,
-  privateKeyJWK,
+  responseEncryptionKeys,
 }: {
   serverAESKeySecret: Uint8Array_;
   presentationLifetime: number;
-  privateKeyJWK?: JsonWebKey;
+  responseEncryptionKeys?: {
+    publicKeyJWK: JsonWebKey;
+    privateKeyJWK: JsonWebKey;
+  };
 }): Promise<string> {
   const data: NonceData = {
     expiresOn: new Date(Date.now() + presentationLifetime * 1000),
-    privateKeyJWK,
+    responseEncryptionKeys,
   };
 
   const encryptionKey = await importAESGCMKey(serverAESKeySecret);
@@ -102,5 +105,8 @@ export async function decryptNonce({
 
 type NonceData = {
   expiresOn: Date;
-  privateKeyJWK?: JsonWebKey;
+  responseEncryptionKeys?: {
+    publicKeyJWK: JsonWebKey;
+    privateKeyJWK: JsonWebKey;
+  };
 };

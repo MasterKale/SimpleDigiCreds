@@ -19,20 +19,21 @@ export type DigitalCredentialRequestOptions = {
 };
 
 export type DigitalCredentialRequest = {
-  protocol: string;
+  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-A.1-3 */
+  protocol: 'openid4vp-v1-unsigned';
   data: DCAPIRequestOID4VP;
 };
 /**
  * Credential-agnostic OID4VP-specific request parameters
  *
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-A.2
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-A.2
  */
 export type DCAPIRequestOID4VP = {
   /** The value `"vp_token"` */
   response_type: 'vp_token';
   /** The value `"dc_api"` (when unsigned and unencrypted) or `"dc_api.jwt"` (when signed or encrypted) */
   response_mode: 'dc_api' | 'dc_api.jwt';
-  /** Ex: `"web-origin:https://example.com"` */
+  /** Only used for signed requests (not currently supported) */
   client_id?: string;
   /** Base64URL-encoded random bytes to ensure uniqueness of the presentation */
   nonce: string;

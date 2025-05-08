@@ -22,6 +22,9 @@ export async function generateEncryptionKeypair(): Promise<{
   const privateKeyJWK = await jose.exportJWK(privateKey);
   const publicKeyJWK = await jose.exportJWK(publicKey);
 
+  publicKeyJWK.kid = 'ephemeral-enc-key';
+  publicKeyJWK.use = 'enc';
+
   return _generateEncryptionKeypairInternals.stubThis({ privateKeyJWK, publicKeyJWK });
 }
 

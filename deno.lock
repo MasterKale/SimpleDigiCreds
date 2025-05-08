@@ -14,6 +14,7 @@
     "jsr:@std/bytes@0.223": "0.223.0",
     "jsr:@std/data-structures@^1.0.4": "1.0.4",
     "jsr:@std/data-structures@^1.0.6": "1.0.6",
+    "jsr:@std/encoding@^1.0.10": "1.0.10",
     "jsr:@std/fmt@0.223": "0.223.0",
     "jsr:@std/fmt@1": "1.0.5",
     "jsr:@std/fs@0.223": "0.223.0",
@@ -105,6 +106,9 @@
     },
     "@std/encoding@1.0.6": {
       "integrity": "ca87122c196e8831737d9547acf001766618e78cd8c33920776c7f5885546069"
+    },
+    "@std/encoding@1.0.10": {
+      "integrity": "8783c6384a2d13abd5e9e87a7ae0520a30e9f56aeeaa3bdf910a3eaaf5c811a1"
     },
     "@std/fmt@0.223.0": {
       "integrity": "6deb37794127dfc7d7bded2586b9fc6f5d50e62a8134846608baf71ffc1a5208"
@@ -363,6 +367,7 @@
     "dependencies": [
       "jsr:@deno/dnt@~0.41.3",
       "jsr:@std/assert@^1.0.9",
+      "jsr:@std/encoding@^1.0.10",
       "jsr:@std/testing@^1.0.6",
       "npm:hono@^4.7.2"
     ],

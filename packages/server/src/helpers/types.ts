@@ -40,7 +40,7 @@ export type VerifiedPresentation = {
 export type VerifiedCredential = {
   claims: VerifiedClaimsMap;
   issuerMeta: VerifiedCredentialIssuerMeta;
-  credentialMeta: VerifiedCredentialMeta;
+  presentationMeta: VerifiedCredentialMeta;
 };
 
 /**

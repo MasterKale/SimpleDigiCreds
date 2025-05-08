@@ -95,7 +95,7 @@ app.get("/options", async (ctx) => {
    */
   const request = await generatePresentationRequest({
     credentialOptions: sdjwtvcRequestComplex,
-    // encryptResponse: true, // Optional, defaults to `true`
+    // encryptResponse: false, // Optional, defaults to `true`
     serverAESKeySecret,
   });
 

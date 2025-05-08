@@ -1,5 +1,6 @@
 import type { DigitalCredentialRequest } from '../../dcapi/types.ts';
 import { generateEncryptionKeypair } from '../../helpers/generateEncryptionKeypair.ts';
+import { SimpleDigiCredsError } from '../../helpers/index.ts';
 import { generateNonce } from '../../helpers/nonce.ts';
 import type { Uint8Array_ } from '../../helpers/types.ts';
 
@@ -15,7 +16,14 @@ export async function modifyRequestToEncryptResponse({
   serverAESKeySecret: Uint8Array_;
   presentationLifetime: number;
 }): Promise<DigitalCredentialRequest> {
-  const clientMetadata = request.data.client_metadata || {};
+  const clientMetadata = request.data.client_metadata;
+
+  if (!clientMetadata) {
+    throw new SimpleDigiCredsError({
+      message: 'Required property client_metadata is missing',
+      code: 'InvalidPresentationOptions',
+    });
+  }
 
   /**
    * Change response_mode to "dc_api.jwt"
@@ -32,16 +40,17 @@ export async function modifyRequestToEncryptResponse({
   request.data.nonce = await generateNonce({
     serverAESKeySecret,
     presentationLifetime,
-    privateKeyJWK,
+    responseEncryptionKeys: {
+      privateKeyJWK,
+      publicKeyJWK,
+    },
   });
 
   /**
-   * Add `authorization_encrypted_response_alg` and `authorization_encrypted_response_enc` as per
-   * OID4VC HAIP
+   * TODO: Do whatever HAIP says to do when it updates for OID4VP Draft 28. Old link:
    * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-6
    */
-  clientMetadata.authorization_encrypted_response_alg = 'ECDH-ES';
-  clientMetadata.authorization_encrypted_response_enc = 'A128GCM';
+  // clientMetadata.encrypted_response_enc_values_supported = undefined;
 
   /**
    * Commit the changes to client_metadata
