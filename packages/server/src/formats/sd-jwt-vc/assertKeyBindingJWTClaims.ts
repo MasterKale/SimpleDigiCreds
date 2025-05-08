@@ -20,11 +20,11 @@ export function assertKeyBindingJWTClaims({
   const issuedAtDate = new Date(payload.iat * 1000);
   const currentDate = new Date();
   // Add 1 second to the current date to account for clock skew
-  const currentDatePlus1Second = new Date(currentDate.getTime() + 1000);
+  const currentDatePlusSkew = new Date(currentDate.getTime() + 1500);
 
-  if (issuedAtDate > currentDatePlus1Second) {
+  if (issuedAtDate > currentDatePlusSkew) {
     const iatISO = issuedAtDate.toISOString();
-    const currentISO = currentDatePlus1Second.toISOString();
+    const currentISO = currentDatePlusSkew.toISOString();
     throw new SimpleDigiCredsError({
       message: `Key Binding JWT was issued at (${iatISO}), after the current date (${currentISO})`,
       code: 'SDJWTVerificationError',
