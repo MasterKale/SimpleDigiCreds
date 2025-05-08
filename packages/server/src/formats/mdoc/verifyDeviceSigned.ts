@@ -41,9 +41,16 @@ export async function verifyDeviceSigned({
   const dateValidUntil = new Date(Date.parse(validUntil));
   const now = new Date(Date.now());
 
-  if (dateValidFrom > now || dateValidUntil < now) {
+  if (dateValidFrom > now) {
     throw new SimpleDigiCredsError({
-      message: `Credential is not yet valid or is expired`,
+      message: 'Credential is not yet valid',
+      code: 'MdocVerificationError',
+    });
+  }
+
+  if (dateValidUntil < now) {
+    throw new SimpleDigiCredsError({
+      message: `Credential is expired`,
       code: 'MdocVerificationError',
     });
   }
