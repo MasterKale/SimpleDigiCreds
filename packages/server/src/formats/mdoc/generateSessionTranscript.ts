@@ -23,10 +23,6 @@ export async function generateSessionTranscript(
   let jwkThumbprint: Uint8Array_ | null = null;
   if (verifierPublicKeyJWK) {
     const thumbprintBase64URL = await jose.calculateJwkThumbprint(verifierPublicKeyJWK);
-    /**
-     * "...the JWK SHA-256 Thumbprint...encoded as a CBOR Byte String..."
-     * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2.6.1-6.3.2.3
-     */
     jwkThumbprint = base64url.base64URLToBuffer(thumbprintBase64URL);
   }
 
