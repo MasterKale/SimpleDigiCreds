@@ -44,7 +44,7 @@ export async function verifyMDocPresentation({
     return {
       claims: {},
       issuerMeta: {},
-      credentialMeta: { verifiedOrigin: '' },
+      presentationMeta: { verifiedOrigin: '' },
     };
   }
 
@@ -61,7 +61,7 @@ export async function verifyMDocPresentation({
     return {
       claims: {},
       issuerMeta: {},
-      credentialMeta: { verifiedOrigin: '' },
+      presentationMeta: { verifiedOrigin: '' },
     };
   }
 
@@ -93,7 +93,7 @@ export async function verifyMDocPresentation({
       expiresOn,
       validFrom,
     },
-    credentialMeta: {
+    presentationMeta: {
       verifiedOrigin,
     },
   };

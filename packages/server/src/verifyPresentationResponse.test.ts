@@ -106,7 +106,7 @@ describe('Method: verifyPresentationResponse()', () => {
             issuedAt: new Date('2025-04-25T06:45:11.965Z'),
             validFrom: new Date('2025-04-25T06:45:11.965Z'),
           },
-          credentialMeta: { verifiedOrigin: 'http://localhost:8000' },
+          presentationMeta: { verifiedOrigin: 'http://localhost:8000' },
         },
       },
     );
@@ -145,7 +145,7 @@ describe('Method: verifyPresentationResponse()', () => {
             issuedAt: new Date('2023-05-02T04:00:00.000Z'),
             validFrom: undefined,
           },
-          credentialMeta: {
+          presentationMeta: {
             verifiedOrigin: 'http://localhost:8000',
             vct: 'urn:eu.europa.ec.eudi:pid:1',
           },
@@ -185,7 +185,7 @@ describe('Method: verifyPresentationResponse()', () => {
             issuedAt: new Date('2023-05-02T04:00:00.000Z'),
             validFrom: undefined,
           },
-          credentialMeta: {
+          presentationMeta: {
             verifiedOrigin: 'http://localhost:8000',
             vct: 'urn:eu.europa.ec.eudi:pid:1',
           },

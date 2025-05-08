@@ -126,7 +126,7 @@ export async function verifySDJWTPresentation({
       issuedAt: issuerClaims.iat ? new Date(issuerClaims.iat * 1000) : undefined,
       validFrom: issuerClaims.nbf ? new Date(issuerClaims.nbf * 1000) : undefined,
     },
-    credentialMeta: {
+    presentationMeta: {
       verifiedOrigin,
       vct: issuerClaims.vct,
     },
