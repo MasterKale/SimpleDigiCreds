@@ -15,10 +15,12 @@ export async function verifyMDocPresentation({
   presentation,
   nonce,
   possibleOrigins,
+  verifierPublicKeyJWK,
 }: {
   presentation: string;
   nonce: string;
   possibleOrigins: string[];
+  verifierPublicKeyJWK?: JsonWebKey;
 }): Promise<VerifiedCredential> {
   if (!base64url.isBase64URLString(presentation)) {
     throw new SimpleDigiCredsError({
@@ -42,7 +44,7 @@ export async function verifyMDocPresentation({
     return {
       claims: {},
       issuerMeta: {},
-      credentialMeta: { verifiedOrigin: '' },
+      presentationMeta: { verifiedOrigin: '' },
     };
   }
 
@@ -53,13 +55,13 @@ export async function verifyMDocPresentation({
     expiresOn,
     issuedAt,
     validFrom,
-  } = await verifyDeviceSigned({ document, nonce, possibleOrigins });
+  } = await verifyDeviceSigned({ document, nonce, possibleOrigins, verifierPublicKeyJWK });
   if (!deviceSignedVerified) {
     console.error('could not verify DeviceSigned (mdoc)');
     return {
       claims: {},
       issuerMeta: {},
-      credentialMeta: { verifiedOrigin: '' },
+      presentationMeta: { verifiedOrigin: '' },
     };
   }
 
@@ -91,7 +93,7 @@ export async function verifyMDocPresentation({
       expiresOn,
       validFrom,
     },
-    credentialMeta: {
+    presentationMeta: {
       verifiedOrigin,
     },
   };

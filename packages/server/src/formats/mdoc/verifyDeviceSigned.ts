@@ -12,10 +12,16 @@ import type {
 import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
 import type { Uint8Array_ } from '../../helpers/types.ts';
 
-export async function verifyDeviceSigned({ document, nonce, possibleOrigins }: {
+export async function verifyDeviceSigned({
+  document,
+  nonce,
+  possibleOrigins,
+  verifierPublicKeyJWK,
+}: {
   document: DecodedDocument;
   nonce: string;
   possibleOrigins: string[];
+  verifierPublicKeyJWK?: JsonWebKey;
 }): Promise<VerifiedDeviceSigned> {
   const issuerSigned = document.get('issuerSigned');
   const deviceSigned = document.get('deviceSigned');
@@ -35,9 +41,16 @@ export async function verifyDeviceSigned({ document, nonce, possibleOrigins }: {
   const dateValidUntil = new Date(Date.parse(validUntil));
   const now = new Date(Date.now());
 
-  if (dateValidFrom > now || dateValidUntil < now) {
+  if (dateValidFrom > now) {
     throw new SimpleDigiCredsError({
-      message: `Credential is not yet valid or is expired`,
+      message: 'Credential is not yet valid',
+      code: 'MdocVerificationError',
+    });
+  }
+
+  if (dateValidUntil < now) {
+    throw new SimpleDigiCredsError({
+      message: `Credential is expired`,
       code: 'MdocVerificationError',
     });
   }
@@ -54,9 +67,11 @@ export async function verifyDeviceSigned({ document, nonce, possibleOrigins }: {
   let verified: boolean = false;
   let verifiedOrigin: string = '';
   for (const origin of possibleOrigins) {
-    const clientID = `web-origin:${origin}`;
-
-    const sessionTranscript = await generateSessionTranscript(origin, clientID, nonce);
+    const sessionTranscript = await generateSessionTranscript(
+      origin,
+      nonce,
+      verifierPublicKeyJWK,
+    );
 
     const deviceSignedNameSpaces = deviceSigned.get('nameSpaces');
 

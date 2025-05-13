@@ -210,7 +210,7 @@ export type MdocCOSESign1SigStructure = [
 ];
 
 /**
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3.4.1
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2.6
  */
 export type DCAPIOID4VPSessionTranscript = [
   deviceEngagementBytes: null,

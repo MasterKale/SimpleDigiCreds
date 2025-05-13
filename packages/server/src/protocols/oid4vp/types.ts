@@ -1,116 +1,62 @@
 import type { Identifier } from '../../formats/mdoc/types.ts';
 
 /**
- * OID4VP: Protocol for requesting documents
- *
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#name-openid4vp-over-the-digital-
- *
- * A.1. Protocol
- *
- * To use OpenID4VP over the DC API, the value of the exchange protocol used with the Digital
- * Credentials API (DC API), is `openid4vp`.
- *
- * A.2. Request
- *
- * Out of the Authorization Request parameters defined in [RFC6749] and Section 5, the following are supported with OpenID4VP over the W3C Digital Credentials API:
- *
- * - client_id
- *   - MUST be omitted in unsigned requests defined in Appendix A.3.1. The Wallet determines the
- *     effective Client Identifier from the origin as asserted by the Web Platform and/or app
- *     platform.
- *   - The effective Client Identifier is composed of a synthetic Client Identifier Scheme of
- *     `web-origin` and the origin itself. For example, an origin of `https://verifier.example.com`
- *     would result in an effective Client Identifier of `web-origin:https://verifier.example.com`.
- * - response_type
- * - response_mode
- *   - The value of the response_mode parameter MUST be `dc_api` when the response is neither signed
- *     nor encrypted and `dc_api.jwt` when the response is signed and/or encrypted as defined in
- *     Section 7.3.
- * - nonce
- * - presentation_definition
- * - client_metadata
- * - request
- * - transaction_data
- * - dcql_query
- *
- * In addition to the above-mentioned parameters, a new parameter is introduced for OpenID4VP over
- * the W3C Digital Credentials API:
- *
- * - `expected_origins`
- *   - REQUIRED when signed requests defined in Appendix A.3.2 are used with the Digital
- *     Credentials API (DC API). An array of strings, each string representing an origin of the
- *     Verifier that is making the request. The Wallet can detect replay of the request from a
- *     malicious Verifier by comparing values in this parameter to the origin asserted by the Web
- *     Platform.
- *
- * B.3. Mobile Documents or mdocs (ISO/IEC 18013 and ISO/IEC 23220 series)
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3
- *
- * - The Credential format identifier for Credentials in the mdoc format is `mso_mdoc`
- *
- * B.3.1.1. Parameters in the meta parameter in Credential Query
- *
- * The following is an ISO mdoc specific parameter in the meta parameter in a Credential Query as
- * defined in Section 6.1.
- *
- * - `doctype_value`: OPTIONAL. String that specifies an allowed value for the doctype of the
- *   requested Verifiable Credential. It MUST be a valid doctype identifier as defined in
- *   [ISO.18013-5].
- *
- * B.3.1.2. Parameters in the Claims Query
- *
- * The following are ISO mdoc specific parameters to be used in a Claims Query as defined in
- * Section 6.3.
- *
- * - `namespace`: REQUIRED if the Credential Format is based on the mdoc format defined in
- *   [ISO.18013-5]; MUST NOT be present otherwise. The value MUST be a string that specifies the
- *   namespace of the data element within the mdoc, e.g., org.iso.18013.5.1.
- * - `claim_name`: REQUIRED if the Credential Format is based on mdoc format defined in
- *   [ISO.18013-5]; MUST NOT be present otherwise. The value MUST be a string that specifies the
- *   data element identifier of the data element within the provided namespace in the mdoc, e.g.,
- *   first_name.
- */
-/**
  * 6.1. Credential Query
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#section-6.1
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#section-6.1
  */
 export type OID4VPCredentialQuery = {
   /** A unique string comprised of alphanumeric, underscore (_) or hyphen (-) characters */
   id: string;
   /** The format of the requested Verifiable Credential */
   format: string;
+  /** Whether multiple credentials can be returned for this query. Defaults to `false` */
+  multiple?: boolean;
   /** Format-specific metadata */
   meta?: unknown;
   claims?: OID4VPClaimQuery[];
+  /**
+   * TODO: A list of trusted authorities or trust frameworks that certify the Issuers of
+   * credentials that the Verifier will accept for this request.
+   * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#dcql_trusted_authorities
+   */
+  trusted_authorities?: unknown[];
+  /**
+   * Whether the Verifier requires a cryptographic proof that the wallet holds the credential.
+   * Defaults to `true`
+   */
+  require_cryptographic_holder_binding?: boolean;
 };
 
 export type OID4VPCredentialQueryMdoc = OID4VPCredentialQuery & {
-  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3-2 */
+  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2-2 */
   format: 'mso_mdoc';
-  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3.1.1-2.2 */
+  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2.3 */
   meta: { doctype_value: string };
   claims: OID4VPClaimQueryMdoc[];
 };
 
-/** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#name-mobile-documents-or-mdocs-i */
+/** https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2 */
 export type OID4VPCredentialQueryMDL = OID4VPCredentialQueryMdoc & {
-  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3.1.1-2.2 */
+  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2.3 */
   meta: { doctype_value: 'org.iso.18013.5.1.mDL' };
 };
 
-/** https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.4 */
+/** https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.3 */
 export type OID4VPCredentialQuerySDJWTVC = OID4VPCredentialQuery & {
   format: 'dc+sd-jwt';
   meta?: {
-    /** An array of strings that specifies allowed values for the type of the requested Verifiable Credential. */
-    vct_values?: string[];
+    /**
+     * An array of strings that specifies allowed values for the type of the requested Verifiable Credential.
+     * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.3.5
+     */
+    vct_values: string[];
   };
   claims: OID4VPClaimQuery[];
 };
 
 /**
  * 6.3. Claims Query
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#section-6.3
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#section-6.3
  */
 export type OID4VPClaimQuery = {
   /** An array of strings indicating a property within a JSON credential format. See {@link PathPointer} for more info */
@@ -122,8 +68,7 @@ export type OID4VPClaimQuery = {
 };
 
 /**
- * B.3.1.2. Parameters in the Claims Query (mdoc)
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.3.1.2
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2.4
  */
 export type OID4VPClaimQueryMdoc = OID4VPClaimQuery & {
   /** A boolean that is equivalent to IntentToRetain variable defined in the mdoc specification */
@@ -156,7 +101,7 @@ export type OID4VPSupportedMDLClaimName = Exclude<Identifier, 'age_over_NN'> | '
 
 /**
  * Verifier metadata values. See
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#section-5.1-4.2.1
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#section-5.1-5.2.1
  */
 export type OID4VPClientMetadata = {
   jwks?: {
@@ -165,35 +110,15 @@ export type OID4VPClientMetadata = {
   /**
    * The shape of this depends on the type of credential being requested
    */
-  vp_formats?: unknown;
+  vp_formats_supported: unknown;
   /**
-   * From https://openid.net/specs/oauth-v2-jarm-final.html#section-3-3.2.1:
+   * From https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#section-5.1-5.2.2.2:
    *
-   * > _The JWS [RFC7515] `alg` algorithm REQUIRED for signing authorization responses. If this is
-   * > specified, the response will be signed using JWS and the configured algorithm. If
-   * > unspecified, the default algorithm to use for signing authorization responses is `RS256`.
-   * > The algorithm `none` is not allowed._
+   * > When a response_mode requiring encryption of the Response (such as dc_api.jwt...) is
+   * > specified, this MUST be present for anything other than the default single value of
+   * > A128GCM. Otherwise, this SHOULD be absent.
    */
-  // TODO: Uncomment when we support request signing
-  // authorization_signed_response_alg?: JWSALG;
-  /**
-   * From https://openid.net/specs/oauth-v2-jarm-final.html#section-3-3.4.1:
-   *
-   * > _The JWE [RFC7516] `alg` algorithm REQUIRED for encrypting authorization responses. If both
-   * > signing and encryption are requested, the response will be signed then encrypted, with the
-   * > result being a Nested JWT, as defined in JWT [RFC7519]. The default, if omitted, is that no
-   * > encryption is performed._
-   */
-  authorization_encrypted_response_alg?: JWEALG_HAIP;
-  /**
-   * From https://openid.net/specs/oauth-v2-jarm-final.html#section-3-3.6.1:
-   *
-   * > _The JWE [RFC7516] `enc` algorithm REQUIRED for encrypting authorization responses. If
-   * > `authorization_encrypted_response_alg` is specified, the default for this value is
-   * > `A128CBC-HS256`. When `authorization_encrypted_response_enc` is included,
-   * > `authorization_encrypted_response_alg` MUST also be provided._
-   */
-  authorization_encrypted_response_enc?: JWEENC_HAIP;
+  encrypted_response_enc_values_supported?: JWEENC_HAIP;
 };
 
 /**
@@ -226,11 +151,24 @@ type JWEENC = 'A128CBC-HS256' | 'A256CBC-HS512' | 'A128GCM' | 'A256GCM';
 type JWEENC_HAIP = Extract<JWEENC, 'A128GCM'>;
 
 /**
+ * The shape of `client_metadata` when requesting an mdoc. See
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2.2
+ */
+export type OID4VPClientMetadataMdoc = OID4VPClientMetadata & {
+  vp_formats_supported: {
+    'mso_mdoc': {
+      issuerauth_alg_values: [-7];
+      deviceauth_alg_values: [-7];
+    };
+  };
+};
+
+/**
  * The shape of `client_metadata` when requesting an SD-JWT-VC. See
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#appendix-B.4.2
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.3.4
  */
 export type OID4VPClientMetadataSDJWTVC = OID4VPClientMetadata & {
-  vp_formats: {
+  vp_formats_supported: {
     'dc+sd-jwt': {
       'sd-jwt_alg_values': ['ES256'];
       'kb-jwt_alg_values': ['ES256'];

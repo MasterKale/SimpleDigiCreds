@@ -6,6 +6,7 @@ import { generateMdocRequestOptions } from './generateMdocRequestOptions.ts';
 import { generateSDJWTRequestOptions } from './generateSDJWTRequestOptions.ts';
 import { modifyRequestToEncryptResponse } from './modifyRequestToEncryptResponse.ts';
 import type {
+  OID4VPClientMetadataMdoc,
   OID4VPClientMetadataSDJWTVC,
   OID4VPCredentialQueryMDL,
   OID4VPCredentialQueryMdoc,
@@ -37,12 +38,13 @@ export async function generateOID4VPRequest({
     | OID4VPCredentialQueryMdoc
     | OID4VPCredentialQueryMDL
     | OID4VPCredentialQuerySDJWTVC;
-  let clientMetadata: OID4VPClientMetadataSDJWTVC | undefined = undefined;
+  let clientMetadata: OID4VPClientMetadataSDJWTVC | OID4VPClientMetadataMdoc | undefined =
+    undefined;
 
   const requestID = 'credential1';
 
   if (format === 'mdl') {
-    ({ credentialQuery } = generateMdocRequestOptions({
+    ({ credentialQuery, clientMetadata } = generateMdocRequestOptions({
       id: requestID,
       doctype: 'org.iso.18013.5.1.mDL',
       claimPaths: desiredClaims.map((claim) => ['org.iso.18013.5.1', claim]),
@@ -75,7 +77,7 @@ export async function generateOID4VPRequest({
       claimPaths = desiredClaims as OID4VPMdocCredentialOptionsFull['desiredClaims'];
     }
 
-    ({ credentialQuery } = generateMdocRequestOptions({
+    ({ credentialQuery, clientMetadata } = generateMdocRequestOptions({
       id: requestID,
       doctype: credentialOptions.doctype,
       claimPaths,
@@ -95,13 +97,11 @@ export async function generateOID4VPRequest({
   }
 
   let request: DigitalCredentialRequest = {
-    // https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#name-protocol
-    protocol: 'openid4vp',
+    protocol: 'openid4vp-v1-unsigned',
     data: {
       response_type: 'vp_token',
       response_mode: 'dc_api',
       nonce: await generateNonce({ serverAESKeySecret, presentationLifetime }),
-      // https://openid.net/specs/openid-4-verifiable-presentations-1_0-24.html#dcql_query
       dcql_query: { credentials: [credentialQuery] },
     },
   };
@@ -181,5 +181,5 @@ export type OID4VPMdocCredentialOptionsFull = {
 export type OID4VPSDJWTVCCredentialOptions = {
   format: 'sd-jwt-vc';
   desiredClaims: (string | string[])[];
-  acceptedVCTValues?: string[];
+  acceptedVCTValues: string[];
 };
