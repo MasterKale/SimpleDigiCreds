@@ -17,6 +17,7 @@ import {
  * - OID4VP (`"oid4vp"`)
  *
  * Supported Document Formats:
+ * - ISO 18013-5 mdoc (`"mdoc"`)
  * - ISO 18013-5 mDL (`"mdl"`)
  * - IETF SD-JWT-VC (`"sd-jwt-vc"`)
  */
