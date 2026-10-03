@@ -77,7 +77,7 @@ export type MdocIssuerAuthProtected = {
    */
   get(
     key: COSEHEADER.ALG,
-  ): COSEALG.ES256 | COSEALG.ES384 | COSEALG.ES512 | COSEALG.EdDSA;
+  ): COSEALG.ES256 | COSEALG.ESP256 | COSEALG.ES384 | COSEALG.ES512 | COSEALG.EdDSA;
 };
 
 export type MdocDeviceAuthProtectedBytes = Uint8Array_;
@@ -90,7 +90,7 @@ export type MdocDeviceAuthProtected = {
    */
   get(
     key: COSEHEADER.ALG,
-  ): COSEALG.ES256 | COSEALG.ES384 | COSEALG.ES512 | COSEALG.EdDSA;
+  ): COSEALG.ES256 | COSEALG.ESP256 | COSEALG.ES384 | COSEALG.ES512 | COSEALG.EdDSA;
 };
 
 export type MobileSecurityObjectBytes = Uint8Array_;
@@ -210,7 +210,7 @@ export type MdocCOSESign1SigStructure = [
 ];
 
 /**
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2.6
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.2.6
  */
 export type DCAPIOID4VPSessionTranscript = [
   deviceEngagementBytes: null,
