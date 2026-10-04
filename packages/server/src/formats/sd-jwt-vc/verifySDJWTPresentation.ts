@@ -21,10 +21,13 @@ export async function verifySDJWTPresentation({
   presentation,
   nonce,
   possibleOrigins,
+  expectedVCTValues,
 }: {
   presentation: string;
   nonce: string;
   possibleOrigins: string[];
+  /** The `vct` values that were requested. The presentation's `vct` must be one of these */
+  expectedVCTValues: string[];
 }): Promise<VerifiedCredential> {
   let decoded: DecodedSDJwt;
   try {
@@ -119,6 +122,17 @@ export async function verifySDJWTPresentation({
 
   assertIssuerSignedJWTClaims({ claims: issuerClaims });
 
+  /**
+   * Make sure the Wallet returned the type of credential that was requested
+   *
+   * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-14.9
+   */
+  if (!expectedVCTValues.includes(issuerClaims.vct ?? '')) {
+    throw new SimpleDigiCredsError({
+      message: `Credential vct "${issuerClaims.vct}" was not one of the requested vct values`,
+      code: 'SDJWTVerificationError',
+    });
+  }
 
   // This _shouldn't_ happen but just in case because the typing says `kb` can be undefined
   if (!verified.kb) {

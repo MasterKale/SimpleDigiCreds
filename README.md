@@ -46,6 +46,9 @@ See the packages' READMEs for more specific installation information.
   [OID4VC HAIP 1.0](https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-5)
 - Stateless presentation verification
 - Wallet error responses (e.g. `access_denied`)
+- Presentations are checked against what was requested (credential IDs, mdoc doctype, SD-JWT-VC
+  `vct`)
+
 ### OID4VP - mdoc
 
 - IssuerAuth and DeviceAuth verification (`ES256`/`ESP256`)

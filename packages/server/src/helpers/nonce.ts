@@ -15,17 +15,17 @@ export async function generateNonce({
   serverAESKeySecret,
   presentationLifetime,
   responseEncryptionKeys,
+  expectedCredentials,
 }: {
   serverAESKeySecret: Uint8Array_;
   presentationLifetime: number;
-  responseEncryptionKeys?: {
-    publicKeyJWK: JsonWebKey;
-    privateKeyJWK: JsonWebKey;
-  };
+  responseEncryptionKeys?: NonceData['responseEncryptionKeys'];
+  expectedCredentials: NonceData['expectedCredentials'];
 }): Promise<string> {
   const data: NonceData = {
     expiresOn: new Date(Date.now() + presentationLifetime * 1000),
     responseEncryptionKeys,
+    expectedCredentials,
   };
 
   const encryptionKey = await importAESGCMKey(serverAESKeySecret);
@@ -98,15 +98,66 @@ export async function decryptNonce({
     });
   }
 
+  if (!Array.isArray(decryptedJSON.expectedCredentials)) {
+    throw new SimpleDigiCredsError({
+      message: 'Nonce data did not contain the expected credentials',
+      code: 'InvalidDCAPIResponse',
+    });
+  }
+
+  for (const expected of decryptedJSON.expectedCredentials) {
+    const isValid = typeof expected?.id === 'string' && (
+      (expected.format === 'mso_mdoc' && typeof expected.doctypeValue === 'string') ||
+      (expected.format === 'dc+sd-jwt' && Array.isArray(expected.vctValues) &&
+        expected.vctValues.length > 0 && expected.vctValues.every((v: unknown) =>
+          typeof v === 'string'
+        ))
+    );
+
+    if (!isValid) {
+      throw new SimpleDigiCredsError({
+        message: 'Nonce data contained a malformed expected credential',
+        code: 'InvalidDCAPIResponse',
+      });
+    }
+  }
+
   decryptedJSON.expiresOn = new Date(decryptedJSON.expiresOn);
 
   return decryptedJSON as NonceData;
 }
 
-type NonceData = {
+export type NonceData = {
+  /** After when the request will no longer be valid */
   expiresOn: Date;
   responseEncryptionKeys?: {
     publicKeyJWK: JsonWebKey;
     privateKeyJWK: JsonWebKey;
   };
+  /**
+   * A summary of the Credential Queries in the request so that the response can be checked
+   * against what was actually requested
+   */
+  expectedCredentials: ExpectedCredential[];
+};
+
+/**
+ * The parts of a Credential Query needed to check that a presentation matches what was requested
+ */
+export type ExpectedCredential =
+  | ExpectedCredentialMdoc
+  | ExpectedCredentialSDJWTVC;
+
+export type ExpectedCredentialMdoc = {
+  id: string;
+  format: 'mso_mdoc';
+  /** The requested doctype */
+  doctypeValue: string;
+};
+
+export type ExpectedCredentialSDJWTVC = {
+  id: string;
+  format: 'dc+sd-jwt';
+  /** The acceptable `vct` values */
+  vctValues: string[];
 };

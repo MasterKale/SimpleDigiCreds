@@ -203,6 +203,24 @@ describe('Method: generatePresentationRequest()', () => {
     );
   });
 
+  it('should remember what was requested in the nonce', async () => {
+    const options = await generatePresentationRequest({
+      credentialOptions: {
+        format: 'sd-jwt-vc',
+        desiredClaims: ['family_name'],
+        acceptedVCTValues: ['urn:eudi:pid:1'],
+      },
+      serverAESKeySecret,
+    });
+
+    const { nonce } = options.dcapiOptions.digital.requests[0].data;
+    const decryptedNonce = await decryptNonce({ serverAESKeySecret, nonce });
+
+    assertEquals(decryptedNonce.expectedCredentials, [
+      { id: 'credential1', format: 'dc+sd-jwt', vctValues: ['urn:eudi:pid:1'] },
+    ]);
+  });
+
   it('should reject empty `acceptedVCTValues`', async () => {
     const rejected = await assertRejects(() =>
       generatePresentationRequest({
