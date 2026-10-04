@@ -31,8 +31,41 @@ export async function verifyMDocPresentation({
 
   const presentationBytes = base64url.base64URLToBuffer(presentation);
 
-  const decodedResponse = decodeCBOR(presentationBytes) as DecodedCredentialResponse;
-  const document = decodedResponse.get('documents')[0];
+  let decodedResponse: DecodedCredentialResponse;
+  try {
+    decodedResponse = decodeCBOR(presentationBytes) as DecodedCredentialResponse;
+  } catch (err) {
+    throw new SimpleDigiCredsError({
+      message: 'Could not decode mdoc presentation',
+      code: 'MdocVerificationError',
+      cause: err as Error,
+    });
+  }
+
+  /**
+   * A status of 0 means "OK". See ISO/IEC 18013-5 8.3.2.1.2.3
+   */
+  const status = decodedResponse.get('status');
+  if (status !== 0) {
+    throw new SimpleDigiCredsError({
+      message: `mdoc presentation had non-OK status ${status}`,
+      code: 'MdocVerificationError',
+    });
+  }
+
+  /**
+   * Each mdoc is returned in its own DeviceResponse
+   *
+   * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-5.3.1
+   */
+  const documents = decodedResponse.get('documents');
+  if (!Array.isArray(documents) || documents.length !== 1) {
+    throw new SimpleDigiCredsError({
+      message: `mdoc presentation contained ${documents?.length ?? 0} documents, expected 1`,
+      code: 'MdocVerificationError',
+    });
+  }
+  const [document] = documents;
 
   // Verify the issuer-signed data
   const {
@@ -40,12 +73,10 @@ export async function verifyMDocPresentation({
     // x5chain: issuerX5C
   } = await verifyIssuerSigned(document);
   if (!issuerSignedVerified) {
-    console.error('could not verify IssuerSigned (mdoc)');
-    return {
-      claims: {},
-      issuerMeta: {},
-      presentationMeta: { verifiedOrigin: '' },
-    };
+    throw new SimpleDigiCredsError({
+      message: 'Could not verify IssuerSigned',
+      code: 'MdocVerificationError',
+    });
   }
 
   // Verify the device-signed data within the verified issuer-signed data
@@ -57,12 +88,10 @@ export async function verifyMDocPresentation({
     validFrom,
   } = await verifyDeviceSigned({ document, nonce, possibleOrigins, verifierPublicKeyJWK });
   if (!deviceSignedVerified) {
-    console.error('could not verify DeviceSigned (mdoc)');
-    return {
-      claims: {},
-      issuerMeta: {},
-      presentationMeta: { verifiedOrigin: '' },
-    };
+    throw new SimpleDigiCredsError({
+      message: 'Could not verify DeviceSigned',
+      code: 'MdocVerificationError',
+    });
   }
 
   // Verify the actual claim values
