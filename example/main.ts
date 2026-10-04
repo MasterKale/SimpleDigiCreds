@@ -122,4 +122,9 @@ app.post("/verify", async (ctx) => {
   return ctx.json({ verified });
 });
 
-Deno.serve({ hostname: "localhost" }, app.fetch);
+Deno.serve({
+  hostname: "127.0.0.1",
+  onListen({ port }) {
+    console.log(`Server started at http://localhost:${port}`);
+  },
+}, app.fetch);
