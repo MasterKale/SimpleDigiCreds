@@ -5,7 +5,9 @@
 - [Installation](#installation)
 - [Supported Features](#supported-features)
   - [OID4VP - All doc formats](#oid4vp---all-doc-formats)
+  - [OID4VP - mdoc](#oid4vp---mdoc)
   - [OID4VP - SD-JWT-VC](#oid4vp---sd-jwt-vc)
+  - [Not yet supported](#not-yet-supported)
 - [Example Site](#example-site)
 - [Contributions](#contributions)
 - [Development](#development)
@@ -17,7 +19,7 @@
 ## Overview
 
 This project makes it easier to request presentations of **ISO 18013-5 mDL** and **IETF SD-JWT-VC**
-digital credentials using **OID4VP (draft 24)** via the
+digital credentials using **OID4VP 1.0** via the
 [Digital Credentials API](https://w3c-fedid.github.io/digital-credentials/). The following packages
 are maintained here to achieve this:
 
@@ -37,15 +39,30 @@ See the packages' READMEs for more specific installation information.
 
 ### OID4VP - All doc formats
 
-- Unencrypted requests
+- [OID4VP 1.0](https://openid.net/specs/openid-4-verifiable-presentations-1_0.html) over the Digital
+  Credentials API (only `openid4vp-v1-unsigned`)
 - Unencrypted responses
-- Encrypted responses (following
-  [OID4VC HAIP](https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0-03.html#section-6))
+- Encrypted responses following
+  [OID4VC HAIP 1.0](https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-5)
 - Stateless presentation verification
+### OID4VP - mdoc
+
+- IssuerAuth and DeviceAuth verification (`ES256`/`ESP256`)
+- SessionTranscript per OID4VP 1.0 (including the response encryption JWK thumbprint)
 
 ### OID4VP - SD-JWT-VC
 
-- Key binding verification
+- Key binding verification (Key Binding JWTs are required)
+
+### Not yet supported
+
+The following features of OID4VP 1.0 and HAIP 1.0 are not yet supported:
+
+- Signed requests (`openid4vp-v1-signed`, `openid4vp-v1-multisigned`)
+- Validating Issuer certificate chains against trust anchors
+- DCQL `trusted_authorities` (required by HAIP)
+- Token Status List checks
+- `transaction_data`, `verifier_info`, `credential_sets`, `claim_sets`, `multiple`
 
 ## Example Site
 
