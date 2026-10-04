@@ -1,9 +1,7 @@
 import type {
   OID4VPClientMetadata,
-  OID4VPClientMetadataSDJWTVC,
   OID4VPCredentialQuery,
-  OID4VPCredentialQueryMDL,
-  OID4VPCredentialQuerySDJWTVC,
+  OID4VPDCQLQuery,
 } from '../protocols/oid4vp/types.ts';
 
 /**
@@ -37,31 +35,9 @@ export type DCAPIRequestOID4VP = {
   client_id?: string;
   /** Base64URL-encoded random bytes to ensure uniqueness of the presentation */
   nonce: string;
-  /** An array of credentials being requested */
-  dcql_query: {
-    credentials: OID4VPCredentialQuery[];
-  };
+  /** The credentials being requested */
+  dcql_query: OID4VPDCQLQuery;
   client_metadata?: OID4VPClientMetadata;
-};
-
-/**
- * OID4VP request parameters specific to requesting an mDL
- */
-export type DCAPIRequestOID4VPMDL = DCAPIRequestOID4VP & {
-  dcql_query: {
-    credentials: OID4VPCredentialQueryMDL[];
-  };
-  client_metadata?: never;
-};
-
-/**
- * OID4VP request parameters specific to requesting an SD-JWT-VC
- */
-export type DCAPIRequestOID4VPSDJWTVC = DCAPIRequestOID4VP & {
-  dcql_query: {
-    credentials: OID4VPCredentialQuerySDJWTVC[];
-  };
-  client_metadata: OID4VPClientMetadataSDJWTVC;
 };
 
 /**
