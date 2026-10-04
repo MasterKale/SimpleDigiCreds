@@ -84,6 +84,23 @@ const verified = await verifyPresentationResponse({
 });
 ```
 
+`verifyPresentationResponse()` will throw a `SimpleDigiCredsError` if presentation response
+verification fails. If the _wallet_ returns an error instead (e.g. consented in the browser but then
+declined to share a credential from within the wallet) then the error's `code` will be
+`'WalletErrorResponse'` and the wallet's error code will be available as `walletError`:
+
+```ts
+import { SimpleDigiCredsError } from '@simpledigicreds/server';
+
+try {
+  const verified = await verifyPresentationResponse({/* ... */});
+} catch (err) {
+  if (err instanceof SimpleDigiCredsError && err.code === 'WalletErrorResponse') {
+    console.log(err.walletError); // e.g. "access_denied"
+  }
+}
+```
+
 ### Step 4: (Server) Use the verified claims <!-- omit in toc -->
 
 ```ts

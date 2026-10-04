@@ -4,10 +4,15 @@ export {
   type PresentationRequestOptions,
 } from './generatePresentationRequest.ts';
 export { verifyPresentationResponse } from './verifyPresentationResponse.ts';
+export {
+  SimpleDigiCredsError,
+  type SimpleDigiCredsErrorCode,
+} from './helpers/simpleDigiCredsError.ts';
 
 export type {
   CredentialRequestOptions,
   DCAPIRequestOID4VP,
+  DCAPIWalletErrorOID4VP,
   DigitalCredentialRequest,
   DigitalCredentialRequestOptions,
 } from './dcapi/types.ts';

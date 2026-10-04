@@ -1,14 +1,16 @@
 import { verifyMDocPresentation } from './formats/mdoc/index.ts';
 import { verifySDJWTPresentation } from './formats/sd-jwt-vc/index.ts';
-import { base64url, isDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
+import { parseDCAPIResponse, SimpleDigiCredsError } from './helpers/index.ts';
 import type { Uint8Array_, VerifiedPresentation } from './helpers/types.ts';
-import type { DCAPIResponse } from './dcapi/types.ts';
+import type { DCAPIWalletErrorOID4VP } from './dcapi/types.ts';
 import { isEncryptedDCAPIResponse } from './dcapi/isEncryptedDCAPIResponse.ts';
 import { decryptDCAPIResponse } from './dcapi/decryptDCAPIResponse.ts';
 import { decryptNonce } from './helpers/nonce.ts';
 
 /**
  * Verify and return a credential presentation out of a call to the Digital Credentials API
+ *
+ * @throws `SimpleDigiCredsError`
  */
 export async function verifyPresentationResponse({
   data,
@@ -34,6 +36,9 @@ export async function verifyPresentationResponse({
       message: `data was type ${typeof data}, not an object`,
     });
   }
+
+  // Wallets can return errors without encrypting them
+  assertNotWalletError(data);
 
   // Extract values like expiration time and privateKeyJWK from the nonce
   const { expiresOn, responseEncryptionKeys } = await decryptNonce({ nonce, serverAESKeySecret });
@@ -61,15 +66,13 @@ export async function verifyPresentationResponse({
     data = await decryptDCAPIResponse(
       data.response,
       responseEncryptionKeys.privateKeyJWK,
-    ) as DCAPIResponse;
+      responseEncryptionKeys.publicKeyJWK,
+    );
+
+    // Wallets can also return errors within the encrypted response
+    assertNotWalletError(data);
   }
 
-  if (!isDCAPIResponse(data)) {
-    throw new SimpleDigiCredsError({
-      message: 'data was not the expected shape',
-      code: 'InvalidDCAPIResponse',
-    });
-  }
 
   let possibleOrigins: string[] = [];
   if (Array.isArray(expectedOrigin)) {
@@ -137,4 +140,28 @@ function isSDJWTPresentation(presentation: string): boolean {
     jwtSeparators && jwtSeparators.length >= 2 &&
     sdJWTVCSeparators && sdJWTVCSeparators.length >= 1
   );
+}
+
+/**
+ * Wallets return protocol errors as `{ "error": "..." }` within a fulfilled DC API response
+ *
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-A.4
+ */
+function assertNotWalletError(data: object): void {
+  const { error, error_description } = data as Partial<DCAPIWalletErrorOID4VP>;
+
+  if (typeof error !== 'string') {
+    return;
+  }
+
+  let message = `Wallet returned error "${error}"`;
+  if (typeof error_description === 'string') {
+    message += `: ${error_description}`;
+  }
+
+  throw new SimpleDigiCredsError({
+    message,
+    code: 'WalletErrorResponse',
+    walletError: error,
+  });
 }
