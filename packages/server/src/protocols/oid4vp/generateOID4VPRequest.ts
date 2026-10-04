@@ -1,6 +1,6 @@
 import type { DigitalCredentialRequest } from '../../dcapi/types.ts';
 import { generateEncryptionKeypair } from '../../helpers/generateEncryptionKeypair.ts';
-import { type ExpectedCredential, generateNonce, type NonceData } from '../../helpers/nonce.ts';
+import { type ExpectedCredential, generateNonce } from '../../helpers/nonce.ts';
 import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
 import type { Uint8Array_ } from '../../helpers/types.ts';
 import { generateMdocRequestOptions } from './generateMdocRequestOptions.ts';
@@ -129,14 +129,25 @@ export async function generateOID4VPRequest({
   /**
    * Remember enough about what was requested to check the response against it later
    */
-  const expectedCredential: ExpectedCredential = {
-    id: credentialQuery.id,
-    format: credentialQuery.format,
-  };
+  let expectedCredential: ExpectedCredential | undefined = undefined;
   if (credentialQuery.format === 'mso_mdoc') {
-    expectedCredential.doctypeValue = credentialQuery.meta.doctype_value;
+    expectedCredential = {
+      id: credentialQuery.id,
+      format: 'mso_mdoc',
+      doctypeValue: credentialQuery.meta.doctype_value,
+    };
+  } else if (credentialQuery.format === 'dc+sd-jwt') {
+    expectedCredential = {
+      id: credentialQuery.id,
+      format: 'dc+sd-jwt',
+      vctValues: credentialQuery.meta.vct_values,
+    };
   } else {
-    expectedCredential.vctValues = credentialQuery.meta.vct_values;
+    throw new SimpleDigiCredsError({
+      // @ts-ignore: We want to report weird formats we're not expecting
+      message: `Unsupported credential query format: ${credentialQuery.format}`,
+      code: 'InvalidPresentationOptions',
+    });
   }
 
   if (clientMetadata) {

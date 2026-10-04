@@ -105,6 +105,23 @@ export async function decryptNonce({
     });
   }
 
+  for (const expected of decryptedJSON.expectedCredentials) {
+    const isValid = typeof expected?.id === 'string' && (
+      (expected.format === 'mso_mdoc' && typeof expected.doctypeValue === 'string') ||
+      (expected.format === 'dc+sd-jwt' && Array.isArray(expected.vctValues) &&
+        expected.vctValues.length > 0 && expected.vctValues.every((v: unknown) =>
+          typeof v === 'string'
+        ))
+    );
+
+    if (!isValid) {
+      throw new SimpleDigiCredsError({
+        message: 'Nonce data contained a malformed expected credential',
+        code: 'InvalidDCAPIResponse',
+      });
+    }
+  }
+
   decryptedJSON.expiresOn = new Date(decryptedJSON.expiresOn);
 
   return decryptedJSON as NonceData;
@@ -127,12 +144,20 @@ export type NonceData = {
 /**
  * The parts of a Credential Query needed to check that a presentation matches what was requested
  */
-export type ExpectedCredential = {
-  /** The Credential Query `id` */
+export type ExpectedCredential =
+  | ExpectedCredentialMdoc
+  | ExpectedCredentialSDJWTVC;
+
+export type ExpectedCredentialMdoc = {
   id: string;
-  format: 'mso_mdoc' | 'dc+sd-jwt';
-  /** mdoc only: the requested doctype */
-  doctypeValue?: string;
-  /** SD-JWT VC only: the acceptable `vct` values */
-  vctValues?: string[];
+  format: 'mso_mdoc';
+  /** The requested doctype */
+  doctypeValue: string;
+};
+
+export type ExpectedCredentialSDJWTVC = {
+  id: string;
+  format: 'dc+sd-jwt';
+  /** The acceptable `vct` values */
+  vctValues: string[];
 };

@@ -231,6 +231,29 @@ describe('Method: decryptNonce()', () => {
       return `${base64url.bufferToBase64URL(encrypted)}.${base64url.bufferToBase64URL(iv)}`;
     }
 
+    it('should throw a library error if an expected credential is malformed', async () => {
+      const malformed = [
+        { id: 'credential1', format: 'mso_mdoc' },
+        { id: 'credential1', format: 'dc+sd-jwt', vctValues: [] },
+        { id: 'credential1', format: 'something-else', doctypeValue: 'x' },
+        { format: 'mso_mdoc', doctypeValue: 'x' },
+        null,
+      ];
+
+      for (const entry of malformed) {
+        const nonce = await encryptNonceData({
+          expiresOn: '2025-04-28T17:45:48.169Z',
+          expectedCredentials: [entry],
+        });
+
+        const rejected = await assertRejects(() => decryptNonce({ serverAESKeySecret, nonce }));
+
+        assert(rejected instanceof SimpleDigiCredsError);
+        assertEquals(rejected.code, 'InvalidDCAPIResponse');
+        assertEquals(rejected.message, 'Nonce data contained a malformed expected credential');
+      }
+    });
+
     it('should throw a library error if the nonce has no expected credentials', async () => {
       const nonce = await encryptNonceData({
         expiresOn: '2025-04-28T17:45:48.169Z',
