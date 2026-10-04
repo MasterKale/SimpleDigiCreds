@@ -1,6 +1,20 @@
 import type { Identifier } from '../../formats/mdoc/types.ts';
 
 /**
+ * 6. Digital Credentials Query Language (DCQL)
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-6
+ */
+export type OID4VPDCQLQuery = {
+  /** A non-empty array of Credential Queries that specify the requested Credentials */
+  credentials: OID4VPCredentialQuery[];
+  /**
+   * A non-empty array of Credential Set Queries that specifies additional constraints on which of
+   * the requested Credentials to return
+   */
+  credential_sets?: OID4VPCredentialSetQuery[];
+};
+
+/**
  * 6.1. Credential Query
  * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-6.1
  */
@@ -11,20 +25,53 @@ export type OID4VPCredentialQuery = {
   format: string;
   /** Whether multiple credentials can be returned for this query. Defaults to `false` */
   multiple?: boolean;
-  /** Format-specific metadata */
-  meta?: unknown;
+  /**
+   * Format-specific metadata. REQUIRED, but can be an empty object if no constraints are placed on
+   * the metadata or validity of the requested Credential
+   */
+  meta: Record<string, unknown>;
+  /** A non-empty array of claims in the requested Credential */
   claims?: OID4VPClaimQuery[];
   /**
-   * TODO: A list of trusted authorities or trust frameworks that certify the Issuers of
-   * credentials that the Verifier will accept for this request.
-   * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#dcql_trusted_authorities
+   * A list of trusted authorities or trust frameworks that certify the Issuers of credentials that
+   * the Verifier will accept for this request.
    */
-  trusted_authorities?: unknown[];
+  trusted_authorities?: OID4VPTrustedAuthoritiesQuery[];
   /**
    * Whether the Verifier requires a cryptographic proof that the wallet holds the credential.
    * Defaults to `true`
    */
   require_cryptographic_holder_binding?: boolean;
+  /**
+   * A non-empty array containing arrays of identifiers for elements in `claims` that specifies
+   * which combinations of claims for the Credential are requested
+   */
+  claim_sets?: string[][];
+};
+
+/**
+ * 6.1.1. Trusted Authorities Query
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-6.1.1
+ */
+export type OID4VPTrustedAuthoritiesQuery = {
+  /**
+   * A string uniquely identifying the type of information about the issuer trust framework.
+   * Ex: `"aki"`, `"etsi_tl"`, `"openid_federation"`
+   */
+  type: string;
+  /** A non-empty array of strings, the shape of which depends on `type` */
+  values: string[];
+};
+
+/**
+ * 6.2. Credential Set Query
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-6.2
+ */
+export type OID4VPCredentialSetQuery = {
+  /** A non-empty array of lists of Credential Query `id`s that satisfy the use case */
+  options: string[][];
+  /** Whether this set of Credentials is required. Defaults to `true` */
+  required?: boolean;
 };
 
 export type OID4VPCredentialQueryMdoc = OID4VPCredentialQuery & {
@@ -44,10 +91,11 @@ export type OID4VPCredentialQueryMDL = OID4VPCredentialQueryMdoc & {
 /** https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.3 */
 export type OID4VPCredentialQuerySDJWTVC = OID4VPCredentialQuery & {
   format: 'dc+sd-jwt';
-  meta?: {
+  meta: {
     /**
-     * An array of strings that specifies allowed values for the type of the requested Verifiable Credential.
-     * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.3.5
+     * A non-empty array of strings that specifies allowed values for the type of the requested
+     * Verifiable Credential.
+     * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.3.5
      */
     vct_values: string[];
   };
@@ -175,8 +223,10 @@ export type JWEENC_HAIP = Extract<JWEENC, 'A128GCM' | 'A256GCM'>;
 export type OID4VPClientMetadataMdoc = OID4VPClientMetadata & {
   vp_formats_supported: {
     'mso_mdoc': {
-      issuerauth_alg_values: [-7];
-      deviceauth_alg_values: [-7];
+      /** COSE algorithm identifiers, e.g. `-7` (ES256) or `-9` (ESP256) */
+      issuerauth_alg_values?: number[];
+      /** COSE algorithm identifiers, e.g. `-7` (ES256) or `-9` (ESP256) */
+      deviceauth_alg_values?: number[];
     };
   };
 };
@@ -188,8 +238,10 @@ export type OID4VPClientMetadataMdoc = OID4VPClientMetadata & {
 export type OID4VPClientMetadataSDJWTVC = OID4VPClientMetadata & {
   vp_formats_supported: {
     'dc+sd-jwt': {
-      'sd-jwt_alg_values': ['ES256'];
-      'kb-jwt_alg_values': ['ES256'];
+      /** Fully-specified JOSE algorithm identifiers, e.g. `"ES256"` */
+      'sd-jwt_alg_values'?: string[];
+      /** Fully-specified JOSE algorithm identifiers, e.g. `"ES256"` */
+      'kb-jwt_alg_values'?: string[];
     };
   };
 };
