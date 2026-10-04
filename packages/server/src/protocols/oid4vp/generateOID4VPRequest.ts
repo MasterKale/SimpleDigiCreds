@@ -1,5 +1,6 @@
 import type { DigitalCredentialRequest } from '../../dcapi/types.ts';
-import { generateNonce } from '../../helpers/nonce.ts';
+import { generateEncryptionKeypair } from '../../helpers/generateEncryptionKeypair.ts';
+import { type ExpectedCredential, generateNonce, type NonceData } from '../../helpers/nonce.ts';
 import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
 import type { Uint8Array_ } from '../../helpers/types.ts';
 import { generateMdocRequestOptions } from './generateMdocRequestOptions.ts';
@@ -119,22 +120,44 @@ export async function generateOID4VPRequest({
     data: {
       response_type: 'vp_token',
       response_mode: 'dc_api',
-      nonce: await generateNonce({ serverAESKeySecret, presentationLifetime }),
+      // This will get set below once we know everything that needs to go into it
+      nonce: '',
       dcql_query: { credentials: [credentialQuery] },
     },
   };
+
+  /**
+   * Remember enough about what was requested to check the response against it later
+   */
+  const expectedCredential: ExpectedCredential = {
+    id: credentialQuery.id,
+    format: credentialQuery.format,
+  };
+  if (credentialQuery.format === 'mso_mdoc') {
+    expectedCredential.doctypeValue = credentialQuery.meta.doctype_value;
+  } else {
+    expectedCredential.vctValues = credentialQuery.meta.vct_values;
+  }
 
   if (clientMetadata) {
     request.data.client_metadata = clientMetadata;
   }
 
+  let responseEncryptionKeys: Awaited<ReturnType<typeof generateEncryptionKeypair>> | undefined;
   if (encryptResponse) {
-    request = await modifyRequestToEncryptResponse({
+    responseEncryptionKeys = await generateEncryptionKeypair();
+    request = modifyRequestToEncryptResponse({
       request,
-      serverAESKeySecret,
-      presentationLifetime,
+      publicKeyJWK: responseEncryptionKeys.publicKeyJWK,
     });
   }
+
+  request.data.nonce = await generateNonce({
+    serverAESKeySecret,
+    presentationLifetime,
+    responseEncryptionKeys,
+    expectedCredentials: [expectedCredential],
+  });
 
   return { request };
 }

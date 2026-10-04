@@ -1,9 +1,6 @@
 import type { DigitalCredentialRequest } from '../../dcapi/types.ts';
-import { generateEncryptionKeypair } from '../../helpers/generateEncryptionKeypair.ts';
 import { SimpleDigiCredsError } from '../../helpers/index.ts';
-import { generateNonce } from '../../helpers/nonce.ts';
-import type { Uint8Array_ } from '../../helpers/types.ts';
-import type { JWEENC_HAIP } from './types.ts';
+import type { JWEENC_HAIP, OID4VPResponseEncryptionJWK } from './types.ts';
 
 /**
  * JWE `enc` values this library can decrypt. HAIP requires Verifiers to list both:
@@ -14,16 +11,16 @@ export const SUPPORTED_RESPONSE_ENC_VALUES: JWEENC_HAIP[] = ['A128GCM', 'A256GCM
 
 /**
  * Modify the DC API request to ensure that the response is encrypted.
+ *
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-8.3
  */
-export async function modifyRequestToEncryptResponse({
+export function modifyRequestToEncryptResponse({
   request,
-  serverAESKeySecret,
-  presentationLifetime,
+  publicKeyJWK,
 }: {
   request: DigitalCredentialRequest;
-  serverAESKeySecret: Uint8Array_;
-  presentationLifetime: number;
-}): Promise<DigitalCredentialRequest> {
+  publicKeyJWK: OID4VPResponseEncryptionJWK;
+}): DigitalCredentialRequest {
   const clientMetadata = request.data.client_metadata;
 
   if (!clientMetadata) {
@@ -39,26 +36,10 @@ export async function modifyRequestToEncryptResponse({
   request.data.response_mode = 'dc_api.jwt';
 
   /**
-   * Add `client_metadata.jwks`
+   * Add `client_metadata.jwks` and the `enc` values we support
    */
-  const { privateKeyJWK, publicKeyJWK } = await generateEncryptionKeypair();
-  clientMetadata.jwks = {
-    keys: [publicKeyJWK],
-  };
-  request.data.nonce = await generateNonce({
-    serverAESKeySecret,
-    presentationLifetime,
-    responseEncryptionKeys: {
-      privateKeyJWK,
-      publicKeyJWK,
-    },
-  });
-
-  /**
-   * TODO: Do whatever HAIP says to do when it updates for OID4VP Draft 28. Old link:
-   * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-6
-   */
-  // clientMetadata.encrypted_response_enc_values_supported = undefined;
+  clientMetadata.jwks = { keys: [publicKeyJWK] };
+  clientMetadata.encrypted_response_enc_values_supported = [...SUPPORTED_RESPONSE_ENC_VALUES];
 
   /**
    * Commit the changes to client_metadata
