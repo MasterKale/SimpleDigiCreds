@@ -41,7 +41,11 @@ export async function verifyPresentationResponse({
   assertNotWalletError(data);
 
   // Extract values like expiration time and privateKeyJWK from the nonce
-  const { expiresOn, responseEncryptionKeys } = await decryptNonce({ nonce, serverAESKeySecret });
+  const {
+    expiresOn,
+    responseEncryptionKeys,
+    expectedCredentials,
+  } = await decryptNonce({ nonce, serverAESKeySecret });
   const now = new Date();
 
   if (expiresOn < now) {
@@ -73,7 +77,6 @@ export async function verifyPresentationResponse({
     assertNotWalletError(data);
   }
 
-
   let possibleOrigins: string[] = [];
   if (Array.isArray(expectedOrigin)) {
     possibleOrigins = expectedOrigin;
@@ -81,16 +84,57 @@ export async function verifyPresentationResponse({
     possibleOrigins = [expectedOrigin];
   }
 
-  // We've verified the shape of the response, now verify it
-  for (const key of Object.keys(data.vp_token)) {
-    const presentation = data.vp_token[key];
+  const { vp_token } = parseDCAPIResponse(data);
 
-    if (!presentation) {
-      console.warn(`could not find matching response for cred id "${key}", skipping`);
-      continue;
+  /**
+   * Don't assume the Wallet will have returned what was requested. Look at each credential
+   * ID in the list of presented credentials and make sure each is in the list of the credential
+   * IDs we specified when requesting presentation.
+   *
+   * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-14.9
+   */
+  for (const credID of Object.keys(vp_token)) {
+    if (!expectedCredentials.some((expected) => expected.id === credID)) {
+      throw new SimpleDigiCredsError({
+        message: `Response contained unrequested credential "${credID}"`,
+        code: 'InvalidDCAPIResponse',
+      });
+    }
+  }
+
+  /**
+   * Make sure the credentials we requested (by ID) are in the response
+   */
+  for (const expected of expectedCredentials) {
+    if (!vp_token[expected.id]) {
+      throw new SimpleDigiCredsError({
+        message: `Response was missing requested credential "${expected.id}"`,
+        code: 'InvalidDCAPIResponse',
+      });
+    }
+  }
+
+  // We've verified the shape of the response, now verify it
+  for (const [credID, presentations] of Object.entries(vp_token)) {
+    /**
+     * This library never sets `multiple: true` in Credential Queries, so there MUST be only one
+     * presentation per query
+     *
+     * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-8.1
+     */
+    if (presentations.length !== 1) {
+      throw new SimpleDigiCredsError({
+        message:
+          `Expected exactly one presentation for "${credID}" but received ${presentations.length}`,
+        code: 'InvalidDCAPIResponse',
+      });
     }
 
-    if (isMdocPresentation(presentation)) {
+    const [presentation] = presentations;
+    const expected = expectedCredentials.find((expected) => expected.id === credID);
+    const format = expected?.format;
+
+    if (format === 'mso_mdoc') {
       const verifiedCredential = await verifyMDocPresentation({
         presentation,
         nonce,
@@ -98,48 +142,24 @@ export async function verifyPresentationResponse({
         verifierPublicKeyJWK: responseEncryptionKeys?.publicKeyJWK,
       });
 
-      verifiedValues[key] = verifiedCredential;
-    } else if (isSDJWTPresentation(presentation)) {
+      verifiedValues[credID] = verifiedCredential;
+    } else if (format === 'dc+sd-jwt') {
       const verifiedCredential = await verifySDJWTPresentation({
         presentation,
         nonce,
         possibleOrigins,
       });
 
-      verifiedValues[key] = verifiedCredential;
+      verifiedValues[credID] = verifiedCredential;
     } else {
       throw new SimpleDigiCredsError({
-        message: `Could not determine type of presentation for "${key}"`,
+        message: `Could not determine type of presentation for "${credID}"`,
         code: 'InvalidDCAPIResponse',
       });
     }
   }
 
   return verifiedValues;
-}
-
-/**
- * Type guard to make sure a query is for an mDL
- */
-function isMdocPresentation(presentation: string): boolean {
-  // Best I can come up with is to make sure it's a base64url string. JWT periods and SD-JWT tildes
-  // will definitely fail this test.
-  return base64url.isBase64URLString(presentation);
-}
-
-/**
- * Type guard to make sure a query is for an SD-JWT
- */
-function isSDJWTPresentation(presentation: string): boolean {
-  // JWTs are two periods each, with a KB JWT there can be up to four matches
-  const jwtSeparators = presentation.match(/\./g);
-  // SD-JWTs have at least one match in the worst case of no disclosures and no KB JWT
-  const sdJWTVCSeparators = presentation.match(/~/g);
-
-  return !!(
-    jwtSeparators && jwtSeparators.length >= 2 &&
-    sdJWTVCSeparators && sdJWTVCSeparators.length >= 1
-  );
 }
 
 /**
