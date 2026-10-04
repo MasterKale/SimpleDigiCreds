@@ -192,13 +192,13 @@ export type OID4VPResponseEncryptionJWK = JsonWebKey & {
  * https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-algorithms
  */
 // Uncomment when we support request signing
-// type JWSALG = 'ECDH-ES' | 'RSA-OAEP' | 'ES256';
+// type JWSALG = 'ES256' | 'ESP256';
 
 /**
  * JWE [RFC7516] `alg` algorithms. Required and Recommended+ values. See
  * https://www.iana.org/assignments/jose/jose.xhtml#web-signature-encryption-algorithms
  */
-type JWEALG = 'HS256' | 'ECDH-ES' | 'RSA-OAEP' | 'ES256';
+type JWEALG = 'ECDH-ES' | 'RSA-OAEP';
 /**
  * JWE [RFC7516] `alg` algorithms required by OID4VC HAIP. See
  * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-5
