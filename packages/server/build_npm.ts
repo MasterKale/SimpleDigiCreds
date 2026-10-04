@@ -1,8 +1,8 @@
-import { build, emptyDir } from "@deno/dnt";
+import { build, emptyDir } from '@deno/dnt';
 
-import denoJSON from "./deno.json" with { type: "json" };
+import denoJSON from './deno.json' with { type: 'json' };
 
-const outDir = "./npm";
+const outDir = './npm';
 
 await emptyDir(outDir);
 
@@ -11,10 +11,10 @@ await build({
     denoJSON.exports,
   ],
   outDir,
-  importMap: "./deno.json",
+  importMap: './deno.json',
   shims: {
     deno: {
-      test: "dev",
+      test: 'dev',
     },
   },
   // TODO: Re-enable if https://github.com/denoland/dnt/issues/331 can get resolved
@@ -26,28 +26,28 @@ await build({
     name: denoJSON.name,
     version: denoJSON.version,
     description:
-      "Part of a collection of TypeScript-first libraries for simpler Digital Credential presentation and verification. Pairs with @simpledigicreds/browser",
-    license: "MIT",
-    author: "Matthew Miller <matthew@millerti.me>",
+      'Part of a collection of TypeScript-first libraries for simpler Digital Credential presentation and verification. Pairs with @simpledigicreds/browser',
+    license: 'MIT',
+    author: 'Matthew Miller <matthew@millerti.me>',
     repository: {
-      type: "git",
-      url: "git+https://github.com/MasterKale/SimpleDigiCreds.git",
-      directory: "packages/server",
+      type: 'git',
+      url: 'git+https://github.com/MasterKale/SimpleDigiCreds.git',
+      directory: 'packages/server',
     },
-    homepage: "https://github.com/MasterKale/SimpleDigiCreds/tree/main/packages/server#readme",
+    homepage: 'https://github.com/MasterKale/SimpleDigiCreds/tree/main/packages/server#readme',
     publishConfig: {
-      access: "public",
+      access: 'public',
     },
     engines: {
-      node: ">=22.0.0",
+      node: '>=24.0.0',
     },
     bugs: {
-      url: "https://github.com/MasterKale/SimpleDigiCreds/issues",
+      url: 'https://github.com/MasterKale/SimpleDigiCreds/issues',
     },
     keywords: [
-      "typescript",
-      "digital credentials",
-      "node",
+      'typescript',
+      'digital credentials',
+      'node',
     ],
     dependencies: {},
   },
@@ -55,9 +55,9 @@ await build({
   mappings: {},
   // TypeScript tsconfig.json config
   compilerOptions: {
-    lib: ["ES2021"],
+    lib: ['ES2021'],
   },
 });
 
-Deno.copyFileSync("LICENSE.md", `${outDir}/LICENSE.md`);
-Deno.copyFileSync("README.md", `${outDir}/README.md`);
+Deno.copyFileSync('LICENSE.md', `${outDir}/LICENSE.md`);
+Deno.copyFileSync('README.md', `${outDir}/README.md`);

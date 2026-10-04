@@ -30,7 +30,7 @@ are maintained here to achieve this:
 ## Installation
 
 SimpleDigiCreds can be installed from **[NPM](https://www.npmjs.com/search?q=%40simpledigicreds)**
-and **[JSR](https://jsr.io/@simpledigicreds)** in **Node LTS 22.x and higher**, **Deno 2.1 and
+and **[JSR](https://jsr.io/@simpledigicreds)** in **Node LTS 24.x and higher**, **Deno 2.5 and
 higher** projects, and other compatible runtimes (Cloudflare Workers, Bun, etc...)
 
 See the packages' READMEs for more specific installation information.
@@ -70,7 +70,7 @@ An example site is included to help test credential presentation locally. Run th
 locally to get started:
 
 ```sh
-# Deno 2.1+
+# Deno 2.5+
 $> deno task example:start
 ```
 
@@ -92,7 +92,7 @@ request new features, or to suggest changes to existing features.
 
 Install the following before proceeding:
 
-- **Deno 2.1+**
+- **Deno 2.5+**
 
 After pulling down the code, set up dependencies:
 
