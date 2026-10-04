@@ -16,11 +16,14 @@ export async function verifyMDocPresentation({
   nonce,
   possibleOrigins,
   verifierPublicKeyJWK,
+  expectedDoctype,
 }: {
   presentation: string;
   nonce: string;
   possibleOrigins: string[];
   verifierPublicKeyJWK?: JsonWebKey;
+  /** The doctype that was requested. The presentation's `docType` must match it */
+  expectedDoctype: string;
 }): Promise<VerifiedCredential> {
   if (!base64url.isBase64URLString(presentation)) {
     throw new SimpleDigiCredsError({
@@ -66,6 +69,20 @@ export async function verifyMDocPresentation({
     });
   }
   const [document] = documents;
+
+  /**
+   * Make sure the Wallet returned the type of credential that was requested
+   *
+   * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-14.9
+   */
+  if (document.get('docType') !== expectedDoctype) {
+    throw new SimpleDigiCredsError({
+      message: `mdoc docType "${
+        document.get('docType')
+      }" did not match requested doctype "${expectedDoctype}"`,
+      code: 'MdocVerificationError',
+    });
+  }
 
   // Verify the issuer-signed data
   const {

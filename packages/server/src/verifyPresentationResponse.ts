@@ -132,30 +132,37 @@ export async function verifyPresentationResponse({
 
     const [presentation] = presentations;
     const expected = expectedCredentials.find((expected) => expected.id === credID);
-    const format = expected?.format;
 
-    if (format === 'mso_mdoc') {
+    /**
+     * Unreachable: unrequested credential IDs were rejected above. This narrows the type for
+     * the compiler.
+     */
+    if (!expected) {
+      throw new SimpleDigiCredsError({
+        message: `Response contained unrequested credential "${credID}"`,
+        code: 'InvalidDCAPIResponse',
+      });
+    }
+
+    if (expected.format === 'mso_mdoc') {
       const verifiedCredential = await verifyMDocPresentation({
         presentation,
         nonce,
         possibleOrigins,
         verifierPublicKeyJWK: responseEncryptionKeys?.publicKeyJWK,
-      });
-
-      verifiedValues[credID] = verifiedCredential;
-    } else if (format === 'dc+sd-jwt') {
-      const verifiedCredential = await verifySDJWTPresentation({
-        presentation,
-        nonce,
-        possibleOrigins,
+        expectedDoctype: expected.doctypeValue,
       });
 
       verifiedValues[credID] = verifiedCredential;
     } else {
-      throw new SimpleDigiCredsError({
-        message: `Could not determine type of presentation for "${credID}"`,
-        code: 'InvalidDCAPIResponse',
+      const verifiedCredential = await verifySDJWTPresentation({
+        presentation,
+        nonce,
+        possibleOrigins,
+        expectedVCTValues: expected.vctValues,
       });
+
+      verifiedValues[credID] = verifiedCredential;
     }
   }
 
