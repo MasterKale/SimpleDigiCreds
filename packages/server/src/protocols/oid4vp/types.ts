@@ -104,8 +104,14 @@ export type OID4VPSupportedMDLClaimName = Exclude<Identifier, 'age_over_NN'> | '
  * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-5.1
  */
 export type OID4VPClientMetadata = {
+  /**
+   * Public keys the Wallet can use to encrypt the response. Each JWK MUST have a `kid`, and `alg`
+   * MUST be present so the Wallet knows which JWE `alg` to use.
+   *
+   * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-8.3
+   */
   jwks?: {
-    keys: JsonWebKey[];
+    keys: OID4VPResponseEncryptionJWK[];
   };
   /**
    * The shape of this depends on the type of credential being requested
@@ -117,8 +123,20 @@ export type OID4VPClientMetadata = {
    * > When a response_mode requiring encryption of the Response (such as dc_api.jwt...) is
    * > specified, this MUST be present for anything other than the default single value of
    * > A128GCM. Otherwise, this SHOULD be absent.
+   *
+   * HAIP additionally requires Verifiers to list both `A128GCM` and `A256GCM`:
+   * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-5
    */
-  encrypted_response_enc_values_supported?: JWEENC_HAIP;
+  encrypted_response_enc_values_supported?: JWEENC[];
+};
+
+/**
+ * A public key JWK suitable for inclusion in `client_metadata.jwks` for response encryption
+ */
+export type OID4VPResponseEncryptionJWK = JsonWebKey & {
+  kid: string;
+  alg: JWEALG_HAIP;
+  use?: 'enc';
 };
 
 /**
@@ -137,18 +155,18 @@ type JWEALG = 'HS256' | 'ECDH-ES' | 'RSA-OAEP' | 'ES256';
  * JWE [RFC7516] `alg` algorithms required by OID4VC HAIP. See
  * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-5
  */
-type JWEALG_HAIP = Extract<JWEALG, 'ECDH-ES'>;
+export type JWEALG_HAIP = Extract<JWEALG, 'ECDH-ES'>;
 
 /**
  * JWE [RFC7516] `enc` algorithms. Required and Recommended values. See
  * https://www.rfc-editor.org/rfc/rfc7518.html#section-5.1
  */
-type JWEENC = 'A128CBC-HS256' | 'A256CBC-HS512' | 'A128GCM' | 'A256GCM';
+export type JWEENC = 'A128CBC-HS256' | 'A256CBC-HS512' | 'A128GCM' | 'A256GCM';
 /**
  * JWE [RFC7516] `enc` algorithms required by OID4VC HAIP. See
  * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-5
  */
-type JWEENC_HAIP = Extract<JWEENC, 'A128GCM'>;
+export type JWEENC_HAIP = Extract<JWEENC, 'A128GCM' | 'A256GCM'>;
 
 /**
  * The shape of `client_metadata` when requesting an mdoc. See
