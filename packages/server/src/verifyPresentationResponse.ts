@@ -73,12 +73,6 @@ export async function verifyPresentationResponse({
     assertNotWalletError(data);
   }
 
-  if (!isDCAPIResponse(data)) {
-    throw new SimpleDigiCredsError({
-      message: 'data was not the expected shape',
-      code: 'InvalidDCAPIResponse',
-    });
-  }
 
   let possibleOrigins: string[] = [];
   if (Array.isArray(expectedOrigin)) {
