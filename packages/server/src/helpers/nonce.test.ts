@@ -1,12 +1,12 @@
-import { assertEquals, assertExists, assertRejects } from '@std/assert';
+import { assert, assertEquals, assertExists, assertRejects } from '@std/assert';
 import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
 import { FakeTime } from '@std/testing/time';
 import { type Stub, stub } from '@std/testing/mock';
 
-import { decryptNonce, generateNonce } from './nonce.ts';
+import { decryptNonce, type ExpectedCredential, generateNonce } from './nonce.ts';
 import { base64url, SimpleDigiCredsError } from './index.ts';
 import type { Uint8Array_ } from './types.ts';
-import { decryptAESGCM, importAESGCMKey } from './cryptoAESGCM.ts';
+import { decryptAESGCM, encryptAESGCM, importAESGCMKey } from './cryptoAESGCM.ts';
 import {
   _generateEncryptionKeypairInternals,
   generateEncryptionKeypair,
@@ -55,6 +55,7 @@ describe('Method: generateNonce()', () => {
     const nonce = await generateNonce({
       serverAESKeySecret,
       presentationLifetime: 300, // 5 minutes
+      expectedCredentials: [],
     });
     const nonceParts = nonce.split('.');
 
@@ -87,6 +88,25 @@ describe('Method: generateNonce()', () => {
     );
   });
 
+  it('should round-trip expected credentials through the nonce', async () => {
+    const serverAESKeySecret: Uint8Array_ = new Uint8Array(32);
+
+    const nonce = await generateNonce({
+      serverAESKeySecret,
+      presentationLifetime: 300,
+      expectedCredentials: [
+        { id: 'credential1', format: 'mso_mdoc', doctypeValue: 'org.iso.18013.5.1.mDL' },
+      ],
+    });
+
+    const decrypted = await decryptNonce({ serverAESKeySecret, nonce });
+
+    assertEquals(decrypted.expiresOn, new Date('2025-04-28T17:45:48.169Z'));
+    assertEquals(decrypted.expectedCredentials, [
+      { id: 'credential1', format: 'mso_mdoc', doctypeValue: 'org.iso.18013.5.1.mDL' },
+    ]);
+  });
+
   it('should generate a nonce containing encrypted expiration, and response encryption keypair when provided', async () => {
     const serverAESKeySecret: Uint8Array_ = new Uint8Array(32);
     const { privateKeyJWK, publicKeyJWK } = await generateEncryptionKeypair();
@@ -95,6 +115,7 @@ describe('Method: generateNonce()', () => {
       serverAESKeySecret,
       presentationLifetime: 300, // 5 minutes
       responseEncryptionKeys: { publicKeyJWK, privateKeyJWK },
+      expectedCredentials: [],
     });
     const [ciphertext, iv] = nonce.split('.');
 
@@ -132,33 +153,47 @@ describe('Method: generateNonce()', () => {
 });
 
 describe('Method: decryptNonce()', () => {
-  it('should decrypt a nonce with expiration', async () => {
-    const serverAESKeySecret: Uint8Array_ = new Uint8Array(32);
+  const serverAESKeySecret: Uint8Array_ = new Uint8Array(32);
+  const expectedCredentials: ExpectedCredential[] = [
+    { id: 'credential1', format: 'mso_mdoc', doctypeValue: 'org.iso.18013.5.1.mDL' },
+  ];
+
+  it('should decrypt a nonce with expiration and expected credentials', async () => {
     const nonce =
-      'l5fkvda0Nhuurfuo_dBKb4knrEKdTATl9mgDeyG19ZbeEj5NKyyqzfmEo07HBqpelDumvRuV4Ls.tlDg1Rg6kh_sQYaH';
+      'kXzFCMtmT7N6GdHXl_it2sjXbk_l1_Y68pTqm7oqe_xv9SzVimb_0kjrgfIr1_dZuO-b-5WhUcrBNuLZVpMVEUwa3q' +
+      'aEy-eul4l6G7WTmDaAH0a0_zQLM8hHI0_d8gu_cBY5lchcEPu2hx9dO7e2B9aW3O7W9HnViuaIG4m54D2THsZ3hHys' +
+      'UFz8bGz8i8VdM92XdRGTV0oqTtnfD1DJx1Xx53O_Ne_zcjoNSOVVKxZpJsJhciU0WtKaKnD-TagTb9TeDLVR.HhZCq' +
+      '-ukVeFOOsD-';
 
-    const decrypted = await decryptNonce({
-      serverAESKeySecret,
-      nonce,
-    });
+    const decrypted = await decryptNonce({ serverAESKeySecret, nonce });
 
-    assertExists(decrypted.expiresOn);
     assertEquals(
       decrypted.expiresOn,
       new Date('2025-04-28T17:45:48.169Z'),
       'Expiration time should be five minutes from now',
     );
+    assertEquals(decrypted.expectedCredentials, expectedCredentials);
     assertEquals(decrypted.responseEncryptionKeys?.privateKeyJWK, undefined);
     assertEquals(decrypted.responseEncryptionKeys?.publicKeyJWK, undefined);
   });
 
-  it('should decrypt a nonce with expiration and encryption keypair', async () => {
+  it('should decrypt a nonce with expiration, expected credentials, and encryption keypair', async () => {
     const nonce =
-      'sWUJqF_goG37GcwWLRnEplIjT8DEA4l4OLS5vdf6W6ixHbADVeAxH_dkHXtv-IOeARinJQ7RT6ZVd7U3OP2GeksgKWEBvmaHaooIJRwgK_f1s1BCpwvkWqJBDsyUcyNblMV2xTc11OKEU3A3b20B9xvfnGSpqu8xC_LL1h3x7Vq8LX7X3c4L29OyZKHSgklcLwiTXkWYGclOWOFL3lBOZHxKfyto52wEx5j6Up5tpQLrXMtF6VeZHWHieGsX_yc-Lq5qfxB8ItOwmR-hn4KxDBMxqyIgHtPbMAQ2K8QaUGjznZQ4ZCX6_XqkxSdrYooB-l69PDw7bAKbsqHIC79jpvngtcRIa27xlMZSWHCdRTlRPlj1FBP_e2Z8BQqtMsqcrdqPDfX2pJDuncgZ1bGWIgTqfEoQl1dNzOPILXJZH2xBZ6917An9Ui30FBvLhj6vjJMDx1kseraHBPloK2NkphvkmIITAq4fjLS6W1FgRsx4C4PEfCyDNu2cwq7o21SFwhqTwXM0jeQxKhOvxiVMyYgCjq81QjN-Wl_3_nJ-jYbluA.oORY5OzMmUqPDPOW';
+      'fIKJWdEwG3FFm5gB0AdDvDjIm4wOdNFi_g8mVshKrW0fR8cXbsdDSqrI-uHZXzM1SFPU-S3dJbQ3QD1hDvtEPkX62c' +
+      'OpxrD08pE5rZgL-ywFxfdtSkCRiE1iRavoZ4REtbmm8li3zzAH9SBhCspe-Ei716VfbtWd7yiSw_syxwWzaFHBFHEw' +
+      '6vkl0fkLxaquGB1res7R7Kxu0lEFrzhmH97ydZPHw82yyzR-SiNPjellovdHg_NWkVf8pEsBDu8KghqpflSR8-X1G5' +
+      'Fm3MwHBTwqzR5bsRCsILRAJHrN7X8JAYoIV1DaN852JO1xW1P0PnAAwyTDl6q45qj5nWYBs_QvPAB6Z8vyaCeAHeuZ' +
+      '3oTetr_7cfja6SRCW4WpXeZO0BuVpWjOp_jJON0HHG-BAxtflKYCBO80HQZCxmU7ShffMVpEcVy88XJIIaIECIfU8O' +
+      'fi2N89D_nwGMVMBc31Ni2lK6UXvH08Q6jq98w43jpPViS8n50ztjTNJ1JKIxVNw4Lo3K1ohjiagPbFl5QqPjlN8k05' +
+      'Jfl6SfM88pLgmi62heK_0ZVftYnz3xUReXAnE-AGISYwG_giw7zWm1pa1daAM0qyV87DPabt4NtiRZyEKXaE6uKTz9' +
+      'WpFtc1lQL9fVzrQ7NxorGpTLH_NPigDMm4FqaeuCOMi76CNQxMxW6BacEN_Ip8zqGb7araoc-yjGdF-4Qwi4GaRudB' +
+      '6-4PIN6wrn-aQNVQCl6G49hUWKLJEh0VjpNyF0K9VhCpXekRt0-C91SG7zk9Tj_V60wZN7OcQ9ajIRtY8rjUYds.6j' +
+      '5fAULGqYL5Cwb4';
 
-    const decrypted = await decryptNonce({ serverAESKeySecret: new Uint8Array(32), nonce });
+    const decrypted = await decryptNonce({ serverAESKeySecret, nonce });
 
     assertEquals(decrypted.expiresOn, new Date('2025-04-28T17:45:48.169Z'));
+    assertEquals(decrypted.expectedCredentials, expectedCredentials);
     assertEquals(decrypted.responseEncryptionKeys?.privateKeyJWK, privateKeyJWK);
     assertEquals(decrypted.responseEncryptionKeys?.publicKeyJWK, publicKeyJWK);
   });
@@ -184,5 +219,28 @@ describe('Method: decryptNonce()', () => {
       SimpleDigiCredsError,
       'AES key secret was not 32 bytes',
     );
+  });
+
+  describe('nonces from older versions of this library', () => {
+    /** Encrypt arbitrary JSON the same way `generateNonce()` does */
+    async function encryptNonceData(data: object): Promise<string> {
+      const [encrypted, iv] = await encryptAESGCM(
+        new Uint8Array(new TextEncoder().encode(JSON.stringify(data))),
+        await importAESGCMKey(serverAESKeySecret),
+      );
+      return `${base64url.bufferToBase64URL(encrypted)}.${base64url.bufferToBase64URL(iv)}`;
+    }
+
+    it('should throw a library error if the nonce has no expected credentials', async () => {
+      const nonce = await encryptNonceData({
+        expiresOn: '2025-04-28T17:45:48.169Z',
+      });
+
+      const rejected = await assertRejects(() => decryptNonce({ serverAESKeySecret, nonce }));
+
+      assert(rejected instanceof SimpleDigiCredsError);
+      assertEquals(rejected.code, 'InvalidDCAPIResponse');
+      assertEquals(rejected.message, 'Nonce data did not contain the expected credentials');
+    });
   });
 });

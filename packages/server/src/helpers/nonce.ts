@@ -15,17 +15,17 @@ export async function generateNonce({
   serverAESKeySecret,
   presentationLifetime,
   responseEncryptionKeys,
+  expectedCredentials,
 }: {
   serverAESKeySecret: Uint8Array_;
   presentationLifetime: number;
-  responseEncryptionKeys?: {
-    publicKeyJWK: JsonWebKey;
-    privateKeyJWK: JsonWebKey;
-  };
+  responseEncryptionKeys?: NonceData['responseEncryptionKeys'];
+  expectedCredentials: NonceData['expectedCredentials'];
 }): Promise<string> {
   const data: NonceData = {
     expiresOn: new Date(Date.now() + presentationLifetime * 1000),
     responseEncryptionKeys,
+    expectedCredentials,
   };
 
   const encryptionKey = await importAESGCMKey(serverAESKeySecret);
@@ -98,15 +98,41 @@ export async function decryptNonce({
     });
   }
 
+  if (!Array.isArray(decryptedJSON.expectedCredentials)) {
+    throw new SimpleDigiCredsError({
+      message: 'Nonce data did not contain the expected credentials',
+      code: 'InvalidDCAPIResponse',
+    });
+  }
+
   decryptedJSON.expiresOn = new Date(decryptedJSON.expiresOn);
 
   return decryptedJSON as NonceData;
 }
 
-type NonceData = {
+export type NonceData = {
+  /** After when the request will no longer be valid */
   expiresOn: Date;
   responseEncryptionKeys?: {
     publicKeyJWK: JsonWebKey;
     privateKeyJWK: JsonWebKey;
   };
+  /**
+   * A summary of the Credential Queries in the request so that the response can be checked
+   * against what was actually requested
+   */
+  expectedCredentials: ExpectedCredential[];
+};
+
+/**
+ * The parts of a Credential Query needed to check that a presentation matches what was requested
+ */
+export type ExpectedCredential = {
+  /** The Credential Query `id` */
+  id: string;
+  format: 'mso_mdoc' | 'dc+sd-jwt';
+  /** mdoc only: the requested doctype */
+  doctypeValue?: string;
+  /** SD-JWT VC only: the acceptable `vct` values */
+  vctValues?: string[];
 };
