@@ -45,6 +45,7 @@ See the packages' READMEs for more specific installation information.
 - Encrypted responses following
   [OID4VC HAIP 1.0](https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-5)
 - Stateless presentation verification
+- Wallet error responses (e.g. `access_denied`)
 ### OID4VP - mdoc
 
 - IssuerAuth and DeviceAuth verification (`ES256`/`ESP256`)
