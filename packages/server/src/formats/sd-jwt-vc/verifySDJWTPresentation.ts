@@ -38,8 +38,21 @@ export async function verifySDJWTPresentation({
     });
   }
 
+  /**
+   * Require the JWT header's `typ` property to be set correctly
+   *
+   * https://datatracker.ietf.org/doc/html/draft-ietf-oauth-sd-jwt-vc-13#section-3.2.1
+   */
+  const issuerJWTHeader = decoded.jwt.header as SDJWTHeader;
+  if (issuerJWTHeader.typ !== 'dc+sd-jwt') {
+    throw new SimpleDigiCredsError({
+      message: `Issuer-signed JWT had unexpected typ "${issuerJWTHeader.typ}"`,
+      code: 'SDJWTVerificationError',
+    });
+  }
+
   const sdJWTVCInstanceConfig: SDJWTVCConfig = {
-    verifier: getIssuerVerifier(decoded.jwt.header as SDJWTHeader),
+    verifier: getIssuerVerifier(issuerJWTHeader),
     hasher: hashSDJWTVCData,
   };
 
