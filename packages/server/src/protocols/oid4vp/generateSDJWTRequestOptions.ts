@@ -4,9 +4,9 @@ import type { OID4VPClientMetadataSDJWTVC, OID4VPCredentialQuerySDJWTVC } from '
  * Generate an SD-JWT-VC-specific set of request options for the Digital Credentials API
  *
  * References:
- * - https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#name-ietf-sd-jwt-vc
- * - https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html
- * - https://www.ietf.org/archive/id/draft-ietf-oauth-sd-jwt-vc-08.html
+ * - https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.3
+ * - https://www.rfc-editor.org/rfc/rfc9901.html
+ * - https://datatracker.ietf.org/doc/html/draft-ietf-oauth-sd-jwt-vc-13
  */
 export function generateSDJWTRequestOptions({
   id,

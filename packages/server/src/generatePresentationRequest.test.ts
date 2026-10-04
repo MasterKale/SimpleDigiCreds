@@ -5,13 +5,17 @@ import { type Stub, stub } from '@std/testing/mock';
 import { generatePresentationRequest } from './generatePresentationRequest.ts';
 import { decryptNonce } from './helpers/nonce.ts';
 import { _generateEncryptionKeypairInternals } from './helpers/generateEncryptionKeypair.ts';
+import type { OID4VPResponseEncryptionJWK } from './protocols/oid4vp/types.ts';
 
 const serverAESKeySecret = new Uint8Array(32);
-const publicKeyJWK: JsonWebKey = {
+const publicKeyJWK: OID4VPResponseEncryptionJWK = {
   kty: 'EC',
   crv: 'P-256',
   x: 'RIlPj8_a_azZ5Ed1ffhja2GFqRDKvjktB_8VK6S7hFo',
   y: 'atJc71TYgZ9jUwgunsTGd8v2nxW0geCT9AvnIqmm4TQ',
+  kid: 'test-kid',
+  alg: 'ECDH-ES',
+  use: 'enc',
 };
 const privateKeyJWK: JsonWebKey = {
   kty: 'EC',
@@ -139,8 +143,8 @@ describe('Method: generatePresentationRequest()', () => {
     assertEquals(dcapiOptions.digital.requests[0].data.response_mode, 'dc_api.jwt');
     assertEquals(
       client_metadata?.encrypted_response_enc_values_supported,
-      undefined,
-      'Encrypted responses should omit this so we can use the default of `A128GCM`',
+      ['A128GCM', 'A256GCM'],
+      'HAIP requires Verifiers to list both A128GCM and A256GCM',
     );
     // Make sure existing client_metadata entries aren't overwritten
     assertExists(client_metadata?.vp_formats_supported);
@@ -152,6 +156,9 @@ describe('Method: generatePresentationRequest()', () => {
     assertEquals(client_metadata.jwks.keys[0].crv, 'P-256');
     assertEquals(client_metadata.jwks.keys[0].x, 'RIlPj8_a_azZ5Ed1ffhja2GFqRDKvjktB_8VK6S7hFo');
     assertEquals(client_metadata.jwks.keys[0].y, 'atJc71TYgZ9jUwgunsTGd8v2nxW0geCT9AvnIqmm4TQ');
+    // OID4VP 1.0 requires `kid` and `alg` on response encryption keys
+    assertEquals(client_metadata.jwks.keys[0].kid, 'test-kid');
+    assertEquals(client_metadata.jwks.keys[0].alg, 'ECDH-ES');
 
     // Verify the corresponding private key is encrypted into the nonce
     const { nonce } = dcapiOptions.digital.requests[0].data;
@@ -172,6 +179,26 @@ describe('Method: generatePresentationRequest()', () => {
     assertEquals(
       decryptedNonce.responseEncryptionKeys.privateKeyJWK.y,
       'atJc71TYgZ9jUwgunsTGd8v2nxW0geCT9AvnIqmm4TQ',
+    );
+  });
+
+  it('should advertise ES256 and ESP256 for mdoc requests', async () => {
+    const options = await generatePresentationRequest({
+      credentialOptions: {
+        format: 'mdl',
+        desiredClaims: ['family_name'],
+      },
+      serverAESKeySecret,
+    });
+
+    assertEquals(
+      options.dcapiOptions.digital.requests[0].data.client_metadata?.vp_formats_supported,
+      {
+        mso_mdoc: {
+          issuerauth_alg_values: [-7, -9],
+          deviceauth_alg_values: [-7, -9],
+        },
+      },
     );
   });
 

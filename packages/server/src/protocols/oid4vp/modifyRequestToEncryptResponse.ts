@@ -3,6 +3,14 @@ import { generateEncryptionKeypair } from '../../helpers/generateEncryptionKeypa
 import { SimpleDigiCredsError } from '../../helpers/index.ts';
 import { generateNonce } from '../../helpers/nonce.ts';
 import type { Uint8Array_ } from '../../helpers/types.ts';
+import type { JWEENC_HAIP } from './types.ts';
+
+/**
+ * JWE `enc` values this library can decrypt. HAIP requires Verifiers to list both:
+ *
+ * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-5
+ */
+export const SUPPORTED_RESPONSE_ENC_VALUES: JWEENC_HAIP[] = ['A128GCM', 'A256GCM'];
 
 /**
  * Modify the DC API request to ensure that the response is encrypted.

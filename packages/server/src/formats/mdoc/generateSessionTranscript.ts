@@ -7,7 +7,7 @@ import { base64url } from '../../helpers/index.ts';
 
 /**
  * See OID4VP for SessionTranscript composition:
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2.6
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.2.6.2
  */
 export async function generateSessionTranscript(
   requestOrigin: string,
@@ -29,7 +29,7 @@ export async function generateSessionTranscript(
   const handoverInfo: OpenID4VPDCAPIHandoverInfo = [requestOrigin, nonce, jwkThumbprint];
 
   const handoverInfoCBOR = encodeCBOR(handoverInfo);
-  const handoverInfoHash = await crypto.subtle.digest('SHA-256', handoverInfoCBOR);
+  const handoverInfoHash = await crypto.subtle.digest('SHA-256', handoverInfoCBOR as Uint8Array_);
 
   const sessionTranscript: DCAPIOID4VPSessionTranscript = [
     null,

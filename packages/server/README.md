@@ -4,8 +4,8 @@ Part of a collection of TypeScript-first libraries for simpler Digital Credentia
 verification.
 
 - [Installation](#installation)
-  - [Node LTS 22.x and higher](#node-lts-22x-and-higher)
-  - [Deno 2.1 and higher](#deno-21-and-higher)
+  - [Node LTS 24.x and higher](#node-lts-24x-and-higher)
+  - [Deno 2.5 and higher](#deno-25-and-higher)
 - [Getting Started](#getting-started)
 - [Example Presentation Requests](#example-presentation-requests)
 
@@ -14,13 +14,13 @@ verification.
 This package can be installed from **[NPM](https://www.npmjs.com/package/@simpledigicreds/server)**
 and **[JSR](https://jsr.io/@simpledigicreds/server)**:
 
-### Node LTS 22.x and higher
+### Node LTS 24.x and higher
 
 ```sh
 npm install @simpledigicreds/server
 ```
 
-### Deno 2.1 and higher
+### Deno 2.5 and higher
 
 ```sh
 deno add jsr:@simpledigicreds/server

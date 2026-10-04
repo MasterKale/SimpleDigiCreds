@@ -7,7 +7,7 @@ import { COSEALG } from '../cose.ts';
 export function mapCoseAlgToWebCryptoAlg(alg: COSEALG): SubtleCryptoAlg {
   if ([COSEALG.RS1].includes(alg)) {
     return 'SHA-1';
-  } else if ([COSEALG.ES256, COSEALG.PS256, COSEALG.RS256].includes(alg)) {
+  } else if ([COSEALG.ES256, COSEALG.ESP256, COSEALG.PS256, COSEALG.RS256].includes(alg)) {
     return 'SHA-256';
   } else if ([COSEALG.ES384, COSEALG.PS384, COSEALG.RS384].includes(alg)) {
     return 'SHA-384';

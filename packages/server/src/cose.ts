@@ -160,6 +160,7 @@ export enum COSEHEADER {
 export enum COSEALG {
   ES256 = -7,
   EdDSA = -8,
+  ESP256 = -9,
   ES384 = -35,
   ES512 = -36,
   PS256 = -37,

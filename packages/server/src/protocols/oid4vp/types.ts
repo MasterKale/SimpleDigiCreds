@@ -1,8 +1,22 @@
 import type { Identifier } from '../../formats/mdoc/types.ts';
 
 /**
+ * 6. Digital Credentials Query Language (DCQL)
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-6
+ */
+export type OID4VPDCQLQuery = {
+  /** A non-empty array of Credential Queries that specify the requested Credentials */
+  credentials: OID4VPCredentialQuery[];
+  /**
+   * A non-empty array of Credential Set Queries that specifies additional constraints on which of
+   * the requested Credentials to return
+   */
+  credential_sets?: OID4VPCredentialSetQuery[];
+};
+
+/**
  * 6.1. Credential Query
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#section-6.1
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-6.1
  */
 export type OID4VPCredentialQuery = {
   /** A unique string comprised of alphanumeric, underscore (_) or hyphen (-) characters */
@@ -11,43 +25,77 @@ export type OID4VPCredentialQuery = {
   format: string;
   /** Whether multiple credentials can be returned for this query. Defaults to `false` */
   multiple?: boolean;
-  /** Format-specific metadata */
-  meta?: unknown;
+  /**
+   * Format-specific metadata. REQUIRED, but can be an empty object if no constraints are placed on
+   * the metadata or validity of the requested Credential
+   */
+  meta: Record<string, unknown>;
+  /** A non-empty array of claims in the requested Credential */
   claims?: OID4VPClaimQuery[];
   /**
-   * TODO: A list of trusted authorities or trust frameworks that certify the Issuers of
-   * credentials that the Verifier will accept for this request.
-   * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#dcql_trusted_authorities
+   * A list of trusted authorities or trust frameworks that certify the Issuers of credentials that
+   * the Verifier will accept for this request.
    */
-  trusted_authorities?: unknown[];
+  trusted_authorities?: OID4VPTrustedAuthoritiesQuery[];
   /**
    * Whether the Verifier requires a cryptographic proof that the wallet holds the credential.
    * Defaults to `true`
    */
   require_cryptographic_holder_binding?: boolean;
+  /**
+   * A non-empty array containing arrays of identifiers for elements in `claims` that specifies
+   * which combinations of claims for the Credential are requested
+   */
+  claim_sets?: string[][];
+};
+
+/**
+ * 6.1.1. Trusted Authorities Query
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-6.1.1
+ */
+export type OID4VPTrustedAuthoritiesQuery = {
+  /**
+   * A string uniquely identifying the type of information about the issuer trust framework.
+   * Ex: `"aki"`, `"etsi_tl"`, `"openid_federation"`
+   */
+  type: string;
+  /** A non-empty array of strings, the shape of which depends on `type` */
+  values: string[];
+};
+
+/**
+ * 6.2. Credential Set Query
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-6.2
+ */
+export type OID4VPCredentialSetQuery = {
+  /** A non-empty array of lists of Credential Query `id`s that satisfy the use case */
+  options: string[][];
+  /** Whether this set of Credentials is required. Defaults to `true` */
+  required?: boolean;
 };
 
 export type OID4VPCredentialQueryMdoc = OID4VPCredentialQuery & {
-  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2-2 */
+  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.2 */
   format: 'mso_mdoc';
-  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2.3 */
+  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.2.3 */
   meta: { doctype_value: string };
   claims: OID4VPClaimQueryMdoc[];
 };
 
-/** https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2 */
+/** https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.2 */
 export type OID4VPCredentialQueryMDL = OID4VPCredentialQueryMdoc & {
-  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2.3 */
+  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.2.3 */
   meta: { doctype_value: 'org.iso.18013.5.1.mDL' };
 };
 
-/** https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.3 */
+/** https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.3 */
 export type OID4VPCredentialQuerySDJWTVC = OID4VPCredentialQuery & {
   format: 'dc+sd-jwt';
-  meta?: {
+  meta: {
     /**
-     * An array of strings that specifies allowed values for the type of the requested Verifiable Credential.
-     * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.3.5
+     * A non-empty array of strings that specifies allowed values for the type of the requested
+     * Verifiable Credential.
+     * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.3.5
      */
     vct_values: string[];
   };
@@ -56,7 +104,7 @@ export type OID4VPCredentialQuerySDJWTVC = OID4VPCredentialQuery & {
 
 /**
  * 6.3. Claims Query
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#section-6.3
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-6.3
  */
 export type OID4VPClaimQuery = {
   /** An array of strings indicating a property within a JSON credential format. See {@link PathPointer} for more info */
@@ -68,7 +116,7 @@ export type OID4VPClaimQuery = {
 };
 
 /**
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2.4
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.2.4
  */
 export type OID4VPClaimQueryMdoc = OID4VPClaimQuery & {
   /** A boolean that is equivalent to IntentToRetain variable defined in the mdoc specification */
@@ -101,24 +149,42 @@ export type OID4VPSupportedMDLClaimName = Exclude<Identifier, 'age_over_NN'> | '
 
 /**
  * Verifier metadata values. See
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#section-5.1-5.2.1
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-5.1
  */
 export type OID4VPClientMetadata = {
+  /**
+   * Public keys the Wallet can use to encrypt the response. Each JWK MUST have a `kid`, and `alg`
+   * MUST be present so the Wallet knows which JWE `alg` to use.
+   *
+   * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-8.3
+   */
   jwks?: {
-    keys: JsonWebKey[];
+    keys: OID4VPResponseEncryptionJWK[];
   };
   /**
    * The shape of this depends on the type of credential being requested
    */
   vp_formats_supported: unknown;
   /**
-   * From https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#section-5.1-5.2.2.2:
+   * From https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-5.1:
    *
    * > When a response_mode requiring encryption of the Response (such as dc_api.jwt...) is
    * > specified, this MUST be present for anything other than the default single value of
    * > A128GCM. Otherwise, this SHOULD be absent.
+   *
+   * HAIP additionally requires Verifiers to list both `A128GCM` and `A256GCM`:
+   * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-5
    */
-  encrypted_response_enc_values_supported?: JWEENC_HAIP;
+  encrypted_response_enc_values_supported?: JWEENC[];
+};
+
+/**
+ * A public key JWK suitable for inclusion in `client_metadata.jwks` for response encryption
+ */
+export type OID4VPResponseEncryptionJWK = JsonWebKey & {
+  kid: string;
+  alg: JWEALG_HAIP;
+  use?: 'enc';
 };
 
 /**
@@ -135,43 +201,47 @@ export type OID4VPClientMetadata = {
 type JWEALG = 'HS256' | 'ECDH-ES' | 'RSA-OAEP' | 'ES256';
 /**
  * JWE [RFC7516] `alg` algorithms required by OID4VC HAIP. See
- * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-6
+ * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-5
  */
-type JWEALG_HAIP = Extract<JWEALG, 'ECDH-ES'>;
+export type JWEALG_HAIP = Extract<JWEALG, 'ECDH-ES'>;
 
 /**
  * JWE [RFC7516] `enc` algorithms. Required and Recommended values. See
  * https://www.rfc-editor.org/rfc/rfc7518.html#section-5.1
  */
-type JWEENC = 'A128CBC-HS256' | 'A256CBC-HS512' | 'A128GCM' | 'A256GCM';
+export type JWEENC = 'A128CBC-HS256' | 'A256CBC-HS512' | 'A128GCM' | 'A256GCM';
 /**
  * JWE [RFC7516] `enc` algorithms required by OID4VC HAIP. See
- * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-6
+ * https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-5
  */
-type JWEENC_HAIP = Extract<JWEENC, 'A128GCM'>;
+export type JWEENC_HAIP = Extract<JWEENC, 'A128GCM' | 'A256GCM'>;
 
 /**
  * The shape of `client_metadata` when requesting an mdoc. See
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.2.2
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.2.2
  */
 export type OID4VPClientMetadataMdoc = OID4VPClientMetadata & {
   vp_formats_supported: {
     'mso_mdoc': {
-      issuerauth_alg_values: [-7];
-      deviceauth_alg_values: [-7];
+      /** COSE algorithm identifiers, e.g. `-7` (ES256) or `-9` (ESP256) */
+      issuerauth_alg_values?: number[];
+      /** COSE algorithm identifiers, e.g. `-7` (ES256) or `-9` (ESP256) */
+      deviceauth_alg_values?: number[];
     };
   };
 };
 
 /**
  * The shape of `client_metadata` when requesting an SD-JWT-VC. See
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-B.3.4
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.3.4
  */
 export type OID4VPClientMetadataSDJWTVC = OID4VPClientMetadata & {
   vp_formats_supported: {
     'dc+sd-jwt': {
-      'sd-jwt_alg_values': ['ES256'];
-      'kb-jwt_alg_values': ['ES256'];
+      /** Fully-specified JOSE algorithm identifiers, e.g. `"ES256"` */
+      'sd-jwt_alg_values'?: string[];
+      /** Fully-specified JOSE algorithm identifiers, e.g. `"ES256"` */
+      'kb-jwt_alg_values'?: string[];
     };
   };
 };

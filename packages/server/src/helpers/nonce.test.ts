@@ -11,12 +11,16 @@ import {
   _generateEncryptionKeypairInternals,
   generateEncryptionKeypair,
 } from './generateEncryptionKeypair.ts';
+import type { OID4VPResponseEncryptionJWK } from '../protocols/oid4vp/types.ts';
 
-const publicKeyJWK: JsonWebKey = {
+const publicKeyJWK: OID4VPResponseEncryptionJWK = {
   kty: 'EC',
   crv: 'P-256',
   x: 'RIlPj8_a_azZ5Ed1ffhja2GFqRDKvjktB_8VK6S7hFo',
   y: 'atJc71TYgZ9jUwgunsTGd8v2nxW0geCT9AvnIqmm4TQ',
+  kid: 'test-kid',
+  alg: 'ECDH-ES',
+  use: 'enc',
 };
 
 const privateKeyJWK: JsonWebKey = {

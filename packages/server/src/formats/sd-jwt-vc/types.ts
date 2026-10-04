@@ -5,10 +5,10 @@ export type SDJWTHeader = {
 };
 
 /**
- * https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html#section-4.1
+ * https://www.rfc-editor.org/rfc/rfc9901.html#section-4.1
  */
 export type IssuerSignedJWTPayload = {
-  // https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html#section-4.2.4.1
+  // https://www.rfc-editor.org/rfc/rfc9901.html#section-4.2.4.1
   _sd?: string[];
   _sd_alg?: SelectiveDisclosureAlgorithm;
   iss?: string;
@@ -16,7 +16,7 @@ export type IssuerSignedJWTPayload = {
   nbf?: number;
   exp?: number;
   vct?: string;
-  // https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html#section-4.1.2
+  // https://www.rfc-editor.org/rfc/rfc9901.html#section-4.1.2
   cnf?: {
     jwk: JsonWebKey;
   };
