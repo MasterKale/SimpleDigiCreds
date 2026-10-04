@@ -175,6 +175,26 @@ describe('Method: generatePresentationRequest()', () => {
     );
   });
 
+  it('should advertise ES256 and ESP256 for mdoc requests', async () => {
+    const options = await generatePresentationRequest({
+      credentialOptions: {
+        format: 'mdl',
+        desiredClaims: ['family_name'],
+      },
+      serverAESKeySecret,
+    });
+
+    assertEquals(
+      options.dcapiOptions.digital.requests[0].data.client_metadata?.vp_formats_supported,
+      {
+        mso_mdoc: {
+          issuerauth_alg_values: [-7, -9],
+          deviceauth_alg_values: [-7, -9],
+        },
+      },
+    );
+  });
+
   it('should generate a straightforward European PID mdoc request', async () => {
     const options = await generatePresentationRequest({
       credentialOptions: {
