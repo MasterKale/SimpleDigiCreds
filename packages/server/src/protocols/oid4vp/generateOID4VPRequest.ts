@@ -34,6 +34,17 @@ export async function generateOID4VPRequest({
 }): Promise<{ request: DigitalCredentialRequest }> {
   const { format, desiredClaims } = credentialOptions;
 
+  /**
+   * DCQL requires `claims` to be a non-empty array when present
+   * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-6.1
+   */
+  if (!Array.isArray(desiredClaims) || desiredClaims.length === 0) {
+    throw new SimpleDigiCredsError({
+      message: 'Empty `desiredClaims` is not allowed',
+      code: 'InvalidPresentationOptions',
+    });
+  }
+
   let credentialQuery:
     | OID4VPCredentialQueryMdoc
     | OID4VPCredentialQueryMDL
@@ -53,13 +64,6 @@ export async function generateOID4VPRequest({
     const { desiredClaims } = credentialOptions;
 
     let claimPaths: string[][];
-
-    if (Array.isArray(desiredClaims) && desiredClaims.length === 0) {
-      throw new SimpleDigiCredsError({
-        message: 'Empty `desiredClaims` is not allowed',
-        code: 'InvalidPresentationOptions',
-      });
-    }
 
     if (typeof desiredClaims[0] === 'string') {
       const { claimPathPrefix } = credentialOptions as OID4VPMdocCredentialOptionsSimple;
@@ -84,6 +88,18 @@ export async function generateOID4VPRequest({
     }));
   } else if (format === 'sd-jwt-vc') {
     const { acceptedVCTValues } = credentialOptions;
+
+    /**
+     * `vct_values` is REQUIRED and must be non-empty
+     * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.3.5
+     */
+    if (!Array.isArray(acceptedVCTValues) || acceptedVCTValues.length === 0) {
+      throw new SimpleDigiCredsError({
+        message: 'Empty `acceptedVCTValues` is not allowed',
+        code: 'InvalidPresentationOptions',
+      });
+    }
+
     ({ credentialQuery, clientMetadata } = generateSDJWTRequestOptions({
       id: requestID,
       desiredClaims,
