@@ -46,7 +46,7 @@ export async function verifySDJWTPresentation({
   const issuerJWTHeader = decoded.jwt.header as SDJWTHeader;
   if (issuerJWTHeader.typ !== 'dc+sd-jwt') {
     throw new SimpleDigiCredsError({
-      message: `SD-JWT-VC had unexpected typ "${issuerJWTHeader.typ}"`,
+      message: `SD-JWT-VC header had unexpected typ "${issuerJWTHeader.typ}"`,
       code: 'SDJWTVerificationError',
     });
   }
