@@ -1,10 +1,11 @@
-import { assert, assertEquals, assertExists } from '@std/assert';
+import { assert, assertEquals, assertExists, assertRejects } from '@std/assert';
 import { afterEach, beforeEach, describe, it } from '@std/testing/bdd';
 import { type Stub, stub } from '@std/testing/mock';
 
 import { generatePresentationRequest } from './generatePresentationRequest.ts';
 import { decryptNonce } from './helpers/nonce.ts';
 import { _generateEncryptionKeypairInternals } from './helpers/generateEncryptionKeypair.ts';
+import { SimpleDigiCredsError } from './helpers/index.ts';
 import type { OID4VPResponseEncryptionJWK } from './protocols/oid4vp/types.ts';
 
 const serverAESKeySecret = new Uint8Array(32);
@@ -200,6 +201,37 @@ describe('Method: generatePresentationRequest()', () => {
         },
       },
     );
+  });
+
+  it('should reject empty `acceptedVCTValues`', async () => {
+    const rejected = await assertRejects(() =>
+      generatePresentationRequest({
+        credentialOptions: {
+          format: 'sd-jwt-vc',
+          desiredClaims: ['family_name'],
+          acceptedVCTValues: [],
+        },
+        serverAESKeySecret,
+      })
+    );
+
+    assert(rejected instanceof SimpleDigiCredsError);
+    assertEquals(rejected.code, 'InvalidPresentationOptions');
+  });
+
+  it('should reject empty `desiredClaims`', async () => {
+    const rejected = await assertRejects(() =>
+      generatePresentationRequest({
+        credentialOptions: {
+          format: 'mdl',
+          desiredClaims: [],
+        },
+        serverAESKeySecret,
+      })
+    );
+
+    assert(rejected instanceof SimpleDigiCredsError);
+    assertEquals(rejected.code, 'InvalidPresentationOptions');
   });
 
   it('should generate a straightforward European PID mdoc request', async () => {
