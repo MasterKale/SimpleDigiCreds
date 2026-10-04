@@ -40,7 +40,8 @@ export async function generateOID4VPRequest({
    */
   if (!Array.isArray(desiredClaims) || desiredClaims.length === 0) {
     throw new SimpleDigiCredsError({
-      message: 'Empty `desiredClaims` is not allowed',
+      message:
+        'At least one `desiredClaims` must be specified when requesting a presentation using OID4VP',
       code: 'InvalidPresentationOptions',
     });
   }
@@ -95,7 +96,8 @@ export async function generateOID4VPRequest({
      */
     if (!Array.isArray(acceptedVCTValues) || acceptedVCTValues.length === 0) {
       throw new SimpleDigiCredsError({
-        message: 'Empty `acceptedVCTValues` is not allowed',
+        message:
+          'At least one `acceptedVCTValues` must be specified when requesting a presentation of an SD-JWT-VC using OID4VP',
         code: 'InvalidPresentationOptions',
       });
     }
