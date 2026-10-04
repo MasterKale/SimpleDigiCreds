@@ -17,6 +17,7 @@ export type {
   OID4VPClaimQueryMdoc,
   OID4VPCredentialQuery,
   OID4VPCredentialQueryMDL,
+  OID4VPResponseEncryptionJWK,
   OID4VPSupportedMDLClaimName as OID4VPSupportedMdocClaimName,
   PathPointer,
 } from './protocols/oid4vp/types.ts';
