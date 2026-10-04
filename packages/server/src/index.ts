@@ -15,10 +15,16 @@ export type {
 export type {
   OID4VPClaimQuery,
   OID4VPClaimQueryMdoc,
+  OID4VPClientMetadata,
   OID4VPCredentialQuery,
   OID4VPCredentialQueryMDL,
+  OID4VPCredentialQueryMdoc,
+  OID4VPCredentialQuerySDJWTVC,
+  OID4VPCredentialSetQuery,
+  OID4VPDCQLQuery,
   OID4VPResponseEncryptionJWK,
   OID4VPSupportedMDLClaimName as OID4VPSupportedMdocClaimName,
+  OID4VPTrustedAuthoritiesQuery,
   PathPointer,
 } from './protocols/oid4vp/types.ts';
 export type {
