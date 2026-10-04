@@ -1,8 +1,4 @@
-import type {
-  OID4VPClientMetadata,
-  OID4VPCredentialQuery,
-  OID4VPDCQLQuery,
-} from '../protocols/oid4vp/types.ts';
+import type { OID4VPClientMetadata, OID4VPDCQLQuery } from '../protocols/oid4vp/types.ts';
 
 /**
  * Options suitable for passing directly into `navigator.credentials.get()` in the browser to
@@ -57,4 +53,16 @@ export type DCAPIResponse = {
  */
 export type DCAPIEncryptedResponse = {
   response: string;
+};
+
+/**
+ * The shape of the value returned from a call to `navigator.credentials.get({ digital: { ... } })`
+ * when the Wallet returns an error in response to an OID4VP presentation request.
+ *
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-A.4
+ */
+export type DCAPIWalletErrorOID4VP = {
+  /** Ex: `"access_denied"`, `"invalid_request"`, `"vp_formats_not_supported"` */
+  error: string;
+  error_description?: string;
 };

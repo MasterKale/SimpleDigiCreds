@@ -12,6 +12,7 @@ export {
 export type {
   CredentialRequestOptions,
   DCAPIRequestOID4VP,
+  DCAPIWalletErrorOID4VP,
   DigitalCredentialRequest,
   DigitalCredentialRequestOptions,
 } from './dcapi/types.ts';
