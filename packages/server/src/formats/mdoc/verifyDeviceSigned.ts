@@ -6,7 +6,7 @@ import { COSEALG, COSEHEADER, COSEKEYS, isCOSEPublicKeyEC2 } from '../../cose.ts
 import type {
   DecodedDocument,
   MdocCOSESign1SigStructure,
-  MdocIssuerAuthProtected,
+  MdocDeviceAuthProtected,
   MobileSecurityObject,
 } from './types.ts';
 import { SimpleDigiCredsError } from '../../helpers/simpleDigiCredsError.ts';
@@ -114,8 +114,9 @@ export async function verifyDeviceSigned({
       });
     }
 
-    const decodedMdocIssuerAuthProtected = decodeCBOR(issuerAuth[0]) as MdocIssuerAuthProtected;
-    const hashAlg = decodedMdocIssuerAuthProtected.get(COSEHEADER.ALG);
+    // Use the alg from the DeviceSignature's protected header, which may differ from IssuerAuth's
+    const decodedDeviceAuthProtected = decodeCBOR(deviceSignature[0]) as MdocDeviceAuthProtected;
+    const hashAlg = decodedDeviceAuthProtected.get(COSEHEADER.ALG);
 
     verified = await verifyEC2({
       cosePublicKey: devicePublicKey,
