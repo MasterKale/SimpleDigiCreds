@@ -73,12 +73,10 @@ export async function verifyMDocPresentation({
     // x5chain: issuerX5C
   } = await verifyIssuerSigned(document);
   if (!issuerSignedVerified) {
-    console.error('could not verify IssuerSigned (mdoc)');
-    return {
-      claims: {},
-      issuerMeta: {},
-      presentationMeta: { verifiedOrigin: '' },
-    };
+    throw new SimpleDigiCredsError({
+      message: 'Could not verify IssuerSigned',
+      code: 'MdocVerificationError',
+    });
   }
 
   // Verify the device-signed data within the verified issuer-signed data
