@@ -50,7 +50,7 @@ export async function verifyNameSpaces(
 
       const handoverInfoHashBuffer = await crypto.subtle.digest(
         msoDigestAlg,
-        encodeCBOR(issuerSignedItemBytes),
+        encodeCBOR(issuerSignedItemBytes) as Uint8Array_,
       );
       const handoverInfoHashBytes = new Uint8Array(handoverInfoHashBuffer);
 
