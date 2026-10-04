@@ -113,7 +113,7 @@ export async function verifySDJWTPresentation({
   const claims: VerifiedClaimsMap = {};
   decoded.disclosures.forEach((disclosure) => {
     // This might drop ArrayElement disclosures, depending on how @sd-jwt/sd-jwt-vc handles them
-    // https://www.ietf.org/archive/id/draft-ietf-oauth-selective-disclosure-jwt-17.html#section-4.2.2
+    // https://www.rfc-editor.org/rfc/rfc9901.html#section-4.2.2
     if (disclosure.key) {
       claims[disclosure.key] = disclosure.value;
     }
