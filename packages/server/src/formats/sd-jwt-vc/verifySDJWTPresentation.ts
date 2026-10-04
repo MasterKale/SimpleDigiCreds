@@ -1,4 +1,4 @@
-import { type SDJWTVCConfig, SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc';
+import { type SDJWTVCConfig, SDJwtVcInstance, type VerificationResult } from '@sd-jwt/sd-jwt-vc';
 import { type DecodedSDJwt, decodeSdJwt, getClaims } from '@sd-jwt/decode';
 
 import type { IssuerSignedJWTPayload, SDJWTHeader } from '../../formats/sd-jwt-vc/types.ts';
@@ -12,6 +12,10 @@ import { assertKeyBindingJWTClaims } from './assertKeyBindingJWTClaims.ts';
 
 /**
  * Verify an SD-JWT-VC presentation
+ *
+ * References:
+ * - https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.3
+ * - https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-6.1
  */
 export async function verifySDJWTPresentation({
   presentation,
@@ -38,32 +42,46 @@ export async function verifySDJWTPresentation({
     verifier: getIssuerVerifier(decoded.jwt.header as SDJWTHeader),
     hasher: hashSDJWTVCData,
   };
-  let verifyKeyBinding = false;
 
-  if (decoded.kbJwt) {
-    sdJWTVCInstanceConfig.kbVerifier = await getKeyBindingVerifier(decoded.jwt.payload);
-    verifyKeyBinding = true;
+  /**
+   * Every presentation must include a Key Binding JWT, otherwise a presentation could be replayed.
+   * (This is related to `require_cryptographic_holder_binding` which defaults to `true` for now)
+   *
+   * - https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-6.1
+   * - https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html#section-6.1.1.1
+   */
+  sdJWTVCInstanceConfig.kbVerifier = await getKeyBindingVerifier(decoded.jwt.payload);
+  if (!sdJWTVCInstanceConfig.kbVerifier) {
+    throw new SimpleDigiCredsError({
+      message: 'Issuer-signed JWT did not have enough information to verify Key Binding JWT',
+      code: 'SDJWTVerificationError',
+    });
+  }
 
-    if (!sdJWTVCInstanceConfig.kbVerifier) {
-      throw new SimpleDigiCredsError({
-        message: 'Issuer-signed JWT did not have enough information to verify Key Binding JWT',
-        code: 'SDJWTVerificationError',
-      });
-    }
+  if (!decoded.kbJwt) {
+    throw new SimpleDigiCredsError({
+      message: 'Presentation was missing required Key Binding JWT',
+      code: 'SDJWTVerificationError',
+    });
   }
 
   const sdjwtVerifier = new SDJwtVcInstance(sdJWTVCInstanceConfig);
 
-  // @sd-jwt/sd-jwt-vc doesn't export `VerificationResult` so we have to do some TS trickery here
-  let verified: Awaited<ReturnType<SDJwtVcInstance['verify']>>;
+  let verified: VerificationResult;
   try {
     /**
-     * If `verifyKeyBinding` is true then `sdjwtVerifier.verify()` will also take care of verifying
-     * `sd_hash` in the Key Binding JWT
-     *
-     * https://github.com/openwallet-foundation/sd-jwt-js/blob/d2f2cb5a4d9f40e5d90209f572665a9bf1f0844b/packages/core/src/index.ts#L255-L257
+     * Specifying `keyBindingNonce` requires the presence of a Key Binding JWT, and verifies its
+     * signature, `typ`, `nonce`, and `sd_hash`.
      */
-    verified = await sdjwtVerifier.verify(presentation, [], verifyKeyBinding);
+    verified = await sdjwtVerifier.verify(presentation, {
+      keyBindingNonce: nonce,
+      expectedKeyBindingAudience: possibleOrigins.map((origin) => `origin:${origin}`),
+      /**
+       * TODO: Token Status List checking isn't supported yet. Without this the library would
+       * fetch the status list itself and verify it with the credential's signing key.
+       */
+      disableStatusVerification: true,
+    });
   } catch (err) {
     const _err = err as Error;
     throw new SimpleDigiCredsError({
@@ -88,24 +106,22 @@ export async function verifySDJWTPresentation({
 
   assertIssuerSignedJWTClaims({ claims: issuerClaims });
 
-  let verifiedOrigin = '';
-  if (verifyKeyBinding) {
-    // This _shouldn't_ happen but just in case because the typing says `kb` can be undefined
-    if (!verified.kb) {
-      throw new SimpleDigiCredsError({
-        message:
-          'Key Binding JWT was supposedly verified but was not returned for some reason... (oops)',
-        code: 'SDJWTVerificationError',
-      });
-    }
 
-    // Verify the claims in the Key Binding JWT
-    ({ verifiedOrigin } = assertKeyBindingJWTClaims({
-      payload: verified.kb.payload,
-      possibleOrigins,
-      nonce,
-    }));
+  // This _shouldn't_ happen but just in case because the typing says `kb` can be undefined
+  if (!verified.kb) {
+    throw new SimpleDigiCredsError({
+      message:
+        'Key Binding JWT was supposedly verified but was not returned for some reason... (oops)',
+      code: 'SDJWTVerificationError',
+    });
   }
+
+  // Verify the claims in the Key Binding JWT
+  const { verifiedOrigin } = assertKeyBindingJWTClaims({
+    payload: verified.kb.payload,
+    possibleOrigins,
+    nonce,
+  });
 
   /**
    * Everything's fine, collect the disclosures
