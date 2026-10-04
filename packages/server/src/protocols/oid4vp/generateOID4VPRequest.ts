@@ -88,6 +88,18 @@ export async function generateOID4VPRequest({
     }));
   } else if (format === 'sd-jwt-vc') {
     const { acceptedVCTValues } = credentialOptions;
+
+    /**
+     * `vct_values` is REQUIRED and must be non-empty
+     * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-B.3.5
+     */
+    if (!Array.isArray(acceptedVCTValues) || acceptedVCTValues.length === 0) {
+      throw new SimpleDigiCredsError({
+        message: 'Empty `acceptedVCTValues` is not allowed',
+        code: 'InvalidPresentationOptions',
+      });
+    }
+
     ({ credentialQuery, clientMetadata } = generateSDJWTRequestOptions({
       id: requestID,
       desiredClaims,
