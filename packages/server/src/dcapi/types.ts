@@ -19,19 +19,19 @@ export type DigitalCredentialRequestOptions = {
 };
 
 export type DigitalCredentialRequest = {
-  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-A.1-3 */
+  /** https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-A.1 */
   protocol: 'openid4vp-v1-unsigned';
   data: DCAPIRequestOID4VP;
 };
 /**
  * Credential-agnostic OID4VP-specific request parameters
  *
- * https://openid.net/specs/openid-4-verifiable-presentations-1_0-28.html#appendix-A.2
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#appendix-A.2
  */
 export type DCAPIRequestOID4VP = {
   /** The value `"vp_token"` */
   response_type: 'vp_token';
-  /** The value `"dc_api"` (when unsigned and unencrypted) or `"dc_api.jwt"` (when signed or encrypted) */
+  /** The value `"dc_api"` (when unencrypted) or `"dc_api.jwt"` (when encrypted) */
   response_mode: 'dc_api' | 'dc_api.jwt';
   /** Only used for signed requests (not currently supported) */
   client_id?: string;
@@ -65,10 +65,14 @@ export type DCAPIRequestOID4VPSDJWTVC = DCAPIRequestOID4VP & {
 };
 
 /**
- * The shape of the value returned from a call to `navigator.credentials.get({ digital: { ... } })`
+ * The shape of the value returned from a call to `navigator.credentials.get({ digital: { ... } })`.
+ * Each entry in `vp_token` is keyed by a Credential Query `id` and contains an array of one or
+ * more presentations
+ *
+ * https://openid.net/specs/openid-4-verifiable-presentations-1_0.html#section-8.1
  */
 export type DCAPIResponse = {
-  vp_token: { [key: string]: string };
+  vp_token: { [credID: string]: string[] };
 };
 
 /**
