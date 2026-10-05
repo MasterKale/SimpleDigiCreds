@@ -1,5 +1,40 @@
 # Changelog
 
+## v0.6.0
+
+**@simpledigicreds/server** now
+targets[OID4VP 1.0](https://openid.net/specs/openid-4-verifiable-presentations-1_0.html) and
+[OID4VC HAIP 1.0](https://openid.net/specs/openid4vc-high-assurance-interoperability-profile-1_0.html)!
+🎉
+
+**This release contains breaking changes!** Read on to learn more.
+
+- **[server]** Package support for OID4VP + HAIP has been updated to 1.0 for both
+  ([#24](https://github.com/MasterKale/SimpleDigiCreds/pull/24))
+- **[server]** `verifyPresentationResponse()` throws `SimpleDigiCredsError` when a response from a
+  wallet contains an error responses ([#25](https://github.com/MasterKale/SimpleDigiCreds/pull/25))
+- **[server]** `verifyPresentationResponse()` ensures that responses contain expected credential
+  responses, and validates mdoc doctype or SD-JWT-VC vct values
+  ([#26](https://github.com/MasterKale/SimpleDigiCreds/pull/26),
+  [#29](https://github.com/MasterKale/SimpleDigiCreds/pull/29))
+- **[server]** mdoc verification now throws instead of returning empty claims when verification
+  fails ([#27](https://github.com/MasterKale/SimpleDigiCreds/pull/27))
+
+### Breaking Changes
+
+The biggest one is that nonces generated using `generatePresentationOptions()` in v0.5.0 won't be
+usable with `verifyPresentationResponse()` in v0.6.0 due to the addition of new values in v0.6.0
+nonces. Use of this library is basically none-existent for now, though, so I'm not offering a
+migration path for now to keep project momentum moving forward.
+
+Aside from this there are various smaller changes related to targeting OID4VP + HAIP 1.0 that may
+prevent verifying responses from wallets targeting earlier pre-release versions of these
+specifications.
+
+At some point in the future I will be less cavalier about changes like this. But for now if you're
+living on the cutting edge of identity standards and are impacted by these breaking changes, please
+feel free to reach out via issue or email and let me know how you're using this project!
+
 ## v0.5.0
 
 - **[server]** Calls to `verifyPresentationResponse()` can now be stateless if the front end sends
